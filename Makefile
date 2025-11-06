@@ -45,18 +45,15 @@ down: ## Down for C (remove orphans)
 	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) down --remove-orphans
 
 
-shell sh bash: up ## Open bash in the running container
+shell sh bash: ## Open bash in the running container
 	docker exec -it $(CONTAINER) bash
 
 # ===== Workspace helpers =====
-link: up ## (Re)link repo packages into $(WS_IN)/src
+link: 
 	docker exec -it $(CONTAINER) bash -lc 'mkdir -p "$(WS_IN)/src" && cd "$(REPO_IN)" && ./scripts/link_ws.sh "$(WS_REL)"'
 
-colcon: up ## Build the workspace
+colcon: up
 	docker exec -it $(CONTAINER) bash -lc 'cd "$(WS_IN)" && colcon build'
-
-source: up ## Source the workspace then open shell
-	docker exec -it $(CONTAINER) bash -lc '. "$(WS_IN)/install/setup.bash" || true; bash'
 
 launch: ## Up -> ensure WS -> deps -> build -> source -> shell
 	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) up -d --build

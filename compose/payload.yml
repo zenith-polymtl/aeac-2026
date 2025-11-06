@@ -1,5 +1,5 @@
 services:
-  dev:
+  payload:
     build:
       context: ..
       dockerfile: docker/dockerfile.dev

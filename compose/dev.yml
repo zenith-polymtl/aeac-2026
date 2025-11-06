@@ -9,5 +9,5 @@ services:
     stdin_open: true
     volumes:
       - ..:/aeac
-    working_dir: /aeac/${WS}     # set WS in .env, e.g. workspaces/small_ws
+    working_dir: /aeac/workspaces    # set WS in .env, e.g. workspaces/small_ws
     command: ["bash","-lc","while :; do sleep 86400; done"]
