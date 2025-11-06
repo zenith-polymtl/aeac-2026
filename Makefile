@@ -44,8 +44,8 @@ up: ## Up (detached) for C, rebuild if needed
 down: ## Down for C (remove orphans)
 	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) down --remove-orphans
 
-shell sh bash: ## Open bash in the running container
-	docker exec -it $(CONTAINER) bash
+shell sh bash: ## Open bash in the running container (with ROS sourced)
+	docker exec -it $(CONTAINER) bash -lc "source /opt/ros/humble/setup.bash && exec bash -i"
 
 # ===== Workspace helpers =====
 link: 
