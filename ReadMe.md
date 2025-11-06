@@ -8,3 +8,8 @@ alias aeac-run='docker exec -it aeac-dev bash -lc "source /opt/ros/humble/setup.
 
 
 docker exec -it aeac-dev bash
+
+sudo chown -R $USER:$USER  ~/aeac-2026/packages/nav_stack \
+                           ~/aeac-2026/packages/custom_interfaces \
+                           ~/aeac-2026/packages/tools \
+                           ~/aeac-2026/packages/UI
