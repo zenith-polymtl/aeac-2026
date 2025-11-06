@@ -1,0 +1,13 @@
+services:
+  dev:
+    build:
+      context: ..
+      dockerfile: docker/dockerfile.dev
+    container_name: aeac-dev
+    network_mode: host
+    tty: true
+    stdin_open: true
+    volumes:
+      - ..:/aeac
+    working_dir: /aeac/${WS}     # set WS in .env, e.g. workspaces/small_ws
+    command: ["bash","-lc","while :; do sleep 86400; done"]
