@@ -1,0 +1,6 @@
+# ------------ ROS 2 / colcon artifacts ------------
+# Per-workspace build products
+workspaces/*/build/
+workspaces/*/install/
+workspaces/*/log/
+workspaces/*/.colcon/

@@ -1,25 +1,31 @@
 #!/usr/bin/env bash
-# Usage: scripts/link_ws.sh workspaces/ws_heavy_task_2
-set -e
-WS_DIR="$1"
-[ -z "$WS_DIR" ] && { echo "Usage: $0 <workspace_dir>"; exit 1; }
+set -euo pipefail
+
+WS_DIR="${1:?Usage: $0 <workspace_dir>}"
 PKGLIST="$WS_DIR/pkgs.txt"
 SRC="$WS_DIR/src"
 
 [ -f "$PKGLIST" ] || { echo "Missing $PKGLIST"; exit 1; }
 mkdir -p "$SRC"
 
-# Clean old links only (do not delete real dirs)
-find "$SRC" -maxdepth 1 -mindepth 1 -type l -exec rm -f {} \;
+# repo root (works whether inside meta-repo or via symlink)
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || realpath "$(cd "$(dirname "$0")/.." && pwd)")"
 
-# Create fresh links
-while read -r PKG; do
-  [ -z "$PKG" ] && continue
-  if [ ! -d "packages/$PKG" ]; then
-    echo "ERROR: packages/$PKG does not exist"
-    exit 2
-  fi
-  ln -s "../../packages/$PKG" "$SRC/$PKG"
+# remove old symlinks only
+find "$SRC" -mindepth 1 -maxdepth 1 -type l -exec rm -f {} \;
+
+while IFS= read -r PKG; do
+  [[ -z "$PKG" || "$PKG" =~ ^# ]] && continue
+  PKG_PATH="$ROOT/packages/$PKG"
+  [ -d "$PKG_PATH" ] || { echo "ERROR: $PKG_PATH not found"; exit 2; }
+
+  # make a RELATIVE symlink so it works both on host and in container
+  REL_TARGET="$(realpath --relative-to="$SRC" "$PKG_PATH" 2>/dev/null || python3 - <<PY
+import os,sys
+print(os.path.relpath("$PKG_PATH","$SRC"))
+PY
+)"
+  ln -s "$REL_TARGET" "$SRC/$PKG"
   echo "linked $PKG"
 done < "$PKGLIST"
 
