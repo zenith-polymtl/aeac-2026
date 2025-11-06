@@ -1,0 +1,12 @@
+[submodule "packages/custom_interfaces"]
+	path = packages/custom_interfaces
+	url = https://github.com/Astro-Coco/custom_interfaces
+[submodule "packages/UI"]
+	path = packages/UI
+	url = https://github.com/Astro-Coco/UI
+[submodule "packages/tools"]
+	path = packages/tools
+	url = https://github.com/Astro-Coco/tools
+[submodule "packages/nav_stack"]
+	path = packages/nav_stack
+	url = https://github.com/Astro-Coco/nav_stack
