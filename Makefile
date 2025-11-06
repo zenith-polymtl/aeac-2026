@@ -44,7 +44,6 @@ up: ## Up (detached) for C, rebuild if needed
 down: ## Down for C (remove orphans)
 	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) down --remove-orphans
 
-
 shell sh bash: ## Open bash in the running container
 	docker exec -it $(CONTAINER) bash
 
@@ -52,19 +51,14 @@ shell sh bash: ## Open bash in the running container
 link: 
 	docker exec -it $(CONTAINER) bash -lc 'mkdir -p "$(WS_IN)/src" && cd "$(REPO_IN)" && ./scripts/link_ws.sh "$(WS_REL)"'
 
-colcon: up
-	docker exec -it $(CONTAINER) bash -lc 'cd "$(WS_IN)" && colcon build'
+launch: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'colcon build && source install/setup.bash && exec bash -i'
 
-launch: ## Up -> ensure WS -> deps -> build -> source -> shell
-	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) up -d --build
-	docker exec -it $(CONTAINER) bash -lc 'mkdir -p "$(WS_IN)/src" && cd "$(WS_IN)"  && colcon build && . install/setup.bash && bash'
 
 clean: ## Remove build/install/log (host + container)
 	-rm -rf "$(WS_REL)/build" "$(WS_REL)/install" "$(WS_REL)/log"
 	-docker exec -it $(CONTAINER) bash -lc 'rm -rf "$(WS_IN)/build" "$(WS_IN)/install" "$(WS_IN)/log"'
-
-ensure-submodules: up ## Init/update submodules inside container
-	docker exec -it $(CONTAINER) bash -lc 'cd "$(REPO_IN)" && ./scripts/ensure_submodules.sh'
 
 # ===== Multi-compose convenience =====
 build-all: ## Build all compose files
@@ -82,7 +76,7 @@ down-all: ## Down all compose files + orphans
 	  C=$$(basename $$f .yml); WS=workspaces/$${C}_ws docker compose -f $$f down --remove-orphans || true; \
 	done
 
-nuke-images: ## Delete local images/volumes for these composes
+delete-images: ## Delete local images/volumes for these composes
 	@for f in $(COMPOSES); do \
 	  C=$$(basename $$f .yml); WS=workspaces/$${C}_ws docker compose -f $$f down --rmi local --volumes --remove-orphans || true; \
 	done
@@ -94,5 +88,5 @@ nuke-all: ## Stop everything + remove images/volumes + wipe all WS artifacts
 	  echo "*** cleaning $$ws"; rm -rf "$$ws/build" "$$ws/install" "$$ws/log"; \
 	done
 
-.PHONY: help print-vars build up down ps logs shell sh bash link deps colcon source launch clean ensure-submodules \
+.PHONY: help print-vars build up down shell sh bash launch clean \
         build-all up-all down-all nuke-images nuke-all
