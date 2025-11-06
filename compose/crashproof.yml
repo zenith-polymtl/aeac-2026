@@ -1,0 +1,17 @@
+services:
+  dev:
+    build:
+      context: ..
+      dockerfile: docker/dockerfile.dev
+    container_name: recon
+    network_mode: host
+    tty: true
+    stdin_open: true
+    volumes:
+      - ../workspaces/small_ws:/small_ws
+      - ../packages/nav_stack:/small_ws/src/nav_stack
+      - ../packages/UI:/small_ws/src/UI
+      - ../packages/tools:/small_ws/src/tools
+      - ../packages/custom_interfaces:/small_ws/src/custom_interfaces
+    working_dir: /small_ws     # set WS in .env, e.g. workspaces/small_ws
+    command: ["bash","-lc","while :; do sleep 86400; done"]
