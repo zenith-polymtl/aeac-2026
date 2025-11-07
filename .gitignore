@@ -4,3 +4,7 @@ workspaces/*/build/
 workspaces/*/install/
 workspaces/*/log/
 workspaces/*/.colcon/
+workspaces/build/
+workspaces/install/
+workspaces/log/
+workspaces/.colcon/

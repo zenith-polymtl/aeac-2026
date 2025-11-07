@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'state'
+package_name = 'water_payload'
 
 setup(
     name=package_name,

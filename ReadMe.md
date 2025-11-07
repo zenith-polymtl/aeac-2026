@@ -9,10 +9,7 @@ docker exec -it aeac-dev bash
 
 If not able to create or delete files in the repo packages:
 
-sudo chown -R $USER:$USER  ~/aeac-2026/packages/nav_stack \
-                           ~/aeac-2026/packages/custom_interfaces \
-                           ~/aeac-2026/packages/tools \
-                           ~/aeac-2026/packages/UI
+sudo chown -R $USER:$USER  ~/aeac-2026/
 
 
 To link packages to a ws :

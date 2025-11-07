@@ -51,13 +51,14 @@ shell sh bash: ## Open bash in the running container (with ROS sourced)
 link: 
 	docker exec -it $(CONTAINER) bash -lc 'mkdir -p "$(WS_IN)/src" && cd "$(REPO_IN)" && ./scripts/link_ws.sh "$(WS_REL)"'
 
+
 launch: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	  bash -lc 'colcon build && source install/setup.bash && exec bash -i'
+	  bash -lc 'source /opt/ros/humble/setup.bash && colcon build && source install/setup.bash && exec bash -i'
 
 
 clean: ## Remove build/install/log (host + container)
-	-rm -rf "$(WS_REL)/build" "$(WS_REL)/install" "$(WS_REL)/log"
+	sudo rm -rf "$(WS_REL)/build" "$(WS_REL)/install" "$(WS_REL)/log" "workspaces/install" "workspaces/log" "workspaces/build"
 	-docker exec -it $(CONTAINER) bash -lc 'rm -rf "$(WS_IN)/build" "$(WS_IN)/install" "$(WS_IN)/log"'
 
 # ===== Multi-compose convenience =====
@@ -85,7 +86,7 @@ nuke-all: ## Stop everything + remove images/volumes + wipe all WS artifacts
 	$(MAKE) down-all || true
 	$(MAKE) nuke-images || true
 	@for ws in $(patsubst compose/%.yml,workspaces/%_ws,$(COMPOSES)); do \
-	  echo "*** cleaning $$ws"; rm -rf "$$ws/build" "$$ws/install" "$$ws/log"; \
+	  echo "*** cleaning $$ws"; sudo rm -rf "$$ws/build" "$$ws/install" "$$ws/log"; \
 	done
 
 .PHONY: help print-vars build up down shell sh bash launch clean \
