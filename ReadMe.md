@@ -35,3 +35,4 @@ To start the docker:
 (-d tag for detached mode)
 docker compose -f compose/crashproof.yml up 
 
+## pkgs.txt file must have a newline at the end to work!!!!! Else will not link
