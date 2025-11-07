@@ -1,6 +1,7 @@
-# ===== Select compose (dev|payload|recon|water) =====
+# ===== Select compose (dev|payload|recon|water|relay) =====
 C ?= dev
 DOMAIN ?= 2
+TCP_PORT ?= 5762
 # ----- Paths / names -----
 COMPOSE_FILE := compose/$(C).yml
 CONTAINER    ?= aeac-$(C)
@@ -71,6 +72,9 @@ launch: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'source /opt/ros/humble/setup.bash && colcon build && source install/setup.bash && exec bash -i'
 
+mavros-sim: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'export ROS_DOMAIN_ID=$(DOMAIN) && source /opt/ros/humble/setup.bash && ros2 daemon start && ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:$(TCP_PORT) fcu_protocol:=v2.0'
 
 clean: ## Remove build/install/log (host + container)
 	sudo rm -rf "$(WS_REL)/build" "$(WS_REL)/install" "$(WS_REL)/log" "workspaces/install" "workspaces/log" "workspaces/build"
@@ -81,11 +85,6 @@ build-all: ## Build all compose files
 	@for f in $(COMPOSES); do \
 	  C=$$(basename $$f .yml); WS=workspaces/$${C}_ws docker compose -f $$f build || exit $$?; \
 	done
-
-mavros-sim: up
-	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	  bash -lc 'export ROS_DOMAIN_ID=$(DOMAIN) && source /opt/ros/humble/setup.bash && ros2 daemon start && ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:5762 fcu_protocol:=v2.0'
-
 
 up-all: ## Up all compose files (detached)
 	@for f in $(COMPOSES); do \

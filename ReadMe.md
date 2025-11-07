@@ -38,12 +38,22 @@ docker compose -f compose/crashproof.yml up
 ## pkgs.txt file must have a newline at the end to work!!!!! Else will not link
 
 Pour créer un package :
-initialiser un repo (terminal ou git web)
+# Wherever you want the repo folder to live
+mkdir my_new_repo && cd my_new_repo
+git init -b main
+echo "# my_new_repo" > README.md
+printf ".venv/\nbuild/\n*.log\n" > .gitignore
+
+git add .
+git commit -m "chore: init repo"
+
+
 ajouter aux sous modules :
 git submodule add -b main https://github.com/Astro-Coco/<repo_name>.git packages/<repo_name>
 git add .gitmodules packages/bringup
 git commit -m "register bringup as proper submodule"
 git push
+git submodule update --init --recursive
 
 ajouter le package au pkgs.txt *attention de bien mettre le dernier new line
 
