@@ -1,0 +1,9 @@
+services:  
+  mavlink-router:  
+    build:  
+      context: .  
+      dockerfile: ../docker/dockerfile.relay
+    container_name: mavlink-router  
+    network_mode: "host"  
+    stdin_open: true  
+    tty: true

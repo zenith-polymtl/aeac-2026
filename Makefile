@@ -12,6 +12,10 @@ WS_REL := workspaces/$(C)_ws
 REPO_IN := /aeac
 WS_IN   := $(REPO_IN)/$(WS_REL)
 
+#Relay settings
+DEVICE ?= /dev/ttyUSB0
+BAUD   ?= 57600
+
 # Host UID/GID so files aren’t root-owned
 UID ?= $(shell id -u)
 GID ?= $(shell id -g)
@@ -34,9 +38,19 @@ print-vars: ## Show resolved variables (debug)
 	@echo "WS_REL=$(WS_REL)"
 	@echo "WS_IN=$(WS_IN)"
 
+
+relay: ## Start SIYI relay (UDP 14540 → MAVROS, Pymavlink, Mission Planner)
+	docker compose -f compose/siyi.yml up -d --build
+	@echo "🚀 SIYI relay running"
+
+
+relay-down:
+	@docker compose -f compose/siyi.yml down
+
 # ===== Docker lifecycle (selected compose) =====
 build: ## Build image for C
 	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) build
+
 
 up: ## Up (detached) for C, rebuild if needed
 	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) up -d --build
@@ -90,4 +104,4 @@ nuke-all: ## Stop everything + remove images/volumes + wipe all WS artifacts
 	done
 
 .PHONY: help print-vars build up down shell sh bash launch clean \
-        build-all up-all down-all nuke-images nuke-all
+        build-all up-all down-all nuke-images nuke-all relay relay-down
