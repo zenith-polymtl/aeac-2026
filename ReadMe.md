@@ -48,3 +48,9 @@ git push
 ajouter le package au pkgs.txt *attention de bien mettre le dernier new line
 
 ./scripts/link_ws.sh workspaces/
+
+
+mavlink-routerd -t 5764 -p 127.0.0.1:5762
+
+mavlink-routerd -t 5764 -e 127.0.0.1:5762
+mavlink-routerd -t 5764  127.0.0.1:5762

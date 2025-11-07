@@ -40,12 +40,12 @@ print-vars: ## Show resolved variables (debug)
 
 
 relay: ## Start SIYI relay (UDP 14540 → MAVROS, Pymavlink, Mission Planner)
-	docker compose -f compose/siyi.yml up -d --build
+	docker compose -f compose/relay.yml up -d --build
 	@echo "🚀 SIYI relay running"
 
 
 relay-down:
-	@docker compose -f compose/siyi.yml down
+	@docker compose -f compose/relay.yml down
 
 # ===== Docker lifecycle (selected compose) =====
 build: ## Build image for C
