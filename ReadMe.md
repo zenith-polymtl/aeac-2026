@@ -59,6 +59,7 @@ ajouter le package au pkgs.txt *attention de bien mettre le dernier new line
 
 ./scripts/link_ws.sh workspaces/
 
+echo "$RMW_IMPLEMENTATION"
 
 mavlink-routerd -t 5764 -e 127.0.0.1:14554
 

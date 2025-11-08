@@ -15,3 +15,6 @@ services:
       - ../packages/custom_interfaces:/recon_ws/src/custom_interfaces
     working_dir: /recon_ws
     command: ["bash","-lc","while :; do sleep 86400; done"]
+    environment:  
+      - ROS_DOMAIN_ID=2
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
