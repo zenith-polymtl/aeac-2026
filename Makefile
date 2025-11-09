@@ -79,6 +79,7 @@ connect: up
 
 
 	  
+
 launch: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	bash -lc 'source /opt/ros/humble/setup.bash && colcon build && source install/setup.bash && exec bash -lc "source /opt/ros/humble/setup.bash && ros2 daemon start && bash"'
