@@ -6,7 +6,7 @@ TCP_PORT ?= 5762
 COMPOSE_FILE := compose/$(C).yml
 CONTAINER    ?= aeac-$(C)
 
-DRONE_IP ?= 192.168.0.13:7447
+DRONE_IP ?= 192.168.0.13
 
 # Workspace path RELATIVE to repo root (e.g., workspaces/dev_ws)
 WS_REL := workspaces/$(C)_ws
@@ -74,7 +74,7 @@ connect: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'source /opt/ros/humble/setup.bash && colcon build && source install/setup.bash && \
 	  export RMW_IMPLEMENTATION=rmw_zenoh_cpp && \
-	  export ZENOH_CONFIG_OVERRIDE="mode=\"client\";connect/endpoints=[\"tcp/$(DRONE_IP)\"]" && \
+	  export ZENOH_CONFIG_OVERRIDE="mode=\"client\";connect/endpoints=[\"tcp/$(DRONE_IP):7447\"]" && \
 	  source /opt/ros/humble/setup.bash && ros2 daemon start && bash'
 
 
