@@ -78,8 +78,6 @@ connect: up
 	  source /opt/ros/humble/setup.bash && ros2 daemon start && bash'
 
 
-	  
-
 launch: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	bash -lc 'source /opt/ros/humble/setup.bash && colcon build && source install/setup.bash && nohup ros2 run rmw_zenoh_cpp rmw_zenohd > /tmp/zenohd.log 2>&1 & exec bash -lc "source /opt/ros/humble/setup.bash && ros2 daemon start && bash"'
@@ -126,5 +124,5 @@ nuke-all: ## Stop everything + remove images/volumes + wipe all WS artifacts
 	  echo "*** cleaning $$ws"; sudo rm -rf "$$ws/build" "$$ws/install" "$$ws/log"; \
 	done
 
-.PHONY: help print-vars build up down shell sh bash launch clean \
+.PHONY: help print-vars build up down connect mavros-sim shell sh bash launch clean \
         build-all up-all down-all nuke-images nuke-all relay relay-down
