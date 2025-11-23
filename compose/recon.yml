@@ -10,11 +10,11 @@ services:
     volumes:
       - ../workspaces/recon_ws:/recon_ws
       - ../packages/nav_stack:/recon_ws/src/nav_stack
-      - ../packages/UI:/recon_ws/src/UI
       - ../packages/tools:/recon_ws/src/tools
+      - ../packages/vision:/recon_ws/src/vision
       - ../packages/custom_interfaces:/recon_ws/src/custom_interfaces
     working_dir: /recon_ws
     command: ["bash","-lc","while :; do sleep 86400; done"]
     environment:  
       - ROS_DOMAIN_ID=2
-      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - RMW_IMPLEMENTATION=rmw_zenoh_cpp

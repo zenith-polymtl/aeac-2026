@@ -18,3 +18,7 @@
 	path = packages/vision
 	url = https://github.com/zenith-polymtl/vision
 	branch = main
+[submodule "packages/polar_system"]
+	path = packages/polar_system
+	url = https://github.com/zenith-polymtl/polar_system.git
+	branch = main

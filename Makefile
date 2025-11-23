@@ -91,6 +91,13 @@ mavros-sim: up
 	  nohup ros2 run rmw_zenoh_cpp rmw_zenohd > /tmp/zenohd.log 2>&1 & \
 	  ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:$(TCP_PORT) fcu_protocol:=v2.0'
 
+mavros-ofa: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'export ROS_DOMAIN_ID=$(DOMAIN); \
+	  source /opt/ros/humble/setup.bash; \
+	  ros2 daemon start; \
+	  nohup ros2 run rmw_zenoh_cpp rmw_zenohd > /tmp/zenohd.log 2>&1 & \
+	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200 fcu_protocol:=v2.0'
 
 clean: ## Remove build/install/log (host + container)
 	sudo rm -rf "$(WS_REL)/build" "$(WS_REL)/install" "$(WS_REL)/log" "workspaces/install" "workspaces/log" "workspaces/build"
