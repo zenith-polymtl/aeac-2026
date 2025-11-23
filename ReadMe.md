@@ -145,15 +145,13 @@ Update submodules so everythin is up to date :
 
  ./scripts/ensure_submodules.sh
 
- .env file to precise which workspace to launch
-
 
 build a specific docker :
 
 * Change crashproof.yml for the docker compose you want
 docker compose -f compose/crashproof.yml build
 
-Possible to add a tage after build to specify the service needed (check compose for services)
+Possible to add a tag after build to specify the service needed (check compose for services)
 
 
 To start the docker:
