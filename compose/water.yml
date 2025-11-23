@@ -14,6 +14,7 @@ services:
       - ../packages/polar_system:/water_ws/src/polar_system
       - ../packages/tools:/water_ws/src/tools
       - ../packages/vision:/water_ws/src/vision
+      - ../packages/ros2_gremsy:/water_ws/src/ros2_gremsy
       - ../packages/custom_interfaces:/water_ws/src/custom_interfaces
     working_dir: /water_ws     # set WS in .env, e.g. workspaces/water_ws
     command: ["bash","-lc","while :; do sleep 86400; done"]
