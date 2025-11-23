@@ -17,4 +17,4 @@ services:
     command: ["bash","-lc","while :; do sleep 86400; done"]
     environment:  
       - ROS_DOMAIN_ID=2
-      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - RMW_IMPLEMENTATION=rmw_zenoh_cpp

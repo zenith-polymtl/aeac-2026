@@ -1,0 +1,61 @@
+# syntax=docker/dockerfile:1.6
+ARG ROS_DISTRO=humble
+FROM --platform=$TARGETPLATFORM ros:${ROS_DISTRO}-ros-base
+
+ARG TARGETPLATFORM
+ENV DEBIAN_FRONTEND=noninteractive
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Update & install ROS/colcon build tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    python3-colcon-common-extensions \
+    && rm -rf /var/lib/apt/lists/*
+
+# Critical mavros package for UAV communication
+RUN apt-get update && apt-get install -y \  
+    ros-${ROS_DISTRO}-mavros \  
+    && rm -rf /var/lib/apt/lists/*  
+  
+# Install GeographicLib datasets (required for mavros)  
+RUN apt-get update && apt-get install -y wget \  
+    && wget https://raw.githubusercontent.com/mavlink/mavros/ros2/mavros/scripts/install_geographiclib_datasets.sh \  
+    && chmod +x install_geographiclib_datasets.sh \  
+    && ./install_geographiclib_datasets.sh \  
+    && rm install_geographiclib_datasets.sh \  
+    && rm -rf /var/lib/apt/lists/*
+
+#Zenoh rmw implementation for ros2
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-humble-rmw-zenoh-cpp \
+ && rm -rf /var/lib/apt/lists/*
+
+
+#ping utils and demo nodes for testing could remove if sure all is working
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    iputils-ping \
+    iproute2 \
+    ros-humble-demo-nodes-cpp \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install tf_transformations for ROS 2 
+#Require for polar system package 
+RUN apt-get update && apt-get install -y \  
+    ros-${ROS_DISTRO}-tf-transformations \  
+    && rm -rf /var/lib/apt/lists/*
+
+# Install python3, pip and numpy
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    python3-numpy \
+    && python3 -m pip install --upgrade pip \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG UID=1000
+ARG GID=1000
+RUN groupadd -g $GID dev && useradd -m -u $UID -g $GID dev
+USER dev
+
+WORKDIR /app

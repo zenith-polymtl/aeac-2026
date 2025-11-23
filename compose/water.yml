@@ -2,19 +2,21 @@ services:
   water:
     build:
       context: ..
-      dockerfile: docker/dockerfile.dev
+      dockerfile: docker/dockerfile.water
     container_name: aeac-${C}
     network_mode: host
     tty: true
     stdin_open: true
     volumes:
       - ../workspaces/water_ws:/water_ws
+      - ../workspaces/bringup:/water_ws/src/bringup
       - ../packages/nav_stack:/water_ws/src/nav_stack
-      - ../packages/UI:/water_ws/src/UI
+      - ../packages/polar_system:/water_ws/src/polar_system
       - ../packages/tools:/water_ws/src/tools
+      - ../packages/vision:/water_ws/src/vision
       - ../packages/custom_interfaces:/water_ws/src/custom_interfaces
     working_dir: /water_ws     # set WS in .env, e.g. workspaces/water_ws
     command: ["bash","-lc","while :; do sleep 86400; done"]
     environment:  
       - ROS_DOMAIN_ID=2
-      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - RMW_IMPLEMENTATION=rmw_zenoh_cpp
