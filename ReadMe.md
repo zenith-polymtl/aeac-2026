@@ -158,6 +158,76 @@ To start the docker:
 (-d tag for detached mode)
 docker compose -f compose/crashproof.yml up 
 
+### ***Si ```colcon build``` fail (pendant le quick start):***
+
+* si c'est qqch comme ça: " PermissionError: [Errno 13] Permission denied: 'log' "
+* Le problème peut être que tu es dans root --> root@tonNom:~/aeac-2026#
+* Assure‑toi que le dossier du projet appartient à ton user normal (pas à root):
+  ```bash
+  cd ~/aeac-2026
+  ls -ld .
+  ls -ld workspaces
+  ```
+  Si tu vois ```root root```, corrige:
+  ```bash
+  sudo chown -R $USER:$USER  ~/aeac-2026/
+  ```
+  Si ça marche toujours pas continue avec les étapes.
+* Si tu n’as que root et pas d’autre compte “normal”, tu peux en créer un
+  
+   * Dans WSL (en root), fait la commande:
+     ```bash
+     adduser tonNom
+     ```
+   * Il va te demander un mot de passe, quelques infos (que tu peux laisser vides en appuyant sur Entrée)
+* Ensuite, tu peux tester:
+  ```bash
+  su - tonNom
+  whoami #vérifie qui tu es
+  pwd
+  ```
+* tu devrais voir qqch genre:
+  ```bash
+  tonNom@qqch:~$
+  ```
+* C’est ce compte-là que tu utiliseras pour:
+   * cloner le repo,
+   * lancer Docker,
+   * travailler dans ~/aeac-2026 (pas dans /root/...)
+* Définir ce user comme “par défaut” dans WSL
+* Pour ne plus arriver en root à chaque ouverture de WSL, tu peux dire à WSL:
+   * ouvre une session avec l’utilisateur tonNom:
+   * Dans PowerShell (hors WSL), tape:
+       ```powershell
+       wsl -l -v
+       ```
+   * Ça te donne le nom de ta distro (par ex. Ubuntu, Ubuntu-22.04, etc.).
+       ```powershell
+       wsl -d <NomDeTaDistro> -u tonNom
+       ```
+   * Si ça marche, tu as un shell WSL en tant que tonNom. Pour le mettre comme user par défaut, dans WSL, en root:
+       ```bash
+       nano /etc/wsl.conf
+       ```
+       * ajoute (ou modifie) ça dans le fichier:
+       ```text
+       [user]
+       default=tonNom
+       ```
+       repart WSL (dans Powershell) :
+       ```text
+       wsl --shutdown
+       ```
+       puis
+       ```text
+       wsl -d Ubuntu-22.04
+       ```
+   * à chaque fois que tu vas ouvrir WSL maintenant tu devrais voir:
+       ```bash
+       tonNom@tonNom #ou tonNom@qqch
+       ```
+### *fin des étapes du ```colcon build``` fail^*
+
 ## pkgs.txt file must have a newline at the end to work!!!!! Else will not link
 
 Pour créer un package :
