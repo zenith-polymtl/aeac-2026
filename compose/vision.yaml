@@ -17,7 +17,7 @@ services:
     
     volumes:
       - /run/udev:/run/udev:ro
-      - ./workspaces/vision_ws:/ros2_ws:rw
+      - ../workspaces/vision_ws:/ros2_ws:rw
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ~/.Xauthority:/root/.Xauthority:ro
     
@@ -25,18 +25,21 @@ services:
       bash -lc "
         set -euo pipefail
 
+        export AMENT_TRACE_SETUP_FILES=${AMENT_TRACE_SETUP_FILES:-}
+        export AMENT_PYTHON_EXECUTABLE=${AMENT_PYTHON_EXECUTABLE:-$(which python3)}
+        export COLCON_PREFIX_PATH=${COLCON_PREFIX_PATH:-}
+
         source /opt/ros/humble/setup.bash
         cd /ros2_ws || exit 1
 
         colcon build --symlink-install || true
-        source install/setup.bash || true
+
+        set +u
+        source install/local_setup.bash 2>/dev/null || true
+        source install/setup.bash 2>/dev/null || true
+        set -u
 
         ros2 daemon start || true
-
-        # Test caméra (optionnel)
-        libcamera-hello --timeout 0 &
-
-        # Lance ton node camera_pub
         ros2 run camera_pub camera_publisher &
 
         tail -f /dev/null
