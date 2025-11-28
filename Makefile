@@ -97,7 +97,7 @@ mavros-ofa: up
 	  source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
 	  nohup ros2 run rmw_zenoh_cpp rmw_zenohd > /tmp/zenohd.log 2>&1 & \
-	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200 fcu_protocol:=v2.0'
+	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200'
 
 clean: ## Remove build/install/log (host + container)
 	sudo rm -rf "$(WS_REL)/build" "$(WS_REL)/install" "$(WS_REL)/log" "workspaces/install" "workspaces/log" "workspaces/build"
