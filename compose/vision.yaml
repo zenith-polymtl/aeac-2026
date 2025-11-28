@@ -1,0 +1,47 @@
+# docker-compose.yml
+services:
+  vision:
+    build:
+      context: .
+      dockerfile: ../docker/dockerfile.vision
+    network_mode: host
+    privileged: true
+    ipc: host
+    tty: true
+    stdin_open: true
+    
+    devices:
+      - /dev/vchiq:/dev/vchiq
+      - /dev/video0:/dev/video0
+      - /dev/video10:/dev/video10
+    
+    volumes:
+      - /run/udev:/run/udev:ro
+      - ./ros2_ws:/ros2_ws:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ~/.Xauthority:/root/.Xauthority:ro
+    
+    command: >
+      bash -c "
+        source /opt/ros/humble/setup.bash &&
+        source /ros2_ws/install/setup.bash &&
+        ros2 daemon start &&
+        ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:5763 &
+        
+        # Test caméra (optionnel)
+        libcamera-hello --timeout 0 &
+        
+        # Lance ton node caméra ROS2
+        ros2 run ton_package camera_publisher &
+        
+        tail -f /dev/null
+      "
+    
+    environment:
+      - ROS_DOMAIN_ID=1
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - XAUTHORITY=/root/.Xauthority
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - LIBCAMERA_LOG_LEVELS=*:DEBUG
+    restart: unless-stopped
