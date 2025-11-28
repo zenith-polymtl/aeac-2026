@@ -22,13 +22,22 @@ services:
       - ~/.Xauthority:/root/.Xauthority:ro
     
     command: >
-      bash -c "
-        source /opt/ros/humble/setup.bash &&
-        source /ros2_ws/install/setup.bash &&
-        ros2 daemon start &&
-        
+      bash -lc "
+        set -euo pipefail
+
+        source /opt/ros/humble/setup.bash
+        cd /ros2_ws || exit 1
+
+        colcon build --symlink-install || true
+        source install/setup.bash || true
+
+        ros2 daemon start || true
+
         # Test caméra (optionnel)
         libcamera-hello --timeout 0 &
+
+        # Lance ton node camera_pub
+        ros2 run camera_pub camera_publisher &
 
         tail -f /dev/null
       "
