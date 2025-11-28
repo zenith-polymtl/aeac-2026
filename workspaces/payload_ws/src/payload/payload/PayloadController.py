@@ -10,10 +10,6 @@ PWM_MIN = 1100
 PWM_MID = 1500
 PWM_MAX = 1900
 
-# class PayloadState(enum):
-#     OPENED = PWM_MID
-#     CLOSED = PWM_MIN
-
 class PayloadController(Node):
     def __init__(self):
         super().__init__('PayloadController')
