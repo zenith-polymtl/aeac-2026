@@ -8,25 +8,36 @@
 #include <map>
 #include <functional>
 
-using custom_interfaces::msg::WaterState;
+// This line make is possible to use water state and use it as simply WaterState
+using WaterState = custom_interfaces::msg::WaterState;
 
 class MissionStatsController : public rclcpp::Node
 {
 public:
-  MissionStatsController();
+	MissionStatsController();
 
 private:
-  uint8_t current_state_ = WaterState::IDLE;
+	// void handleAskStateChange(const custom_interfaces::msg::WaterState msg);
 
-  // void handleAskStateChange(const custom_interfaces::msg::WaterState msg);
+	/// @brief This function handle the transition between state
+	/// @param state This is the state that we should change to
+	void handleStateChange(const WaterState state);
 
-  void handleStateChange(const custom_interfaces::msg::WaterState msg);
+	/// @brief This function handle when the Error state occure
+	void enterErrorState();
 
-  // Publisher
-  rclcpp::Publisher<custom_interfaces::msg::WaterState>::SharedPtr state_publisher_;
-  
-  // Subscriber
-  rclcpp::Subscription<custom_interfaces::msg::WaterState>::SharedPtr ask_state_change_subscriber_;
+	void HandleSwitchToIddle();
+
+	void HandleSwitchToActive();
+
+	/// @brief This variable holds the current state of the mission. Initale state is IDLE
+	uint8_t current_state_ = WaterState::IDLE;
+
+	// Publishers
+	rclcpp::Publisher<WaterState>::SharedPtr state_publisher_;
+
+	// Subscribers
+	rclcpp::Subscription<WaterState>::SharedPtr ask_state_change_subscriber_;
 };
 
 #endif // MISSION_STATS_CONTROLLER_HPP_
