@@ -1,0 +1,22 @@
+services:
+  dev:
+    build:
+      context: ..
+      dockerfile: docker/dockerfile.nvidia_dev
+    container_name: aeac-${C}
+    network_mode: host
+    tty: true
+    ipc: host
+    privileged: true
+    stdin_open: true
+    gpus: all
+    volumes:
+      - ..:/aeac
+    working_dir: /aeac/workspaces    # set WS in .env, e.g. workspaces/small_ws
+    command: ["bash","-lc","tail -f /dev/null"]
+    environment:  
+      - ROS_DOMAIN_ID=2
+      - RMW_IMPLEMENTATION=rmw_zenoh_cpp
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility
+  

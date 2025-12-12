@@ -5,7 +5,7 @@ ARG UBUNTU_MINOR=04
 ARG CUDA_VERSION=12.6.3
 ARG ROS_DISTRO=humble
 
-FROM --platform=$TARGETPLATFORM nvidia/cuda:${CUDA_VERSION}-devel-ubuntu${UBUNTU_MAJOR}.${UBUNTU_MINOR}
+FROM nvidia/cuda:${CUDA_VERSION}-devel-ubuntu${UBUNTU_MAJOR}.${UBUNTU_MINOR}
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
