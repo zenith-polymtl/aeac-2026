@@ -3,6 +3,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include "custom_interfaces/msg/water_state.hpp"
+#include "std_msgs/msg/bool.hpp"
 #include <vector>
 #include <string>
 #include <map>
@@ -30,6 +31,8 @@ private:
 
 	void HandleSwitchToActive();
 
+	void HandleIncrementState(const std_msgs::msg::Bool& msg);
+
 	/// @brief This variable holds the current state of the mission. Initale state is IDLE
 	uint8_t current_state_ = WaterState::IDLE;
 
@@ -38,6 +41,7 @@ private:
 
 	// Subscribers
 	rclcpp::Subscription<WaterState>::SharedPtr ask_state_change_subscriber_;
+	rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr increment_state_subscriber_;
 };
 
 #endif // MISSION_STATS_CONTROLLER_HPP_

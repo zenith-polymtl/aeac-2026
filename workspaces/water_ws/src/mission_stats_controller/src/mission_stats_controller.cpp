@@ -10,6 +10,9 @@ MissionStatsController::MissionStatsController() : Node("mission_stats_controlle
 	// Subscribers Initalisation
 	ask_state_change_subscriber_ = create_subscription<WaterState>(
 		"ask_state_change", 10, std::bind(&MissionStatsController::handleStateChange, this, std::placeholders::_1));
+
+	increment_state_subscriber_ = create_subscription<std_msgs::msg::Bool>(
+		"mission/increment_state", 10, std::bind(&MissionStatsController::HandleIncrementState, this, std::placeholders::_1));
 }
 
 void MissionStatsController::handleStateChange(const WaterState state)
@@ -39,6 +42,28 @@ void MissionStatsController::handleStateChange(const WaterState state)
 		RCLCPP_WARN(get_logger(), "State transition not covered: %d", static_cast<int>(state.mode));
 		break;
 	}
+}
+
+void MissionStatsController::HandleIncrementState(const std_msgs::msg::Bool&)
+{
+	uint8_t next_state;
+	switch (current_state_) {
+    case WaterState::IDLE:
+		next_state = WaterState::ACTIVE;
+		break;
+	case WaterState::ACTIVE:
+		next_state = WaterState::ERROR;
+		break;
+	case WaterState::ERROR:
+		next_state = WaterState::IDLE;
+		break;
+	default:
+		RCLCPP_WARN(get_logger(), "State transition not covered: %d", static_cast<int>(current_state_));
+		break;
+	}
+	WaterState new_state_msg;
+	new_state_msg.mode = next_state;
+	handleStateChange(new_state_msg);
 }
 
 void MissionStatsController::HandleSwitchToIddle()
