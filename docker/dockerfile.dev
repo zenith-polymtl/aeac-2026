@@ -59,6 +59,9 @@ COPY packages/ros2_gremsy /app/packages/ros2_gremsy
 # rosdep pour installer les dépendances du paquet gremsy
 RUN rosdep install -y -r -q --from-paths /app/packages/ros2_gremsy --ignore-src --rosdistro ${ROS_DISTRO}
 
+RUN python3 -m pip install -U \
+    geopy 
+
 ARG UID=1000
 ARG GID=1000
 RUN groupadd -g $GID dev && useradd -m -u $UID -g $GID dev
