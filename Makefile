@@ -1,4 +1,4 @@
-# ===== Select compose (dev|payload|recon|water|relay) =====
+# ===== Select compose (dev|payload|water|relay) =====
 C ?= dev
 DOMAIN ?= 2
 TCP_PORT ?= 5762
@@ -6,7 +6,7 @@ TCP_PORT ?= 5762
 COMPOSE_FILE := compose/$(C).yml
 CONTAINER    ?= aeac-$(C)
 
-DRONE_IP ?= 192.168.0.13
+DRONE_IP ?= 192.168.144.12
 
 # Workspace path RELATIVE to repo root (e.g., workspaces/dev_ws)
 WS_REL := workspaces/$(C)_ws
