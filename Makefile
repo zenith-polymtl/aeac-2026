@@ -28,11 +28,11 @@ export UID GID
 ENV_INJECT := C=$(C) WS=$(WS_REL)
 
 # All compose files for the *-all targets
-COMPOSES := compose/dev.yml compose/payload.yml compose/recon.yml compose/water.yml compose/relay.yml
+COMPOSES := compose/dev.yml compose/payload.yml compose/water.yml compose/relay.yml
 
 # ===== Pretty help =====
 help: ## Show help
-	@awk 'BEGIN{FS":.*##"; printf "\nTargets (use C=<dev|payload|recon|water>):\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN{FS":.*##"; printf "\nTargets (use C=<dev|payload|water|relay>):\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 print-vars: ## Show resolved variables (debug)
 	@echo "C=$(C)"
