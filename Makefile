@@ -63,7 +63,13 @@ down: ## Down for C (remove orphans)
 	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) down --remove-orphans
 
 shell sh bash: ## Open bash in the running container (with ROS sourced)
-	docker exec -it $(CONTAINER) bash -lc "export ROS_DOMAIN_ID=$(DOMAIN) && source /opt/ros/humble/setup.bash && ros2 daemon start && exec bash -i"
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    exec bash -i'
 
 # ===== Workspace helpers =====
 link: 
@@ -80,7 +86,14 @@ connect: up
 
 launch: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	bash -lc 'source /opt/ros/humble/setup.bash && colcon build && source install/setup.bash && nohup ros2 run rmw_zenoh_cpp rmw_zenohd > /tmp/zenohd.log 2>&1 & exec bash -lc "source /opt/ros/humble/setup.bash && ros2 daemon start && bash"'
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    colcon build; \
+	    source install/setup.bash; \
+	    nohup ros2 run rmw_zenoh_cpp rmw_zenohd > /tmp/zenohd.log 2>&1 & \
+	    ros2 daemon start; \
+	    exec bash -i'
 
 
 mavros-sim: up
