@@ -41,9 +41,10 @@ class AutonomousApproach(Node):
             self.valve_state_pub.publish(Bool(data=self.open))
             #TODO: Implement valve opening logic here
             #Probably a servo mavlink command
+            #Timing wont be super precise but should be good enough? Ig
 
     def close_valve(self):
-        
+
         if self.open:
             self.destroy_timer(self.close_valve)
 
