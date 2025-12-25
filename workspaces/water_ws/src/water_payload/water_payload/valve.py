@@ -35,17 +35,24 @@ class AutonomousApproach(Node):
         self.open_valve()
 
     def open_valve(self):
-        self.get_logger().info("Valve opened for shooting.")
-        self.open = True
-        self.valve_state_pub.publish(Bool(data=self.open))
-        #TODO: Implement valve opening logic here
-        #Probably a servo mavlink command
+        if not self.open:
+            self.get_logger().info("Valve opened for shooting.")
+            self.open = True
+            self.valve_state_pub.publish(Bool(data=self.open))
+            #TODO: Implement valve opening logic here
+            #Probably a servo mavlink command
 
     def close_valve(self):
-        self.get_logger().info("Valve closed after shooting.")
-        self.open = False  
-        self.valve_state_pub.publish(Bool(data=self.open))
-        #TODO: Implement valve closing logic here
+        
+        if self.open:
+            self.destroy_timer(self.close_valve)
+
+            self.get_logger().info("Valve closed after shooting.")
+            self.open = False  
+            self.valve_state_pub.publish(Bool(data=self.open))
+            self.request_picture_pub.publish(Bool(data=True))
+
+            #TODO: Implement valve closing logic here
 
 
     def set_up_topics(self):
@@ -62,6 +69,12 @@ class AutonomousApproach(Node):
         self.valve_state_pub = self.create_publisher(
             Bool,
             '/valve_state',
+            qos_reliable
+        )
+
+        self.request_picture_pub = self.create_publisher(
+            Bool,
+            '/request_picture',
             qos_reliable
         )
 
