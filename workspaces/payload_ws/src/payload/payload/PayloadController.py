@@ -1,38 +1,49 @@
-import enum
 import rclpy
 from rclpy.node import Node
 from mavros_msgs.srv import CommandLong
-from std_msgs.msg import Int32
-# could make it a parameter to support multiple motor
-SERVO_NUM = 8
-
-PWM_MIN = 1100
-PWM_MID = 1500
-PWM_MAX = 1900
+from custom_interfaces.srv import ServoState 
 
 class PayloadController(Node):
     def __init__(self):
         super().__init__('PayloadController')
-        self.sub_open = self.create_subscription(Int32, '/payload/set_state', self.send_servo, 2)
 
-        self.client = self.create_client(CommandLong, '/mavros/cmd/command')
-        while not self.client.wait_for_service(timeout_sec=1.0):
+        self.srv = self.create_service(ServoState, '/payload/set_state', self.handle_servo_request)
+
+        self.mavros_client = self.create_client(CommandLong, '/mavros/cmd/command')
+        while not self.mavros_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('waiting for /mavros/cmd/command...')
 
-        self.get_logger().info('PayloadController initialized')
+        self.get_logger().info('PayloadController Service Ready')
 
-    def send_servo(self, msg):
-        pwm = msg.data
-        self.get_logger().info(f'Setting payload servo {SERVO_NUM} to PWM: {pwm}')
-        req = CommandLong.Request()
-        req.broadcast = False
-        # voir https://ardupilot.org/copter/docs/common-mavlink-mission-command-messages-mav_cmd.html
-        req.command = 183  # MAV_CMD_DO_SET_SERVO
-        req.confirmation = 0
-        req.param1 = float(SERVO_NUM)
-        req.param2 = float(pwm)
-        req.param3 = req.param4 = req.param5 = req.param6 = req.param7 = 0.0
-        return self.client.call_async(req)
+    async def handle_servo_request(self, request, response):
+        self.get_logger().info(f'Setting payload servo {request.servo_num} to PWM {request.pwm}')
+
+        mavros_req = CommandLong.Request()
+        mavros_req.broadcast = False
+        # see https://ardupilot.org/copter/docs/common-mavlink-mission-command-messages-mav_cmd.html
+        mavros_req.command = 183 # MAV_CMD_DO_SET_SERVO
+        mavros_req.confirmation = 0
+        mavros_req.param1 = float(request.servo_num)
+        mavros_req.param2 = float(request.pwm)
+        mavros_req.param3 = mavros_req.param4 = mavros_req.param5 = mavros_req.param6 = mavros_req.param7 = 0.0
+
+        try:
+            future = self.mavros_client.call_async(mavros_req)
+            mavros_result = await future
+
+            if mavros_result.success:
+                response.success = True
+                response.message = ""
+            else:
+                response.success = False
+                response.message = f"MAVROS has rejected request (Result: {mavros_result.result})"
+                
+        except Exception as e:
+            response.success = False
+            response.message = f"Error while processing request: {str(e)}"
+            self.get_logger().error(response.message)
+
+        return response
 
 def main():
     rclpy.init()
