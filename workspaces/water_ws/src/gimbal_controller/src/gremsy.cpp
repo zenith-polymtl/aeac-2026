@@ -1,7 +1,6 @@
 #include "gimbal_controller/gremsy.hpp"
 #include <thread>
 #include <chrono>
-#include "gremsy.hpp"
 
 void Gremsy::declareParameters()
 {
@@ -14,8 +13,6 @@ void Gremsy::declareParameters()
     // LOCK_MODE = 1, FOLLOW_MODE = 2
     this->declare_parameter("gimbal_mode", 2);
 
-    // input mode: 0: CTRL_ANGLE_BODY_FRAME, 1: CTRL_ANGULAR_RATE, 2:CTRL_ANGLE_ABSOLUTE_FRAME
-    // Note: Only Gimbal Pixy and T3V3 support CTRL_ANGLE_BODY_FRAME mode with pitch and yaw axis.
     this->declare_parameter("tilt_axis_input_mode", 1);
 
     this->declare_parameter("tilt_axis_stabilize", true);
@@ -62,21 +59,6 @@ Gremsy::Gremsy(const rclcpp::NodeOptions & options, const std::string & com_port
     pan_axis_input_mode_ = convertIntToAxisInputMode(this->get_parameter("pan_axis_input_mode").as_int());
     pan_axis_stabilize_ = this->get_parameter("pan_axis_stabilize").as_bool();
 
-    // Define SDK objects
-    serial_port_ = new Serial_Port(com_port_.c_str(), baud_rate_);
-    gimbal_interface_ = new Gimbal_Interface(serial_port_);
-
-    serial_port_->start();
-    gimbal_interface_->start();
-
-    // publishers
-    orientation_pub_ = this->create_publisher<geometry_msgs::msg::Quaternion>("/gimbal/orientation", 10);
-
-    orientation_timer_ = this->create_wall_timer(
-        std::chrono::milliseconds(50), 
-        std::bind(&Gremsy::publish_orientation_callback, this)
-    );
-
     // Initialize subscribers
     this->aiming_subscriber_ =
         this->create_subscription<int>(
@@ -88,6 +70,13 @@ Gremsy::Gremsy(const rclcpp::NodeOptions & options, const std::string & com_port
         this->create_service<std_srvs::srv::SetBool>("gimbal/lock_mode",
         std::bind(&Gremsy::enableLockModeCallback, this, std::placeholders::_1, std::placeholders::_2));
 
+  
+    // Define SDK objects
+    serial_port_ = new Serial_Port(com_port_.c_str(), baud_rate_);
+    gimbal_interface_ = new Gimbal_Interface(serial_port_);
+
+    serial_port_->start();
+    gimbal_interface_->start();
 
     if (gimbal_interface_->get_gimbal_status().mode == GIMBAL_STATE_OFF) {
         RCLCPP_INFO(this->get_logger(), "Gimbal is off, turning it on");
@@ -114,32 +103,9 @@ Gremsy::Gremsy(const rclcpp::NodeOptions & options, const std::string & com_port
 
   gimbal_interface_->set_gimbal_axes_mode(tilt_axis_mode, roll_axis_mode, pan_axis_mode);
 }
-
 Gremsy::~Gremsy()
 {
-  serial_port_->stop();
-  delete gimbal_interface_;
-  delete serial_port_;
-}
-
-void Gremsy::publish_orientation_callback()
-{
-    mavlink_mount_orientation_t m = gimbal_interface_->get_gimbal_mount_orientation();
-
-    double roll_rad = m.roll * (M_PI / 180.0);
-    double pitch_rad = m.pitch * (M_PI / 180.0);
-    double yaw_local_rad = m.yaw * (M_PI / 180.0);
-
-    tf2::Quaternion q;
-    q.setRPY(roll_rad, pitch_rad, yaw_local_rad);
-
-    geometry_msgs::msg::Quaternion msg;
-    msg.x = q.x();
-    msg.y = q.y();
-    msg.z = q.z();
-    msg.w = q.w();
-
-    orientation_pub_->publish(msg);
+  // TODO: Close serial port
 }
 
 void Gremsy::reset_pid_memory() {
@@ -155,7 +121,6 @@ void Gremsy::reset_pid_memory() {
 void Gremsy::enableLockModeCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request> request, const std::shared_ptr<std_srvs::srv::SetBool::Response> response){
     
     reset_pid_memory();
-    gimbal_interface_->set_gimbal_move(0, 0, 0);
 
     control_gimbal_mode_t new_mode = request->data ? control_gimbal_mode_t::LOCK_MODE : control_gimbal_mode_t::FOLLOW_MODE;
     
@@ -163,6 +128,7 @@ void Gremsy::enableLockModeCallback(const std::shared_ptr<std_srvs::srv::SetBool
         response->success = true;
         response->message = "Gimbal is already in requested mode.";
     } else {
+        gimbal_interface_->set_gimbal_move(0, 0, 0);
         gimbal_mode_ = new_mode;
         gimbal_interface_->set_gimbal_mode(gimbal_mode_);
 
