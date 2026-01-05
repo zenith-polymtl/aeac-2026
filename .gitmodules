@@ -26,8 +26,3 @@
 	path = packages/polar_system
 	url = https://github.com/zenith-polymtl/polar_system.git
 	branch = main
-
-[submodule "packages/ros2_gremsy"]
-	path = packages/ros2_gremsy
-	url = https://github.com/tiiuae/ros2_gremsy.git
-	branch = main
