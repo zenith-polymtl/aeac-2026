@@ -3,6 +3,7 @@ services:
     build:
       context: ..
       dockerfile: docker/dockerfile.dev
+      network: host
     container_name: aeac-${C}
     network_mode: host
     tty: true
@@ -15,5 +16,26 @@ services:
     command: ["bash","-lc","while :; do sleep 86400; done"]
     environment:  
       - ROS_DOMAIN_ID=2
-      - RMW_IMPLEMENTATION=rmw_zenoh_cpp
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+  zed-ros2:    
+    image: zed_ros2_l4t_35.4.1_sdk_5.1.0   
+    runtime: nvidia    
+    privileged: true    
+    network_mode: host    
+    ipc: host    
+    pid: host    
+    environment:    
+      - NVIDIA_DRIVER_CAPABILITIES=all    
+      - DISPLAY=${DISPLAY}   
+      - ROS_DOMAIN_ID=2 
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+    volumes:    
+      - /tmp/.X11-unix/:/tmp/.X11-unix    
+      - /dev:/dev    
+      - /dev/shm:/dev/shm    
+      - /usr/local/zed/resources/:/usr/local/zed/resources/    
+      - /usr/local/zed/settings/:/usr/local/zed/settings/    
+      - /home/holybro-nx/zenith/zed-ros2-wrapper/zed_wrapper/config:/root/ros2_ws/src/zed_wrapper/config  
+    command: bash -c "source install/setup.bash "
   

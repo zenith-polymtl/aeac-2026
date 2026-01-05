@@ -13,20 +13,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-colcon-common-extensions \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y \  
-    ros-${ROS_DISTRO}-mavros-extras \  
-    ros-${ROS_DISTRO}-mavlink \  
-    geographiclib-tools \  
-    && rm -rf /var/lib/apt/lists/*  
+RUN apt-get update && apt-get install -y \
+    ros-${ROS_DISTRO}-mavros-extras \
+    ros-${ROS_DISTRO}-mavlink \
+    geographiclib-tools \
+    && rm -rf /var/lib/apt/lists/* 
   
 # Use the correct GeographicLib script  
 RUN /opt/ros/humble/lib/mavros/install_geographiclib_datasets.sh  
 
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ros-humble-rmw-zenoh-cpp \
+RUN apt-get update && apt-get install -y \
+    ros-humble-rmw-cyclonedds-cpp \
  && rm -rf /var/lib/apt/lists/*
 
+ 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     iputils-ping \
     iproute2 \
@@ -59,9 +59,7 @@ RUN rosdep install -y -r -q --from-paths /app/packages/ros2_gremsy --ignore-src 
 RUN python3 -m pip install -U \
     geopy 
 
-RUN apt-get update && apt-get install -y \
-    ros-humble-rmw-cyclonedds-cpp \
- && rm -rf /var/lib/apt/lists/*
+
 
 
 ARG UID=1000
