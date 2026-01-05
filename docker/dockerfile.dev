@@ -59,6 +59,11 @@ RUN rosdep install -y -r -q --from-paths /app/packages/ros2_gremsy --ignore-src 
 RUN python3 -m pip install -U \
     geopy 
 
+RUN apt-get update && apt-get install -y \
+    ros-humble-rmw-cyclonedds-cpp \
+ && rm -rf /var/lib/apt/lists/*
+
+
 ARG UID=1000
 ARG GID=1000
 RUN groupadd -g $GID dev && useradd -m -u $UID -g $GID dev
