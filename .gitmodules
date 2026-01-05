@@ -26,3 +26,7 @@
 	path = packages/polar_system
 	url = https://github.com/zenith-polymtl/polar_system.git
 	branch = main
+[submodule "packages/zed-ros2-wrapper"]
+	path = packages/zed-ros2-wrapper
+	url = https://github.com/Astro-Coco/zed-ros2-wrapper
+	branch = zenith

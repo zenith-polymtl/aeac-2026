@@ -92,6 +92,11 @@ launch: up
 	    ros2 daemon start; \
 	    exec bash -i'
 
+build-zed:
+	    
+
+zed-mavros:
+
 
 mavros-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
