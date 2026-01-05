@@ -1,0 +1,23 @@
+services:
+  zed-ros2:
+    image: zed_ros2_l4t_35.4.1_sdk_5.1.0
+    runtime: nvidia
+    privileged: true
+    network_mode: host
+    ipc: host
+    pid: host
+    environment:
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - DISPLAY=${DISPLAY}
+      - ROS_DOMAIN_ID=2
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+    volumes:
+      - /tmp/.X11-unix/:/tmp/.X11-unix
+      - /dev:/dev
+      - /dev/shm:/dev/shm
+      - /usr/local/zed/resources/:/usr/local/zed/resources/
+      - /usr/local/zed/settings/:/usr/local/zed/settings/
+      - ../configs/zenith_stereo.yaml:/config/zenith_stereo.yaml:ro
+
+    # ✅ keep container alive for `docker compose exec`
+    command: ["bash", "-lc", "sleep infinity"]

@@ -1,0 +1,74 @@
+# config/zed2i_image_od_only.yaml  
+/**:  
+    ros__parameters:  
+        # General settings  
+        general:  
+            camera_name: 'zed2i'  
+            pub_frame_rate: 15.0
+            pub_resolution: 'CUSTOM'  
+            pub_downscale_factor: 1.5  
+            gpu_id: -1  
+            enable_image_validity_check: 1  
+            async_image_retrieval: false  
+          
+        # Video settings - outdoor optimized  
+        video:  
+            brightness: 4  
+            contrast: 4  
+            auto_exposure_gain: true  
+            exposure: 80  
+            gain: 80  
+            auto_whitebalance: true  
+          
+        # Sensor settings  
+        sensors:  
+            sensors_pub_rate: 100.0  
+            publish_imu_tf: false  
+            sensors_image_sync: true  
+          
+        # Depth settings - minimal for object detection  
+        depth:  
+            depth_mode: 'NEURAL_LIGHT'  # Required for object detection  
+            point_cloud_freq: 5.0  # DISABLED - not needed  
+            depth_confidence: 85  
+            depth_texture_conf: 90  
+            remove_saturated_areas: true  
+          
+        # POSITIONAL TRACKING DISABLED  
+        pos_tracking:  
+            pos_tracking_enabled: false  # DISABLED - no SLAM  
+            publish_tf: false  
+            publish_map_tf: false  
+          
+        # MAPPING DISABLED  
+        mapping:  
+            mapping_enabled: false  # DISABLED - no SLAM  
+          
+        # GNSS FUSION DISABLED  
+        gnss_fusion:  
+            gnss_fusion_enabled: false  # DISABLED - no SLAM  
+          
+        # Object Detection - CUSTOM ONNX MODEL  
+        #object_detection:  
+        #    od_enabled: true  
+        #    model: 'CUSTOM_YOLOLIKE_BOX_OBJECTS'  
+        #    custom_onnx_file: '/path/to/your/model.onnx'  
+        #    custom_onnx_input_size: 640  
+        #    custom_label_yaml: '/path/to/your/labels.yaml'  
+        #    allow_reduced_precision_inference: true  
+        #    max_range: 30.0  
+        #    confidence_threshold: 70.0  
+        #    prediction_timeout: 0.2  
+        #    enable_tracking: true  
+        #
+          
+        # Jetson optimization  
+        advanced:  
+            thread_sched_policy: 'SCHED_FIFO'  
+            thread_grab_priority: 60  
+            thread_sensor_priority: 80  
+            thread_pointcloud_priority: 40  
+          
+        debug:  
+            debug_object_detection: true  
+            debug_advanced: true
