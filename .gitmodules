@@ -28,5 +28,5 @@
 	branch = main
 [submodule "packages/zed-ros2-wrapper"]
 	path = packages/zed-ros2-wrapper
-	url = https://github.com/Astro-Coco/zed-ros2-wrapper
+	url = https://github.com/zenith-polymtl/zed-ros2-wrapper
 	branch = zenith
