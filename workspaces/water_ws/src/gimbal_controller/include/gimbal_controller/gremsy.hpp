@@ -35,15 +35,17 @@ private:
 
     bool pan_axis_stabilize_;
 
+    rclcpp::Publisher<geometry_msgs::msg::Quaternion>::SharedPtr orientation_pub_;
+    rclcpp::TimerBase::SharedPtr orientation_timer_;
+    void publish_orientation_callback();
+
     rclcpp::Subscription<int>::SharedPtr aiming_subscriber_;
 
     void aimingCallback(float msg);
 
     rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr enable_lock_mode_service_;
-    void enableLockModeCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request> request,
-                              const std::shared_ptr<std_srvs::srv::SetBool::Response> response);
+    void enableLockModeCallback(const std::shared_ptr<std_srvs::srv::SetBool::Request> request, const std::shared_ptr<std_srvs::srv::SetBool::Response> response);
     
-
     // PID functions
     float compute_pid_output(float error, float &integral, float &prev_error, float dt);    
 
