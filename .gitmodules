@@ -27,3 +27,8 @@
 	path = packages/ros2_gremsy
 	url = https://github.com/tiiuae/ros2_gremsy.git
 	branch = main
+
+[submodule "workspaces/water_ws/src/gimbal_controller/gSDK"]
+	path = workspaces/water_ws/src/gimbal_controller/gSDK
+	url = https://github.com/Gremsy/gSDK.git
+	branch = master
