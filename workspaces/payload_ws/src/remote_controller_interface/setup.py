@@ -24,7 +24,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'remote_controller_interface = remote_controller_interface.remote_controller_interface:main'
+            'remote_controller_interface = remote_controller_interface.remote_controller_interface:main',
+            'rc_simulator = remote_controller_interface.rc_simulator:main'
         ],
     },
 )
