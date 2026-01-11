@@ -61,8 +61,6 @@ class RCSimulator(Node):
         center_pwm = 1500
         
         if key == 'w':
-            # Toggle servo 1 (channel 7)
-            # self.channels[7] = high_pwm if self.channels[7] < center_pwm else low_pwm
             self.channels[7] = high_pwm
         elif key == 's':
             self.channels[7] = center_pwm
@@ -73,8 +71,14 @@ class RCSimulator(Node):
         elif key == 'd':
             self.channels[8] = center_pwm
         elif key == 'c':
-            # Toggle servo 2 (channel 8)
             self.channels[8] = low_pwm
+        elif key == 'r':
+            self.channels[9] = high_pwm
+        elif key == 'f':
+            self.channels[9] = center_pwm
+        elif key == 'v':
+            self.channels[9] = low_pwm
+        
         elif key == 'q':
             self.stop_event.set()
             self.get_logger().info("===  STOP ===")

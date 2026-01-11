@@ -7,7 +7,9 @@ from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 from mavros_msgs.msg import RCIn
 from std_msgs.msg import String
 from mavros_msgs.srv import MessageInterval 
-
+from mavros_msgs.srv import SetMode
+from mavros_msgs.msg import State
+import threading
 
 class RemoteControlInterface(Node):
     """ROS2 node for reading RC channel inputs and triggering events."""
@@ -21,17 +23,25 @@ class RemoteControlInterface(Node):
 
         # Using MAVROS Python client  
         self.msg_interval_client = self.create_client(MessageInterval, '/mavros/set_message_interval')  
-
-
-        # TODO Verify if this initalisation is really necessary
-        # Set up message intervals after a short delay  
-        # self.setup_timer = self.create_timer(1.0, self.setup_message_intervals)  
         
-        # Initialize state variables
+        
+        self.state_sub = self.create_subscription(  
+            State, '/mavros/state', self.state_callback, 10)  
+          
+        # self.mode_changed_event = threading.Event()  
+
+        self.set_mode_client = self.create_client(SetMode, '/mavros/set_mode')
+                
+        # States for servo motor
         self.active_servo_1 = False
         self.active_servo_2 = False
         self.last_active_servo_1 = self.active_servo_1
         self.last_active_servo_2 = self.active_servo_2
+        
+        # States for polar lock
+        self.active_polar_lock = False
+        self.last_active_polar_lock = self.active_polar_lock
+        self.requested_polar_lock = False
         
         # Declare parameters
         self._declare_parameters()
@@ -51,6 +61,9 @@ class RemoteControlInterface(Node):
             '/servo_topic',
             qos_reliable
         )
+        
+        while not self.set_mode_client.wait_for_service(timeout_sec=1.0):  
+            self.get_logger().info('Waiting for set_mode service...')  
         
         self.get_logger().info("Remote Controller Interface started")
 
@@ -84,6 +97,8 @@ class RemoteControlInterface(Node):
         servo_1_input = msg.channels[7] # Channel 8
         servo_2_input = msg.channels[8] # Channel 9
         
+        polar_lock_input = msg.channels[9] # Channel 10
+        
         if servo_1_input > 1700:
             self.active_servo_1 = True
         elif servo_1_input < 1300:
@@ -94,6 +109,12 @@ class RemoteControlInterface(Node):
         elif servo_2_input < 1300:
             self.active_servo_2 = False
         
+        if polar_lock_input > 1700:
+            self.active_polar_lock = True
+        elif polar_lock_input < 1300:
+            self.active_polar_lock = False
+        
+        
     def handle_servo_controls(self):
         if self.active_servo_1 and not self.last_active_servo_1:
             self.get_logger().info(f"Published open command for servo_1")
@@ -102,14 +123,20 @@ class RemoteControlInterface(Node):
             
         if self.active_servo_2 and not self.last_active_servo_2:
             self.get_logger().info(f"Published open command for servo_2")
-            # self.start_position()
-            pass
         elif not self.active_servo_2 and self.last_active_servo_2:
             self.get_logger().info(f"Published close command for servo 2")
+        
+        if self.active_polar_lock and not self.last_active_polar_lock:
+            self.requested_polar_lock = True
+            self.set_guided_mode()
+        elif not self.active_polar_lock and self.last_active_polar_lock:
+            # TODO Determine the behavior when polar lock is disactivated
+            self.requested_polar_lock = False
             pass
         
         self.last_active_servo_1 = self.active_servo_1
         self.last_active_servo_2 = self.active_servo_2
+        self.last_active_polar_lock = self.active_polar_lock
       
     def rc_callback(self, msg):
         """
@@ -139,6 +166,20 @@ class RemoteControlInterface(Node):
             
         # Destroy the timer since we only need to run this once  
         self.destroy_timer(self.setup_timer) 
+        
+    def set_guided_mode(self):
+        req = SetMode.Request()  
+        req.base_mode = 0  
+        req.custom_mode = "GUIDED"         
+        self.set_mode_client.call_async(req)  
+
+    def state_callback(self, msg):  
+        """Callback to monitor state changes"""  
+        if msg.mode == "GUIDED" and self.requested_polar_lock:
+            self.get_logger().info(f'Changing to Polar Lock')
+            # TODO Add the request to polar Mode 
+            self.requested_polar_lock = False
+
 
     def message_interval_callback(self, future):  
         try:  
