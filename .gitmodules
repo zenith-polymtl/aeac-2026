@@ -27,3 +27,7 @@
 	path = packages/ros2_gremsy
 	url = https://github.com/tiiuae/ros2_gremsy.git
 	branch = main
+[submodule "packages/zed-ros2-wrapper"]
+	path = packages/zed-ros2-wrapper
+	url = https://github.com/Astro-Coco/zed-ros2-wrapper
+	branch = zenith

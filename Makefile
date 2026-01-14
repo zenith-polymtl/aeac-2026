@@ -1,4 +1,4 @@
-# ===== Select compose (dev|payload|recon|water|relay) =====
+# ===== Select compose (dev|payload|water|relay) =====
 C ?= dev
 DOMAIN ?= 2
 TCP_PORT ?= 5762
@@ -6,7 +6,7 @@ TCP_PORT ?= 5762
 COMPOSE_FILE := compose/$(C).yml
 CONTAINER    ?= aeac-$(C)
 
-DRONE_IP ?= 192.168.0.13
+DRONE_IP ?= 192.168.144.12
 
 # Workspace path RELATIVE to repo root (e.g., workspaces/dev_ws)
 WS_REL := workspaces/$(C)_ws
@@ -28,11 +28,11 @@ export UID GID
 ENV_INJECT := C=$(C) WS=$(WS_REL)
 
 # All compose files for the *-all targets
-COMPOSES := compose/dev.yml compose/payload.yml compose/recon.yml compose/water.yml compose/relay.yml
+COMPOSES := compose/dev.yml compose/payload.yml compose/water.yml compose/relay.yml
 
 # ===== Pretty help =====
 help: ## Show help
-	@awk 'BEGIN{FS":.*##"; printf "\nTargets (use C=<dev|payload|recon|water>):\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN{FS":.*##"; printf "\nTargets (use C=<dev|payload|water|relay>):\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 print-vars: ## Show resolved variables (debug)
 	@echo "C=$(C)"
@@ -110,7 +110,7 @@ mavros-ofa: up
 	  source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
 	  nohup ros2 run rmw_zenoh_cpp rmw_zenohd > /tmp/zenohd.log 2>&1 & \
-	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200 fcu_protocol:=v2.0'
+	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200'
 
 clean: ## Remove build/install/log (host + container)
 	sudo rm -rf "$(WS_REL)/build" "$(WS_REL)/install" "$(WS_REL)/log" "workspaces/install" "workspaces/log" "workspaces/build"

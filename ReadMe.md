@@ -2,6 +2,9 @@
 
 ROS 2 (Humble) + Docker setup with per-mission workspaces, a MAVLink router, and Zenoh transport.
 
+# Got a question? Ask Devin!
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/zenith-polymtl/aeac-2026)
+
 ## Prereqs
 
 * Docker 

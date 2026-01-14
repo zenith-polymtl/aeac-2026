@@ -14,16 +14,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install -y \  
-    ros-${ROS_DISTRO}-mavros \  
+    ros-${ROS_DISTRO}-mavros-extras \  
+    ros-${ROS_DISTRO}-mavlink \  
+    geographiclib-tools \  
     && rm -rf /var/lib/apt/lists/*  
   
-# Install GeographicLib datasets (required)  
-RUN apt-get update && apt-get install -y wget \  
-    && wget https://raw.githubusercontent.com/mavlink/mavros/ros2/mavros/scripts/install_geographiclib_datasets.sh \  
-    && chmod +x install_geographiclib_datasets.sh \  
-    && ./install_geographiclib_datasets.sh \  
-    && rm install_geographiclib_datasets.sh \  
-    && rm -rf /var/lib/apt/lists/*
+# Use the correct GeographicLib script  
+RUN /opt/ros/humble/lib/mavros/install_geographiclib_datasets.sh  
 
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -65,4 +62,4 @@ RUN python3 -m pip install -U \
 ARG UID=1000
 ARG GID=1000
 RUN groupadd -g $GID dev && useradd -m -u $UID -g $GID dev
-USER dev
+RUN usermod -a -G dialout dev
