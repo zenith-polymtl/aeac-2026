@@ -7,10 +7,6 @@
   },  
   mode: "client",  
   connect: {  
-    endpoints: [  
-      "tcp/jetson-zenith-hexa.local:7447",  // Drone's antenna IP  
-      "tcp/192.168.1.12:7447",    // Drone's WiFi IP    
-      "tcp/10.0.0.12:7447"        // Drone's LTE IP  
-    ]  
-  }  
+    endpoints: ["tcp/drone.local:7447"]  
+    }  
 }

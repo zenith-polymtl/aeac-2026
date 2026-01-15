@@ -56,7 +56,11 @@ zed-shell: ## Open bash in the ZED container (with ROS sourced)
 	  source /root/ros2_ws/install/setup.bash; \
 	  exec bash -i'
 
+zenoh-ground: ## Start zenoh ground bridge
+	docker compose -f compose/zenoh-ground.yml up --build
 
+zenoh-air: ## Start zenoh air bridge
+	docker compose -f compose/zenoh-air.yml up --build
 
 launch-zed:
 	docker compose -f compose/zed.yml up -d zed-ros2
