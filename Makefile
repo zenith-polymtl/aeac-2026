@@ -51,15 +51,18 @@ relay: ## Start SIYI relay (UDP 14540 → MAVROS, Pymavlink, Mission Planner)
 relay-down:
 	@docker compose -f compose/relay.yml down
 
-ZED_CFG=zenith_stereo.yaml
+zed-shell: ## Open bash in the ZED container (with ROS sourced)
+	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
+	  source /root/ros2_ws/install/setup.bash; \
+	  exec bash -i'
 
-ZED_CFG=/config/zenith_stereo.yaml
+
 
 launch-zed:
 	docker compose -f compose/zed.yml up -d zed-ros2
 	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
 	  source /root/ros2_ws/install/setup.bash; \
-	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=/config/zenith_stereo.yaml \
+	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml \
 	'
 
 # ===== Docker lifecycle (selected compose) =====
