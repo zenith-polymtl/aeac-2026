@@ -1,0 +1,18 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run mission",
+      "type": "shell",
+      "command": "python3",
+      "args": [
+        "mission/laps.py",
+        "trajectoirePhase1.json"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/packages/nav_stack/ros2_ws/src/mission"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

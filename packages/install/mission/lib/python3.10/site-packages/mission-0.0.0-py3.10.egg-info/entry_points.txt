@@ -1,0 +1,4 @@
+[console_scripts]
+gps_to_local = mission.gps_to_local:main
+laps = mission.laps:main
+

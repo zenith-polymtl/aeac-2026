@@ -1,0 +1,36 @@
+[8.687s] Invoking command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/bringup': PYTHONPATH=/home/tom/aeac-2026/packages/build/bringup/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../../../build/bringup build --build-base /home/tom/aeac-2026/packages/build/bringup/build install --record /home/tom/aeac-2026/packages/build/bringup/install.log --single-version-externally-managed install_data
+[9.881s] running egg_info
+[9.882s] creating ../../../../../build/bringup/bringup.egg-info
+[9.884s] writing ../../../../../build/bringup/bringup.egg-info/PKG-INFO
+[9.885s] writing dependency_links to ../../../../../build/bringup/bringup.egg-info/dependency_links.txt
+[9.886s] writing requirements to ../../../../../build/bringup/bringup.egg-info/requires.txt
+[9.887s] writing top-level names to ../../../../../build/bringup/bringup.egg-info/top_level.txt
+[9.889s] writing manifest file '../../../../../build/bringup/bringup.egg-info/SOURCES.txt'
+[9.895s] reading manifest file '../../../../../build/bringup/bringup.egg-info/SOURCES.txt'
+[9.897s] writing manifest file '../../../../../build/bringup/bringup.egg-info/SOURCES.txt'
+[9.899s] running build
+[9.900s] running build_py
+[9.900s] creating /home/tom/aeac-2026/packages/build/bringup/build
+[9.905s] creating /home/tom/aeac-2026/packages/build/bringup/build/lib
+[9.907s] creating /home/tom/aeac-2026/packages/build/bringup/build/lib/bringup
+[9.909s] copying bringup/__init__.py -> /home/tom/aeac-2026/packages/build/bringup/build/lib/bringup
+[9.910s] running install
+[9.912s] running install_lib
+[9.914s] creating /home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages/bringup
+[9.916s] copying /home/tom/aeac-2026/packages/build/bringup/build/lib/bringup/__init__.py -> /home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages/bringup
+[9.921s] byte-compiling /home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages/bringup/__init__.py to __init__.cpython-310.pyc
+[9.925s] running install_data
+[9.926s] creating /home/tom/aeac-2026/packages/install/bringup/share/ament_index
+[9.931s] creating /home/tom/aeac-2026/packages/install/bringup/share/ament_index/resource_index
+[9.933s] creating /home/tom/aeac-2026/packages/install/bringup/share/ament_index/resource_index/packages
+[9.936s] copying resource/bringup -> /home/tom/aeac-2026/packages/install/bringup/share/ament_index/resource_index/packages
+[9.936s] copying package.xml -> /home/tom/aeac-2026/packages/install/bringup/share/bringup
+[9.937s] creating /home/tom/aeac-2026/packages/install/bringup/share/bringup/launch
+[9.939s] copying launch/phase1.launch.py -> /home/tom/aeac-2026/packages/install/bringup/share/bringup/launch
+[9.940s] creating /home/tom/aeac-2026/packages/install/bringup/share/bringup/config
+[9.943s] copying config/trajectoirePhase1.json -> /home/tom/aeac-2026/packages/install/bringup/share/bringup/config
+[9.944s] running install_egg_info
+[9.948s] Copying ../../../../../build/bringup/bringup.egg-info to /home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages/bringup-0.0.0-py3.10.egg-info
+[9.951s] running install_scripts
+[10.021s] writing list of installed files to '/home/tom/aeac-2026/packages/build/bringup/install.log'
+[10.121s] Invoked command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/bringup' returned '0': PYTHONPATH=/home/tom/aeac-2026/packages/build/bringup/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../../../build/bringup build --build-base /home/tom/aeac-2026/packages/build/bringup/build install --record /home/tom/aeac-2026/packages/build/bringup/install.log --single-version-externally-managed install_data

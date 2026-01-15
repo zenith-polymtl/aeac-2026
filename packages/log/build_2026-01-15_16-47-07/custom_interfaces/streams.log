@@ -1,0 +1,237 @@
+[3.389s] Invoking command in '/home/tom/aeac-2026/packages/build/custom_interfaces': /usr/bin/cmake /home/tom/aeac-2026/packages/src/custom_interfaces -DCATKIN_INSTALL_INTO_PREFIX_ROOT=0 -DCMAKE_INSTALL_PREFIX=/home/tom/aeac-2026/packages/install/custom_interfaces
+[5.209s] -- The C compiler identification is GNU 11.4.0
+[8.734s] -- The CXX compiler identification is GNU 11.4.0
+[10.397s] -- Detecting C compiler ABI info
+[11.161s] -- Detecting C compiler ABI info - done
+[11.178s] -- Check for working C compiler: /usr/bin/cc - skipped
+[11.179s] -- Detecting C compile features
+[11.180s] -- Detecting C compile features - done
+[11.191s] -- Detecting CXX compiler ABI info
+[11.935s] -- Detecting CXX compiler ABI info - done
+[11.952s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[11.953s] -- Detecting CXX compile features
+[11.954s] -- Detecting CXX compile features - done
+[11.965s] -- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)
+[12.526s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[12.841s] -- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)
+[12.856s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[12.886s] -- Found rosidl_adapter: 3.1.7 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[13.531s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[14.627s] -- Found ament_cmake_ros: 0.10.0 (/opt/ros/humble/share/ament_cmake_ros/cmake)
+[15.239s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[16.456s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[16.885s] -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.10.12", minimum required is "3.6") 
+[16.889s] -- Found python_cmake_module: 0.10.0 (/opt/ros/humble/share/python_cmake_module/cmake)
+[18.064s] -- Found PythonLibs: /usr/lib/x86_64-linux-gnu/libpython3.10.so (found suitable version "3.10.12", minimum required is "3.5") 
+[18.065s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[18.065s] -- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10
+[18.065s] -- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.10.so
+[18.119s] -- Found PythonExtra: .so  
+[18.633s] -- Configuring done
+[18.876s] -- Generating done
+[18.885s] [33mCMake Warning:
+[18.885s]   Manually-specified variables were not used by the project:
+[18.885s] 
+[18.885s]     CATKIN_INSTALL_INTO_PREFIX_ROOT
+[18.886s] 
+[18.886s] [0m
+[18.909s] -- Build files have been written to: /home/tom/aeac-2026/packages/build/custom_interfaces
+[18.934s] Invoked command in '/home/tom/aeac-2026/packages/build/custom_interfaces' returned '0': /usr/bin/cmake /home/tom/aeac-2026/packages/src/custom_interfaces -DCATKIN_INSTALL_INTO_PREFIX_ROOT=0 -DCMAKE_INSTALL_PREFIX=/home/tom/aeac-2026/packages/install/custom_interfaces
+[18.940s] Invoking command in '/home/tom/aeac-2026/packages/build/custom_interfaces': /usr/bin/cmake --build /home/tom/aeac-2026/packages/build/custom_interfaces -- -j8 -l8
+[19.068s] [  3%] [34m[1mGenerating C code for ROS interfaces[0m
+[19.109s] [  6%] [34m[1mGenerating C++ code for ROS interfaces[0m
+[19.161s] [  6%] Built target ament_cmake_python_copy_custom_interfaces
+[20.551s] [  9%] [32mBuilding C object CMakeFiles/custom_interfaces__rosidl_generator_c.dir/rosidl_generator_c/custom_interfaces/srv/detail/gps_to_local__functions.c.o[0m
+[20.644s] running egg_info
+[20.654s] creating custom_interfaces.egg-info
+[20.663s] writing custom_interfaces.egg-info/PKG-INFO
+[20.663s] writing dependency_links to custom_interfaces.egg-info/dependency_links.txt
+[20.664s] writing top-level names to custom_interfaces.egg-info/top_level.txt
+[20.664s] writing manifest file 'custom_interfaces.egg-info/SOURCES.txt'
+[20.665s] reading manifest file 'custom_interfaces.egg-info/SOURCES.txt'
+[20.668s] writing manifest file 'custom_interfaces.egg-info/SOURCES.txt'
+[20.717s] [  9%] Built target custom_interfaces__cpp
+[20.805s] [ 12%] [34m[1mGenerating C++ type support for eProsima Fast-RTPS[0m
+[20.813s] [ 16%] [34m[1mGenerating C++ introspection for ROS interfaces[0m
+[20.842s] [ 19%] [34m[1mGenerating C++ type support dispatch for ROS interfaces[0m
+[20.877s] [ 19%] Built target ament_cmake_python_build_custom_interfaces_egg
+[20.977s] [ 22%] [32m[1mLinking C shared library libcustom_interfaces__rosidl_generator_c.so[0m
+[22.519s] [ 22%] Built target custom_interfaces__rosidl_generator_c
+[22.590s] [ 25%] [34m[1mGenerating C type support dispatch for ROS interfaces[0m
+[22.604s] [ 29%] [34m[1mGenerating C introspection for ROS interfaces[0m
+[22.605s] [ 32%] [34m[1mGenerating C type support for eProsima Fast-RTPS[0m
+[22.699s] [ 35%] [32mBuilding CXX object CMakeFiles/custom_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_interfaces/srv/detail/dds_fastrtps/gps_to_local__type_support.cpp.o[0m
+[22.982s] [ 38%] [32mBuilding CXX object CMakeFiles/custom_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/custom_interfaces/srv/gps_to_local__type_support.cpp.o[0m
+[23.062s] [ 41%] [32mBuilding CXX object CMakeFiles/custom_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/custom_interfaces/srv/detail/gps_to_local__type_support.cpp.o[0m
+[24.643s] [ 45%] [32mBuilding CXX object CMakeFiles/custom_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/custom_interfaces/srv/detail/gps_to_local__type_support_c.cpp.o[0m
+[25.140s] [ 48%] [32mBuilding CXX object CMakeFiles/custom_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/custom_interfaces/srv/gps_to_local__type_support.cpp.o[0m
+[25.718s] [ 51%] [32mBuilding C object CMakeFiles/custom_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/custom_interfaces/srv/detail/gps_to_local__type_support.c.o[0m
+[25.795s] [ 54%] [32m[1mLinking CXX shared library libcustom_interfaces__rosidl_typesupport_c.so[0m
+[26.409s] [ 58%] [32m[1mLinking C shared library libcustom_interfaces__rosidl_typesupport_introspection_c.so[0m
+[26.606s] [ 61%] [32m[1mLinking CXX shared library libcustom_interfaces__rosidl_typesupport_cpp.so[0m
+[27.343s] [ 64%] [32m[1mLinking CXX shared library libcustom_interfaces__rosidl_typesupport_introspection_cpp.so[0m
+[27.574s] [ 64%] Built target custom_interfaces__rosidl_typesupport_c
+[27.605s] [ 67%] [32m[1mLinking CXX shared library libcustom_interfaces__rosidl_typesupport_fastrtps_cpp.so[0m
+[28.057s] [ 67%] Built target custom_interfaces__rosidl_typesupport_introspection_c
+[28.270s] [ 67%] Built target custom_interfaces__rosidl_typesupport_cpp
+[28.781s] [ 67%] Built target custom_interfaces__rosidl_typesupport_introspection_cpp
+[29.196s] [ 67%] Built target custom_interfaces__rosidl_typesupport_fastrtps_cpp
+[29.208s] [ 70%] [32m[1mLinking CXX shared library libcustom_interfaces__rosidl_typesupport_fastrtps_c.so[0m
+[30.223s] [ 70%] Built target custom_interfaces__rosidl_typesupport_fastrtps_c
+[30.293s] [ 70%] Built target custom_interfaces
+[30.355s] [ 74%] [34m[1mGenerating Python code for ROS interfaces[0m
+[31.630s] [ 74%] Built target custom_interfaces__py
+[31.703s] [ 77%] [32mBuilding C object CMakeFiles/custom_interfaces__rosidl_generator_py.dir/rosidl_generator_py/custom_interfaces/srv/_gps_to_local_s.c.o[0m
+[32.367s] [ 80%] [32m[1mLinking C shared library rosidl_generator_py/custom_interfaces/libcustom_interfaces__rosidl_generator_py.so[0m
+[33.096s] [ 80%] Built target custom_interfaces__rosidl_generator_py
+[33.293s] [ 83%] [32mBuilding C object CMakeFiles/custom_interfaces__rosidl_typesupport_introspection_c__pyext.dir/rosidl_generator_py/custom_interfaces/_custom_interfaces_s.ep.rosidl_typesupport_introspection_c.c.o[0m
+[33.362s] [ 87%] [32mBuilding C object CMakeFiles/custom_interfaces__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_generator_py/custom_interfaces/_custom_interfaces_s.ep.rosidl_typesupport_fastrtps_c.c.o[0m
+[33.518s] [ 90%] [32mBuilding C object CMakeFiles/custom_interfaces__rosidl_typesupport_c__pyext.dir/rosidl_generator_py/custom_interfaces/_custom_interfaces_s.ep.rosidl_typesupport_c.c.o[0m
+[34.346s] [ 93%] [32m[1mLinking C shared library rosidl_generator_py/custom_interfaces/custom_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so[0m
+[34.391s] [ 96%] [32m[1mLinking C shared library rosidl_generator_py/custom_interfaces/custom_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so[0m
+[34.612s] [100%] [32m[1mLinking C shared library rosidl_generator_py/custom_interfaces/custom_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so[0m
+[35.078s] [100%] Built target custom_interfaces__rosidl_typesupport_introspection_c__pyext
+[35.104s] [100%] Built target custom_interfaces__rosidl_typesupport_fastrtps_c__pyext
+[35.401s] [100%] Built target custom_interfaces__rosidl_typesupport_c__pyext
+[35.485s] Invoked command in '/home/tom/aeac-2026/packages/build/custom_interfaces' returned '0': /usr/bin/cmake --build /home/tom/aeac-2026/packages/build/custom_interfaces -- -j8 -l8
+[35.521s] Invoking command in '/home/tom/aeac-2026/packages/build/custom_interfaces': /usr/bin/cmake --install /home/tom/aeac-2026/packages/build/custom_interfaces
+[35.564s] -- Install configuration: ""
+[35.575s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/ament_index/resource_index/rosidl_interfaces/custom_interfaces
+[35.579s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces
+[35.589s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg
+[35.593s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg/rosidl_generator_c__visibility_control.h
+[35.596s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv
+[35.601s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail
+[35.608s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__functions.c
+[35.609s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__type_support.h
+[35.609s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__functions.h
+[35.610s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__struct.h
+[35.612s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/gps_to_local.h
+[35.617s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/library_path.sh
+[35.619s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/library_path.dsv
+[35.623s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_generator_c.so
+[35.626s] -- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_generator_c.so" to ""
+[35.627s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces
+[35.628s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg
+[35.629s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg/rosidl_typesupport_fastrtps_c__visibility_control.h
+[35.629s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv
+[35.630s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail
+[35.630s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__rosidl_typesupport_fastrtps_c.h
+[35.631s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_fastrtps_c.so
+[35.635s] -- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_fastrtps_c.so" to ""
+[35.637s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces
+[35.642s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg
+[35.643s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg/rosidl_typesupport_introspection_c__visibility_control.h
+[35.644s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv
+[35.644s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail
+[35.645s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__rosidl_typesupport_introspection_c.h
+[35.645s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__type_support.c
+[35.646s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_introspection_c.so
+[35.646s] -- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_introspection_c.so" to ""
+[35.646s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_c.so
+[35.647s] -- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_c.so" to ""
+[35.649s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces
+[35.664s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg
+[35.665s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg/rosidl_generator_cpp__visibility_control.hpp
+[35.665s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv
+[35.665s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/gps_to_local.hpp
+[35.666s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail
+[35.666s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__struct.hpp
+[35.667s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__type_support.hpp
+[35.667s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__builder.hpp
+[35.667s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__traits.hpp
+[35.668s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces
+[35.668s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg
+[35.669s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h
+[35.669s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv
+[35.670s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail
+[35.670s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/dds_fastrtps
+[35.671s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__rosidl_typesupport_fastrtps_cpp.hpp
+[35.672s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_fastrtps_cpp.so
+[35.675s] -- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_fastrtps_cpp.so" to ""
+[35.675s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces
+[35.677s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv
+[35.677s] -- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail
+[35.677s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__type_support.cpp
+[35.678s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__rosidl_typesupport_introspection_cpp.hpp
+[35.678s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_introspection_cpp.so
+[35.682s] -- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_introspection_cpp.so" to ""
+[35.683s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_cpp.so
+[35.687s] -- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_cpp.so" to ""
+[35.688s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/pythonpath.sh
+[35.689s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/pythonpath.dsv
+[35.690s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces-0.0.0-py3.10.egg-info
+[35.698s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces-0.0.0-py3.10.egg-info/PKG-INFO
+[35.698s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces-0.0.0-py3.10.egg-info/SOURCES.txt
+[35.699s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces-0.0.0-py3.10.egg-info/dependency_links.txt
+[35.700s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces-0.0.0-py3.10.egg-info/top_level.txt
+[35.701s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces
+[35.703s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[35.704s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[35.704s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[35.705s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/libcustom_interfaces__rosidl_generator_py.so
+[35.706s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv
+[35.709s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv/_gps_to_local_s.c
+[35.711s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv/_gps_to_local.py
+[35.712s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv/__init__.py
+[35.712s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/_custom_interfaces_s.ep.rosidl_typesupport_c.c
+[35.715s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/_custom_interfaces_s.ep.rosidl_typesupport_fastrtps_c.c
+[35.716s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/__init__.py
+[35.717s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/_custom_interfaces_s.ep.rosidl_typesupport_introspection_c.c
+[36.010s] Listing '/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces'...
+[36.010s] Compiling '/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/__init__.py'...
+[36.010s] Listing '/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv'...
+[36.011s] Compiling '/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv/__init__.py'...
+[36.011s] Compiling '/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv/_gps_to_local.py'...
+[36.060s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[36.062s] -- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so" to ""
+[36.063s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[36.065s] -- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so" to ""
+[36.066s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[36.068s] -- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so" to ""
+[36.068s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_generator_py.so
+[36.080s] -- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_generator_py.so" to ""
+[36.086s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/srv/GpsToLocal.idl
+[36.097s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/srv/GpsToLocal.srv
+[36.098s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/srv/GpsToLocal_Request.msg
+[36.098s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/srv/GpsToLocal_Response.msg
+[36.103s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/ament_index/resource_index/package_run_dependencies/custom_interfaces
+[36.107s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/ament_index/resource_index/parent_prefix_path/custom_interfaces
+[36.107s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/ament_prefix_path.sh
+[36.115s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/ament_prefix_path.dsv
+[36.116s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/path.sh
+[36.118s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/path.dsv
+[36.120s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/local_setup.bash
+[36.127s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/local_setup.sh
+[36.128s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/local_setup.zsh
+[36.129s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/local_setup.dsv
+[36.130s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/package.dsv
+[36.141s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/ament_index/resource_index/packages/custom_interfaces
+[36.144s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_generator_cExport.cmake
+[36.145s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_generator_cExport-noconfig.cmake
+[36.146s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_typesupport_fastrtps_cExport.cmake
+[36.148s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_typesupport_fastrtps_cExport-noconfig.cmake
+[36.149s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_introspection_cExport.cmake
+[36.157s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_introspection_cExport-noconfig.cmake
+[36.159s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_cExport.cmake
+[36.160s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_cExport-noconfig.cmake
+[36.161s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_generator_cppExport.cmake
+[36.162s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_typesupport_fastrtps_cppExport.cmake
+[36.163s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake
+[36.171s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_introspection_cppExport.cmake
+[36.171s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_introspection_cppExport-noconfig.cmake
+[36.172s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_cppExport.cmake
+[36.174s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_cppExport-noconfig.cmake
+[36.175s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_generator_pyExport.cmake
+[36.177s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_generator_pyExport-noconfig.cmake
+[36.178s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/rosidl_cmake-extras.cmake
+[36.187s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/ament_cmake_export_include_directories-extras.cmake
+[36.187s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/ament_cmake_export_libraries-extras.cmake
+[36.187s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/ament_cmake_export_targets-extras.cmake
+[36.188s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake
+[36.194s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/ament_cmake_export_dependencies-extras.cmake
+[36.194s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake
+[36.197s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfacesConfig.cmake
+[36.199s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfacesConfig-version.cmake
+[36.202s] -- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/package.xml
+[36.212s] Invoked command in '/home/tom/aeac-2026/packages/build/custom_interfaces' returned '0': /usr/bin/cmake --install /home/tom/aeac-2026/packages/build/custom_interfaces

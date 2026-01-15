@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ROS2 - Phase 1 (bringup)",
+      "type": "python",
+      "request": "launch",
+      "program": "/usr/bin/ros2",
+      "args": [
+        "launch",
+        "bringup",
+        "phase1.launch.py"
+      ],
+      "cwd": "${workspaceFolder}/packages/nav_stack/ros2_ws",
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  ]
+}

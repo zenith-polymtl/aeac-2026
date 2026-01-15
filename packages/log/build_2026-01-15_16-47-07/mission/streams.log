@@ -1,0 +1,56 @@
+[8.434s] Invoking command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/mission': PYTHONPATH=/home/tom/aeac-2026/packages/build/mission/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../../../build/mission build --build-base /home/tom/aeac-2026/packages/build/mission/build install --record /home/tom/aeac-2026/packages/build/mission/install.log --single-version-externally-managed install_data
+[9.691s] running egg_info
+[9.693s] creating ../../../../../build/mission/mission.egg-info
+[9.698s] writing ../../../../../build/mission/mission.egg-info/PKG-INFO
+[9.700s] writing dependency_links to ../../../../../build/mission/mission.egg-info/dependency_links.txt
+[9.700s] writing entry points to ../../../../../build/mission/mission.egg-info/entry_points.txt
+[9.701s] writing requirements to ../../../../../build/mission/mission.egg-info/requires.txt
+[9.701s] writing top-level names to ../../../../../build/mission/mission.egg-info/top_level.txt
+[9.706s] writing manifest file '../../../../../build/mission/mission.egg-info/SOURCES.txt'
+[9.709s] reading manifest file '../../../../../build/mission/mission.egg-info/SOURCES.txt'
+[9.715s] writing manifest file '../../../../../build/mission/mission.egg-info/SOURCES.txt'
+[9.715s] running build
+[9.717s] running build_py
+[9.717s] creating /home/tom/aeac-2026/packages/build/mission/build
+[9.718s] creating /home/tom/aeac-2026/packages/build/mission/build/lib
+[9.719s] creating /home/tom/aeac-2026/packages/build/mission/build/lib/mission
+[9.721s] copying mission/connection.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission
+[9.725s] copying mission/helpers.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission
+[9.725s] copying mission/laps.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission
+[9.727s] copying mission/takeoff.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission
+[9.729s] copying mission/lapsDeBase.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission
+[9.729s] copying mission/gps_to_local.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission
+[9.729s] copying mission/__init__.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission
+[9.729s] copying mission/data.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission
+[9.729s] running install
+[9.730s] running install_lib
+[9.732s] creating /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission
+[9.735s] copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/connection.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission
+[9.735s] copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/helpers.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission
+[9.735s] copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/laps.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission
+[9.736s] copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/takeoff.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission
+[9.739s] copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/lapsDeBase.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission
+[9.740s] copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/gps_to_local.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission
+[9.740s] copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/__init__.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission
+[9.740s] copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/data.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission
+[9.746s] byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/connection.py to connection.cpython-310.pyc
+[9.748s] byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/helpers.py to helpers.cpython-310.pyc
+[9.748s] byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/laps.py to laps.cpython-310.pyc
+[9.749s] byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/takeoff.py to takeoff.cpython-310.pyc
+[9.750s] byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/lapsDeBase.py to lapsDeBase.cpython-310.pyc
+[9.758s] byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/gps_to_local.py to gps_to_local.cpython-310.pyc
+[9.759s] byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/__init__.py to __init__.cpython-310.pyc
+[9.759s] byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/data.py to data.cpython-310.pyc
+[9.759s] running install_data
+[9.760s] creating /home/tom/aeac-2026/packages/install/mission/share/ament_index
+[9.761s] creating /home/tom/aeac-2026/packages/install/mission/share/ament_index/resource_index
+[9.767s] creating /home/tom/aeac-2026/packages/install/mission/share/ament_index/resource_index/packages
+[9.769s] copying resource/mission -> /home/tom/aeac-2026/packages/install/mission/share/ament_index/resource_index/packages
+[9.769s] copying package.xml -> /home/tom/aeac-2026/packages/install/mission/share/mission
+[9.770s] running install_egg_info
+[9.772s] Copying ../../../../../build/mission/mission.egg-info to /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission-0.0.0-py3.10.egg-info
+[9.780s] running install_scripts
+[9.836s] Installing gps_to_local script to /home/tom/aeac-2026/packages/install/mission/lib/mission
+[9.838s] Installing laps script to /home/tom/aeac-2026/packages/install/mission/lib/mission
+[9.840s] writing list of installed files to '/home/tom/aeac-2026/packages/build/mission/install.log'
+[9.940s] Invoked command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/mission' returned '0': PYTHONPATH=/home/tom/aeac-2026/packages/build/mission/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../../../build/mission build --build-base /home/tom/aeac-2026/packages/build/mission/build install --record /home/tom/aeac-2026/packages/build/mission/install.log --single-version-externally-managed install_data

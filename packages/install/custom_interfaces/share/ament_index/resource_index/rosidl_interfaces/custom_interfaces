@@ -1,0 +1,4 @@
+srv/GpsToLocal.idl
+srv/GpsToLocal.srv
+srv/GpsToLocal_Request.msg
+srv/GpsToLocal_Response.msg

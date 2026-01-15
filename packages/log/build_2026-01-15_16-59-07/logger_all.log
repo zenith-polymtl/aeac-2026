@@ -1,0 +1,373 @@
+[0.455s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build']
+[0.456s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=False, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=8, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=None, packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, allow_overriding=[], cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, mixin_files=None, mixin=None, verb_parser=<colcon_mixin.mixin.mixin_argument.MixinArgumentDecorator object at 0x7e32fd34f100>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7e32fd4906a0>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7e32fd4906a0>>, mixin_verb=('build',))
+[0.821s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.821s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.821s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.821s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.821s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.822s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.822s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/tom/aeac-2026/packages'
+[0.822s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.822s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.822s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.823s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.823s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.823s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.823s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.823s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.823s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.850s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[0.850s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[0.850s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[0.850s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[0.850s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[0.851s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[0.851s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[0.851s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[0.851s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[0.851s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[0.852s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[0.852s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[0.852s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[0.852s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[0.853s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ignore', 'ignore_ament_install']
+[0.853s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore'
+[0.853s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore_ament_install'
+[0.853s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_pkg']
+[0.853s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_pkg'
+[0.853s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_meta']
+[0.853s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_meta'
+[0.854s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ros']
+[0.854s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ros'
+[0.854s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['cmake', 'python']
+[0.854s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'cmake'
+[0.854s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python'
+[0.854s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['python_setup_py']
+[0.854s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python_setup_py'
+[0.855s] Level 1:colcon.colcon_core.package_identification:_identify(src/UI) by extensions ['ignore', 'ignore_ament_install']
+[0.855s] Level 1:colcon.colcon_core.package_identification:_identify(src/UI) by extension 'ignore'
+[0.855s] Level 1:colcon.colcon_core.package_identification:_identify(src/UI) by extension 'ignore_ament_install'
+[0.855s] Level 1:colcon.colcon_core.package_identification:_identify(src/UI) by extensions ['colcon_pkg']
+[0.855s] Level 1:colcon.colcon_core.package_identification:_identify(src/UI) by extension 'colcon_pkg'
+[0.855s] Level 1:colcon.colcon_core.package_identification:_identify(src/UI) by extensions ['colcon_meta']
+[0.855s] Level 1:colcon.colcon_core.package_identification:_identify(src/UI) by extension 'colcon_meta'
+[0.855s] Level 1:colcon.colcon_core.package_identification:_identify(src/UI) by extensions ['ros']
+[0.855s] Level 1:colcon.colcon_core.package_identification:_identify(src/UI) by extension 'ros'
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(src/UI) by extensions ['cmake', 'python']
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(src/UI) by extension 'cmake'
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(src/UI) by extension 'python'
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(src/UI) by extensions ['python_setup_py']
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(src/UI) by extension 'python_setup_py'
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(src/bringup) by extensions ['ignore', 'ignore_ament_install']
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(src/bringup) by extension 'ignore'
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(src/bringup) by extension 'ignore_ament_install'
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(src/bringup) by extensions ['colcon_pkg']
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(src/bringup) by extension 'colcon_pkg'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(src/bringup) by extensions ['colcon_meta']
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(src/bringup) by extension 'colcon_meta'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(src/bringup) by extensions ['ros']
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(src/bringup) by extension 'ros'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(src/bringup) by extensions ['cmake', 'python']
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(src/bringup) by extension 'cmake'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(src/bringup) by extension 'python'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(src/bringup) by extensions ['python_setup_py']
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(src/bringup) by extension 'python_setup_py'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_interfaces) by extensions ['ignore', 'ignore_ament_install']
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_interfaces) by extension 'ignore'
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_interfaces) by extension 'ignore_ament_install'
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_interfaces) by extensions ['colcon_pkg']
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_interfaces) by extension 'colcon_pkg'
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_interfaces) by extensions ['colcon_meta']
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_interfaces) by extension 'colcon_meta'
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_interfaces) by extensions ['ros']
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_interfaces) by extension 'ros'
+[0.862s] DEBUG:colcon.colcon_core.package_identification:Package 'src/custom_interfaces' with type 'ros.catkin' and name 'custom_interfaces'
+[0.862s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack) by extensions ['ignore', 'ignore_ament_install']
+[0.862s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack) by extension 'ignore'
+[0.862s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack) by extension 'ignore_ament_install'
+[0.862s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack) by extensions ['colcon_pkg']
+[0.862s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack) by extension 'colcon_pkg'
+[0.862s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack) by extensions ['colcon_meta']
+[0.862s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack) by extension 'colcon_meta'
+[0.863s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack) by extensions ['ros']
+[0.863s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack) by extension 'ros'
+[0.863s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack) by extensions ['cmake', 'python']
+[0.863s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack) by extension 'cmake'
+[0.863s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack) by extension 'python'
+[0.863s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack) by extensions ['python_setup_py']
+[0.863s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack) by extension 'python_setup_py'
+[0.863s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws) by extensions ['ignore', 'ignore_ament_install']
+[0.863s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws) by extension 'ignore'
+[0.863s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws) by extension 'ignore_ament_install'
+[0.863s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws) by extensions ['colcon_pkg']
+[0.864s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws) by extension 'colcon_pkg'
+[0.864s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws) by extensions ['colcon_meta']
+[0.864s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws) by extension 'colcon_meta'
+[0.864s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws) by extensions ['ros']
+[0.864s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws) by extension 'ros'
+[0.864s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws) by extensions ['cmake', 'python']
+[0.864s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws) by extension 'cmake'
+[0.864s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws) by extension 'python'
+[0.864s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws) by extensions ['python_setup_py']
+[0.864s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws) by extension 'python_setup_py'
+[0.864s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src) by extensions ['ignore', 'ignore_ament_install']
+[0.864s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src) by extension 'ignore'
+[0.864s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src) by extension 'ignore_ament_install'
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src) by extensions ['colcon_pkg']
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src) by extension 'colcon_pkg'
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src) by extensions ['colcon_meta']
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src) by extension 'colcon_meta'
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src) by extensions ['ros']
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src) by extension 'ros'
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src) by extensions ['cmake', 'python']
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src) by extension 'cmake'
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src) by extension 'python'
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src) by extensions ['python_setup_py']
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src) by extension 'python_setup_py'
+[0.866s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/bringup) by extensions ['ignore', 'ignore_ament_install']
+[0.866s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/bringup) by extension 'ignore'
+[0.866s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/bringup) by extension 'ignore_ament_install'
+[0.866s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/bringup) by extensions ['colcon_pkg']
+[0.866s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/bringup) by extension 'colcon_pkg'
+[0.866s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/bringup) by extensions ['colcon_meta']
+[0.866s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/bringup) by extension 'colcon_meta'
+[0.867s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/bringup) by extensions ['ros']
+[0.867s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/bringup) by extension 'ros'
+[0.868s] DEBUG:colcon.colcon_core.package_identification:Package 'src/nav_stack/ros2_ws/src/bringup' with type 'ros.ament_python' and name 'bringup'
+[0.868s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/mission) by extensions ['ignore', 'ignore_ament_install']
+[0.869s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/mission) by extension 'ignore'
+[0.869s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/mission) by extension 'ignore_ament_install'
+[0.869s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/mission) by extensions ['colcon_pkg']
+[0.869s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/mission) by extension 'colcon_pkg'
+[0.869s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/mission) by extensions ['colcon_meta']
+[0.869s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/mission) by extension 'colcon_meta'
+[0.869s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/mission) by extensions ['ros']
+[0.869s] Level 1:colcon.colcon_core.package_identification:_identify(src/nav_stack/ros2_ws/src/mission) by extension 'ros'
+[0.870s] DEBUG:colcon.colcon_core.package_identification:Package 'src/nav_stack/ros2_ws/src/mission' with type 'ros.ament_python' and name 'mission'
+[0.870s] Level 1:colcon.colcon_core.package_identification:_identify(src/polar_system) by extensions ['ignore', 'ignore_ament_install']
+[0.871s] Level 1:colcon.colcon_core.package_identification:_identify(src/polar_system) by extension 'ignore'
+[0.871s] Level 1:colcon.colcon_core.package_identification:_identify(src/polar_system) by extension 'ignore_ament_install'
+[0.871s] Level 1:colcon.colcon_core.package_identification:_identify(src/polar_system) by extensions ['colcon_pkg']
+[0.871s] Level 1:colcon.colcon_core.package_identification:_identify(src/polar_system) by extension 'colcon_pkg'
+[0.871s] Level 1:colcon.colcon_core.package_identification:_identify(src/polar_system) by extensions ['colcon_meta']
+[0.871s] Level 1:colcon.colcon_core.package_identification:_identify(src/polar_system) by extension 'colcon_meta'
+[0.871s] Level 1:colcon.colcon_core.package_identification:_identify(src/polar_system) by extensions ['ros']
+[0.871s] Level 1:colcon.colcon_core.package_identification:_identify(src/polar_system) by extension 'ros'
+[0.871s] Level 1:colcon.colcon_core.package_identification:_identify(src/polar_system) by extensions ['cmake', 'python']
+[0.871s] Level 1:colcon.colcon_core.package_identification:_identify(src/polar_system) by extension 'cmake'
+[0.871s] Level 1:colcon.colcon_core.package_identification:_identify(src/polar_system) by extension 'python'
+[0.871s] Level 1:colcon.colcon_core.package_identification:_identify(src/polar_system) by extensions ['python_setup_py']
+[0.871s] Level 1:colcon.colcon_core.package_identification:_identify(src/polar_system) by extension 'python_setup_py'
+[0.871s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_gremsy) by extensions ['ignore', 'ignore_ament_install']
+[0.872s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_gremsy) by extension 'ignore'
+[0.872s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_gremsy) by extension 'ignore_ament_install'
+[0.872s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_gremsy) by extensions ['colcon_pkg']
+[0.872s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_gremsy) by extension 'colcon_pkg'
+[0.872s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_gremsy) by extensions ['colcon_meta']
+[0.872s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_gremsy) by extension 'colcon_meta'
+[0.872s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_gremsy) by extensions ['ros']
+[0.872s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_gremsy) by extension 'ros'
+[0.872s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_gremsy) by extensions ['cmake', 'python']
+[0.872s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_gremsy) by extension 'cmake'
+[0.872s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_gremsy) by extension 'python'
+[0.872s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_gremsy) by extensions ['python_setup_py']
+[0.872s] Level 1:colcon.colcon_core.package_identification:_identify(src/ros2_gremsy) by extension 'python_setup_py'
+[0.873s] Level 1:colcon.colcon_core.package_identification:_identify(src/tools) by extensions ['ignore', 'ignore_ament_install']
+[0.873s] Level 1:colcon.colcon_core.package_identification:_identify(src/tools) by extension 'ignore'
+[0.873s] Level 1:colcon.colcon_core.package_identification:_identify(src/tools) by extension 'ignore_ament_install'
+[0.873s] Level 1:colcon.colcon_core.package_identification:_identify(src/tools) by extensions ['colcon_pkg']
+[0.873s] Level 1:colcon.colcon_core.package_identification:_identify(src/tools) by extension 'colcon_pkg'
+[0.873s] Level 1:colcon.colcon_core.package_identification:_identify(src/tools) by extensions ['colcon_meta']
+[0.873s] Level 1:colcon.colcon_core.package_identification:_identify(src/tools) by extension 'colcon_meta'
+[0.873s] Level 1:colcon.colcon_core.package_identification:_identify(src/tools) by extensions ['ros']
+[0.873s] Level 1:colcon.colcon_core.package_identification:_identify(src/tools) by extension 'ros'
+[0.873s] Level 1:colcon.colcon_core.package_identification:_identify(src/tools) by extensions ['cmake', 'python']
+[0.873s] Level 1:colcon.colcon_core.package_identification:_identify(src/tools) by extension 'cmake'
+[0.873s] Level 1:colcon.colcon_core.package_identification:_identify(src/tools) by extension 'python'
+[0.873s] Level 1:colcon.colcon_core.package_identification:_identify(src/tools) by extensions ['python_setup_py']
+[0.874s] Level 1:colcon.colcon_core.package_identification:_identify(src/tools) by extension 'python_setup_py'
+[0.874s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision) by extensions ['ignore', 'ignore_ament_install']
+[0.874s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision) by extension 'ignore'
+[0.874s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision) by extension 'ignore_ament_install'
+[0.874s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision) by extensions ['colcon_pkg']
+[0.874s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision) by extension 'colcon_pkg'
+[0.874s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision) by extensions ['colcon_meta']
+[0.874s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision) by extension 'colcon_meta'
+[0.874s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision) by extensions ['ros']
+[0.874s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision) by extension 'ros'
+[0.875s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision) by extensions ['cmake', 'python']
+[0.875s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision) by extension 'cmake'
+[0.875s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision) by extension 'python'
+[0.875s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision) by extensions ['python_setup_py']
+[0.875s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision) by extension 'python_setup_py'
+[0.875s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.875s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.875s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.875s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.875s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[0.955s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[0.956s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[0.963s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 3 installed packages in /home/tom/aeac-2026/packages/install
+[0.965s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 4 installed packages in /home/tom/ros2_ws/install
+[0.968s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 271 installed packages in /opt/ros/humble
+[0.971s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[1.030s] Level 5:colcon.colcon_core.verb:set package 'bringup' build argument 'cmake_args' from command line to 'None'
+[1.030s] Level 5:colcon.colcon_core.verb:set package 'bringup' build argument 'cmake_target' from command line to 'None'
+[1.030s] Level 5:colcon.colcon_core.verb:set package 'bringup' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.030s] Level 5:colcon.colcon_core.verb:set package 'bringup' build argument 'cmake_clean_cache' from command line to 'False'
+[1.030s] Level 5:colcon.colcon_core.verb:set package 'bringup' build argument 'cmake_clean_first' from command line to 'False'
+[1.030s] Level 5:colcon.colcon_core.verb:set package 'bringup' build argument 'cmake_force_configure' from command line to 'False'
+[1.030s] Level 5:colcon.colcon_core.verb:set package 'bringup' build argument 'ament_cmake_args' from command line to 'None'
+[1.030s] Level 5:colcon.colcon_core.verb:set package 'bringup' build argument 'catkin_cmake_args' from command line to 'None'
+[1.030s] Level 5:colcon.colcon_core.verb:set package 'bringup' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.030s] DEBUG:colcon.colcon_core.verb:Building package 'bringup' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/tom/aeac-2026/packages/build/bringup', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/tom/aeac-2026/packages/install/bringup', 'merge_install': False, 'path': '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/bringup', 'symlink_install': False, 'test_result_base': None}
+[1.031s] Level 5:colcon.colcon_core.verb:set package 'custom_interfaces' build argument 'cmake_args' from command line to 'None'
+[1.031s] Level 5:colcon.colcon_core.verb:set package 'custom_interfaces' build argument 'cmake_target' from command line to 'None'
+[1.031s] Level 5:colcon.colcon_core.verb:set package 'custom_interfaces' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.031s] Level 5:colcon.colcon_core.verb:set package 'custom_interfaces' build argument 'cmake_clean_cache' from command line to 'False'
+[1.031s] Level 5:colcon.colcon_core.verb:set package 'custom_interfaces' build argument 'cmake_clean_first' from command line to 'False'
+[1.031s] Level 5:colcon.colcon_core.verb:set package 'custom_interfaces' build argument 'cmake_force_configure' from command line to 'False'
+[1.031s] Level 5:colcon.colcon_core.verb:set package 'custom_interfaces' build argument 'ament_cmake_args' from command line to 'None'
+[1.031s] Level 5:colcon.colcon_core.verb:set package 'custom_interfaces' build argument 'catkin_cmake_args' from command line to 'None'
+[1.031s] Level 5:colcon.colcon_core.verb:set package 'custom_interfaces' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.031s] DEBUG:colcon.colcon_core.verb:Building package 'custom_interfaces' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/tom/aeac-2026/packages/build/custom_interfaces', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/tom/aeac-2026/packages/install/custom_interfaces', 'merge_install': False, 'path': '/home/tom/aeac-2026/packages/src/custom_interfaces', 'symlink_install': False, 'test_result_base': None}
+[1.032s] Level 5:colcon.colcon_core.verb:set package 'mission' build argument 'cmake_args' from command line to 'None'
+[1.032s] Level 5:colcon.colcon_core.verb:set package 'mission' build argument 'cmake_target' from command line to 'None'
+[1.032s] Level 5:colcon.colcon_core.verb:set package 'mission' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.032s] Level 5:colcon.colcon_core.verb:set package 'mission' build argument 'cmake_clean_cache' from command line to 'False'
+[1.032s] Level 5:colcon.colcon_core.verb:set package 'mission' build argument 'cmake_clean_first' from command line to 'False'
+[1.032s] Level 5:colcon.colcon_core.verb:set package 'mission' build argument 'cmake_force_configure' from command line to 'False'
+[1.032s] Level 5:colcon.colcon_core.verb:set package 'mission' build argument 'ament_cmake_args' from command line to 'None'
+[1.032s] Level 5:colcon.colcon_core.verb:set package 'mission' build argument 'catkin_cmake_args' from command line to 'None'
+[1.032s] Level 5:colcon.colcon_core.verb:set package 'mission' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.032s] DEBUG:colcon.colcon_core.verb:Building package 'mission' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/tom/aeac-2026/packages/build/mission', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/tom/aeac-2026/packages/install/mission', 'merge_install': False, 'path': '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/mission', 'symlink_install': False, 'test_result_base': None}
+[1.032s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[1.035s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[1.036s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/bringup' with build type 'ament_python'
+[1.036s] Level 1:colcon.colcon_core.shell:create_environment_hook('bringup', 'ament_prefix_path')
+[1.042s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[1.043s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/bringup/share/bringup/hook/ament_prefix_path.ps1'
+[1.045s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/tom/aeac-2026/packages/install/bringup/share/bringup/hook/ament_prefix_path.dsv'
+[1.047s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/bringup/share/bringup/hook/ament_prefix_path.sh'
+[1.052s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.053s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.068s] INFO:colcon.colcon_ros.task.catkin.build:Building ROS package in '/home/tom/aeac-2026/packages/src/custom_interfaces' with build type 'catkin'
+[1.069s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/tom/aeac-2026/packages/src/custom_interfaces'
+[1.070s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.070s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.081s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/mission' with build type 'ament_python'
+[1.082s] Level 1:colcon.colcon_core.shell:create_environment_hook('mission', 'ament_prefix_path')
+[1.083s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/mission/share/mission/hook/ament_prefix_path.ps1'
+[1.085s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/tom/aeac-2026/packages/install/mission/share/mission/hook/ament_prefix_path.dsv'
+[1.087s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/mission/share/mission/hook/ament_prefix_path.sh'
+[1.090s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.090s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.911s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/bringup'
+[1.912s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.912s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.952s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/tom/aeac-2026/packages/build/custom_interfaces': /usr/bin/cmake --build /home/tom/aeac-2026/packages/build/custom_interfaces -- -j8 -l8
+[4.170s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/mission'
+[4.171s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[4.172s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[4.731s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/tom/aeac-2026/packages/build/custom_interfaces' returned '0': /usr/bin/cmake --build /home/tom/aeac-2026/packages/build/custom_interfaces -- -j8 -l8
+[4.809s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/tom/aeac-2026/packages/build/custom_interfaces': /usr/bin/cmake --install /home/tom/aeac-2026/packages/build/custom_interfaces
+[5.275s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/tom/aeac-2026/packages/build/custom_interfaces' returned '0': /usr/bin/cmake --install /home/tom/aeac-2026/packages/build/custom_interfaces
+[5.276s] Level 1:colcon.colcon_core.shell:create_environment_hook('custom_interfaces', 'ros_package_path')
+[5.277s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/ros_package_path.ps1'
+[5.282s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/ros_package_path.dsv'
+[5.284s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/ros_package_path.sh'
+[5.287s] Level 1:colcon.colcon_ros.task.catkin:checking '/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages'
+[5.287s] Level 1:colcon.colcon_core.shell:create_environment_hook('custom_interfaces', 'catkin_pythonpath')
+[5.288s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/catkin_pythonpath.ps1'
+[5.289s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/catkin_pythonpath.dsv'
+[5.291s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/catkin_pythonpath.sh'
+[5.293s] Level 1:colcon.colcon_core.shell:create_environment_hook('custom_interfaces', 'pkg_config_path')
+[5.295s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/pkg_config_path.ps1'
+[5.297s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/pkg_config_path.dsv'
+[5.298s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/pkg_config_path.sh'
+[5.308s] Level 1:colcon.colcon_core.shell:create_environment_hook('custom_interfaces', 'pkg_config_path_multiarch')
+[5.310s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/pkg_config_path_multiarch.ps1'
+[5.312s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/pkg_config_path_multiarch.dsv'
+[5.319s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/pkg_config_path_multiarch.sh'
+[5.327s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(custom_interfaces)
+[5.343s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/custom_interfaces' for CMake module files
+[5.346s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/custom_interfaces' for CMake config files
+[5.348s] Level 1:colcon.colcon_core.shell:create_environment_hook('custom_interfaces', 'cmake_prefix_path')
+[5.350s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/cmake_prefix_path.ps1'
+[5.355s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/cmake_prefix_path.dsv'
+[5.357s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/cmake_prefix_path.sh'
+[5.361s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/custom_interfaces/lib'
+[5.363s] Level 1:colcon.colcon_core.shell:create_environment_hook('custom_interfaces', 'ld_library_path_lib')
+[5.371s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/ld_library_path_lib.ps1'
+[5.374s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/ld_library_path_lib.dsv'
+[5.377s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/hook/ld_library_path_lib.sh'
+[5.380s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/custom_interfaces/bin'
+[5.380s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/custom_interfaces/lib/pkgconfig/custom_interfaces.pc'
+[5.385s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/custom_interfaces/lib/python3.10/site-packages'
+[5.387s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/custom_interfaces/bin'
+[5.389s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/package.ps1'
+[5.394s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/package.dsv'
+[5.398s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/package.sh'
+[5.403s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/package.bash'
+[5.406s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/package.zsh'
+[5.409s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/tom/aeac-2026/packages/install/custom_interfaces/share/colcon-core/packages/custom_interfaces)
+[6.654s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/mission': PYTHONPATH=/home/tom/aeac-2026/packages/build/mission/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../../../build/mission build --build-base /home/tom/aeac-2026/packages/build/mission/build install --record /home/tom/aeac-2026/packages/build/mission/install.log --single-version-externally-managed install_data
+[6.741s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/bringup': PYTHONPATH=/home/tom/aeac-2026/packages/build/bringup/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../../../build/bringup build --build-base /home/tom/aeac-2026/packages/build/bringup/build install --record /home/tom/aeac-2026/packages/build/bringup/install.log --single-version-externally-managed install_data
+[8.088s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/mission' for CMake module files
+[8.091s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/mission' returned '0': PYTHONPATH=/home/tom/aeac-2026/packages/build/mission/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../../../build/mission build --build-base /home/tom/aeac-2026/packages/build/mission/build install --record /home/tom/aeac-2026/packages/build/mission/install.log --single-version-externally-managed install_data
+[8.093s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/mission' for CMake config files
+[8.096s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/mission/lib'
+[8.097s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/mission/bin'
+[8.097s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/mission/lib/pkgconfig/mission.pc'
+[8.098s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages'
+[8.099s] Level 1:colcon.colcon_core.shell:create_environment_hook('mission', 'pythonpath')
+[8.099s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/mission/share/mission/hook/pythonpath.ps1'
+[8.102s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/tom/aeac-2026/packages/install/mission/share/mission/hook/pythonpath.dsv'
+[8.104s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/mission/share/mission/hook/pythonpath.sh'
+[8.107s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/mission/bin'
+[8.107s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mission)
+[8.109s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/aeac-2026/packages/install/mission/share/mission/package.ps1'
+[8.111s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/tom/aeac-2026/packages/install/mission/share/mission/package.dsv'
+[8.114s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/aeac-2026/packages/install/mission/share/mission/package.sh'
+[8.117s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/aeac-2026/packages/install/mission/share/mission/package.bash'
+[8.123s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/aeac-2026/packages/install/mission/share/mission/package.zsh'
+[8.127s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/tom/aeac-2026/packages/install/mission/share/colcon-core/packages/mission)
+[8.183s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/bringup' for CMake module files
+[8.185s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/bringup' returned '0': PYTHONPATH=/home/tom/aeac-2026/packages/build/bringup/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../../../build/bringup build --build-base /home/tom/aeac-2026/packages/build/bringup/build install --record /home/tom/aeac-2026/packages/build/bringup/install.log --single-version-externally-managed install_data
+[8.187s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/bringup' for CMake config files
+[8.189s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/bringup/lib'
+[8.189s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/bringup/bin'
+[8.189s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/bringup/lib/pkgconfig/bringup.pc'
+[8.190s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages'
+[8.190s] Level 1:colcon.colcon_core.shell:create_environment_hook('bringup', 'pythonpath')
+[8.191s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/bringup/share/bringup/hook/pythonpath.ps1'
+[8.192s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/tom/aeac-2026/packages/install/bringup/share/bringup/hook/pythonpath.dsv'
+[8.193s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/tom/aeac-2026/packages/install/bringup/share/bringup/hook/pythonpath.sh'
+[8.195s] Level 1:colcon.colcon_core.environment:checking '/home/tom/aeac-2026/packages/install/bringup/bin'
+[8.196s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(bringup)
+[8.197s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/aeac-2026/packages/install/bringup/share/bringup/package.ps1'
+[8.199s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/tom/aeac-2026/packages/install/bringup/share/bringup/package.dsv'
+[8.201s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/aeac-2026/packages/install/bringup/share/bringup/package.sh'
+[8.204s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/aeac-2026/packages/install/bringup/share/bringup/package.bash'
+[8.206s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/aeac-2026/packages/install/bringup/share/bringup/package.zsh'
+[8.208s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/tom/aeac-2026/packages/install/bringup/share/colcon-core/packages/bringup)
+[8.209s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[8.213s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[8.214s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[8.215s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[8.464s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.notify_send': Could not find 'notify-send'
+[8.465s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[8.465s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[8.465s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[8.469s] DEBUG:colcon.colcon_notification.desktop_notification.notify2:Failed to initialize notify2: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.Notifications was not provided by any .service files
+[8.469s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[8.470s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/tom/aeac-2026/packages/install/local_setup.ps1'
+[8.474s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/tom/aeac-2026/packages/install/_local_setup_util_ps1.py'
+[8.480s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/tom/aeac-2026/packages/install/setup.ps1'
+[8.494s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/tom/aeac-2026/packages/install/local_setup.sh'
+[8.500s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/tom/aeac-2026/packages/install/_local_setup_util_sh.py'
+[8.504s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/tom/aeac-2026/packages/install/setup.sh'
+[8.509s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/tom/aeac-2026/packages/install/local_setup.bash'
+[8.512s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/tom/aeac-2026/packages/install/setup.bash'
+[8.522s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/tom/aeac-2026/packages/install/local_setup.zsh'
+[8.527s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/tom/aeac-2026/packages/install/setup.zsh'

@@ -1,0 +1,25 @@
+[3.056s] Invoking command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/mission': PYTHONPATH=/home/tom/aeac-2026/packages/build/mission/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../../../build/mission build --build-base /home/tom/aeac-2026/packages/build/mission/build install --record /home/tom/aeac-2026/packages/build/mission/install.log --single-version-externally-managed install_data
+[4.019s] running egg_info
+[4.027s] writing ../../../../../build/mission/mission.egg-info/PKG-INFO
+[4.033s] writing dependency_links to ../../../../../build/mission/mission.egg-info/dependency_links.txt
+[4.034s] writing entry points to ../../../../../build/mission/mission.egg-info/entry_points.txt
+[4.034s] writing requirements to ../../../../../build/mission/mission.egg-info/requires.txt
+[4.034s] writing top-level names to ../../../../../build/mission/mission.egg-info/top_level.txt
+[4.037s] reading manifest file '../../../../../build/mission/mission.egg-info/SOURCES.txt'
+[4.050s] writing manifest file '../../../../../build/mission/mission.egg-info/SOURCES.txt'
+[4.051s] running build
+[4.051s] running build_py
+[4.052s] copying mission/laps.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission
+[4.063s] running install
+[4.064s] running install_lib
+[4.066s] copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/laps.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission
+[4.074s] byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/laps.py to laps.cpython-310.pyc
+[4.080s] running install_data
+[4.080s] running install_egg_info
+[4.091s] removing '/home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission-0.0.0-py3.10.egg-info' (and everything under it)
+[4.095s] Copying ../../../../../build/mission/mission.egg-info to /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission-0.0.0-py3.10.egg-info
+[4.103s] running install_scripts
+[4.182s] Installing gps_to_local script to /home/tom/aeac-2026/packages/install/mission/lib/mission
+[4.185s] Installing laps script to /home/tom/aeac-2026/packages/install/mission/lib/mission
+[4.185s] writing list of installed files to '/home/tom/aeac-2026/packages/build/mission/install.log'
+[4.325s] Invoked command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/mission' returned '0': PYTHONPATH=/home/tom/aeac-2026/packages/build/mission/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../../../build/mission build --build-base /home/tom/aeac-2026/packages/build/mission/build install --record /home/tom/aeac-2026/packages/build/mission/install.log --single-version-externally-managed install_data

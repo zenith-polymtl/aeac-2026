@@ -1,0 +1,701 @@
+[0.000000] (-) TimerEvent: {}
+[0.000902] (bringup) JobQueued: {'identifier': 'bringup', 'dependencies': OrderedDict()}
+[0.001955] (custom_interfaces) JobQueued: {'identifier': 'custom_interfaces', 'dependencies': OrderedDict()}
+[0.002062] (mission) JobQueued: {'identifier': 'mission', 'dependencies': OrderedDict()}
+[0.002152] (bringup) JobStarted: {'identifier': 'bringup'}
+[0.038341] (custom_interfaces) JobStarted: {'identifier': 'custom_interfaces'}
+[0.054344] (mission) JobStarted: {'identifier': 'mission'}
+[0.099520] (-) TimerEvent: {}
+[0.200318] (-) TimerEvent: {}
+[0.301511] (-) TimerEvent: {}
+[0.402509] (-) TimerEvent: {}
+[0.503620] (-) TimerEvent: {}
+[0.605177] (-) TimerEvent: {}
+[0.706344] (-) TimerEvent: {}
+[0.807428] (-) TimerEvent: {}
+[0.908595] (-) TimerEvent: {}
+[1.009752] (-) TimerEvent: {}
+[1.110825] (-) TimerEvent: {}
+[1.211592] (-) TimerEvent: {}
+[1.312535] (-) TimerEvent: {}
+[1.425149] (-) TimerEvent: {}
+[1.526116] (-) TimerEvent: {}
+[1.627206] (-) TimerEvent: {}
+[1.728230] (-) TimerEvent: {}
+[1.829293] (-) TimerEvent: {}
+[1.930234] (-) TimerEvent: {}
+[2.031645] (-) TimerEvent: {}
+[2.132694] (-) TimerEvent: {}
+[2.233688] (-) TimerEvent: {}
+[2.334701] (-) TimerEvent: {}
+[2.436067] (-) TimerEvent: {}
+[2.537207] (-) TimerEvent: {}
+[2.638066] (-) TimerEvent: {}
+[2.738965] (-) TimerEvent: {}
+[2.839788] (-) TimerEvent: {}
+[2.940507] (-) TimerEvent: {}
+[3.041249] (-) TimerEvent: {}
+[3.142166] (-) TimerEvent: {}
+[3.243120] (-) TimerEvent: {}
+[3.347705] (-) TimerEvent: {}
+[3.372311] (custom_interfaces) JobProgress: {'identifier': 'custom_interfaces', 'progress': 'cmake'}
+[3.409937] (custom_interfaces) Command: {'cmd': ['/usr/bin/cmake', '/home/tom/aeac-2026/packages/src/custom_interfaces', '-DCATKIN_INSTALL_INTO_PREFIX_ROOT=0', '-DCMAKE_INSTALL_PREFIX=/home/tom/aeac-2026/packages/install/custom_interfaces'], 'cwd': '/home/tom/aeac-2026/packages/build/custom_interfaces', 'env': OrderedDict([('PYTHON_BASIC_REPL', '1'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'tom'), ('ROS_PACKAGE_PATH', '/home/tom/aeac-2026/packages/install/custom_interfaces/share'), ('GIT_ASKPASS', '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/extensions/git/dist/askpass.sh'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/tom/aeac-2026/packages/install/custom_interfaces/lib:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('MOTD_SHOWN', 'update-motd'), ('HOME', '/home/tom'), ('OLDPWD', '/home/tom/aeac-2026/packages'), ('TERM_PROGRAM_VERSION', '1.108.0'), ('VSCODE_IPC_HOOK_CLI', '/run/user/1000/vscode-ipc-a5f7f2a1-b7dc-40a0-a4ae-6872bd90c736.sock'), ('ROS_PYTHON_VERSION', '3'), ('VSCODE_GIT_ASKPASS_MAIN', '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/extensions/git/dist/askpass-main.js'), ('VSCODE_GIT_ASKPASS_NODE', '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/node'), ('PYDEVD_DISABLE_FILE_VALIDATION', '1'), ('BUNDLED_DEBUGPY_PATH', '/home/tom/.vscode-server/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy'), ('VSCODE_PYTHON_AUTOACTIVATE_GUARD', '1'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('WSL_DISTRO_NAME', 'Ubuntu-22.04'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/tom/aeac-2026/packages/install:/home/tom/ros2_ws/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'tom'), ('NAME', 'LAPTOP-I7UUP03M'), ('WSL_INTEROP', '/run/WSL/707_interop'), ('PULSE_SERVER', 'unix:/mnt/wslg/PulseServer'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('PKG_CONFIG_PATH', '/home/tom/aeac-2026/packages/install/custom_interfaces/lib/x86_64-linux-gnu/pkgconfig:/home/tom/aeac-2026/packages/install/custom_interfaces/lib/pkgconfig'), ('TERM', 'xterm-256color'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/bin/remote-cli:/home/tom/.local/bin:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files (x86)/dotnet/:/mnt/c/Program Files/PuTTY/:/mnt/c/Program Files/MATLAB/MATLAB Runtime/v93/runtime/win64:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files/dotnet/:/mnt/c/ProgramData/Microsoft/Windows/Start Menu/Programs:/mnt/c/Users/Tommy/Desktop/BatimentType/env/Scripts:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/Scripts/:/mnt/c/Users/Tommy/AppData/Local/Programs/MiKTeX/miktex/bin/x64/miktex-console.exe:/mnt/c/Program Files/MATLAB/R2025a/runtime/win64:/mnt/c/Program Files/MATLAB/R2025a/bin:/mnt/c/Program Files/PVsyst8.0.12/:/mnt/c/Users/Tommy/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/Tommy/.dotnet/tools:/mnt/c/Users/Tommy/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python311:/mnt/c/ffmpeg/bin:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/Scripts/:/mnt/c/Users/Tommy/AppData/Local/Programs/MiKTeX/miktex/bin/x64/:/mnt/c/Users/Tommy/AppData/Local/Pandoc/:/snap/bin:/home/tom/.vscode-server/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/scripts/noConfigScripts'), ('XDG_RUNTIME_DIR', '/run/user/1000/'), ('DISPLAY', ':0'), ('VSCODE_DEBUGPY_ADAPTER_ENDPOINTS', '/home/tom/.vscode-server/extensions/ms-python.debugpy-2025.18.0-linux-x64/.noConfigDebugAdapterEndpoints/endpoint-afb8dbf0d2cdbe3a.txt'), ('LANG', 'en_US.UTF-8'), ('PYTHONSTARTUP', '/home/tom/.vscode-server/data/User/workspaceStorage/aa24c71cad9e2ed24d993d3dea5efb80-1/ms-python.python/pythonrc.py'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-6b130a5a25.sock'), ('TERM_PROGRAM', 'vscode'), ('AMENT_PREFIX_PATH', '/home/tom/aeac-2026/packages/install/mission:/home/tom/aeac-2026/packages/install/bringup:/home/tom/ros2_ws/install/bme_ros2_tutorials_py:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces:/home/tom/ros2_ws/install/bme_ros2_tutorials_cpp:/home/tom/ros2_ws/install/bme_ros2_tutorials_bringup:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', ''), ('PWD', '/home/tom/aeac-2026/packages/build/custom_interfaces'), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/tom/aeac-2026/packages/build/mission:/home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages:/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages:/home/tom/aeac-2026/packages/build/bringup:/home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages:/home/tom/ros2_ws/install/bme_ros2_tutorials_py/lib/python3.10/site-packages:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('WSL2_GUI_APPS_ENABLED', '1'), ('HOSTTYPE', 'x86_64'), ('CMAKE_PREFIX_PATH', '/home/tom/aeac-2026/packages/install/custom_interfaces:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces:/home/tom/ros2_ws/install/bme_ros2_tutorials_cpp:/home/tom/ros2_ws/install/bme_ros2_tutorials_bringup'), ('WSLENV', 'VSCODE_WSL_EXT_LOCATION/up:VSCODE_SERVER_TAR/up')]), 'shell': False}
+[3.450899] (-) TimerEvent: {}
+[3.554009] (-) TimerEvent: {}
+[3.654773] (-) TimerEvent: {}
+[3.813412] (-) TimerEvent: {}
+[3.918670] (-) TimerEvent: {}
+[4.023593] (-) TimerEvent: {}
+[4.131896] (-) TimerEvent: {}
+[4.233879] (-) TimerEvent: {}
+[4.334808] (-) TimerEvent: {}
+[4.435789] (-) TimerEvent: {}
+[4.539267] (-) TimerEvent: {}
+[4.640211] (-) TimerEvent: {}
+[4.741386] (-) TimerEvent: {}
+[4.842325] (-) TimerEvent: {}
+[4.943254] (-) TimerEvent: {}
+[5.044208] (-) TimerEvent: {}
+[5.144947] (-) TimerEvent: {}
+[5.245837] (-) TimerEvent: {}
+[5.248465] (custom_interfaces) StdoutLine: {'line': b'-- The C compiler identification is GNU 11.4.0\n'}
+[5.346069] (-) TimerEvent: {}
+[5.446953] (-) TimerEvent: {}
+[5.548283] (-) TimerEvent: {}
+[5.649525] (-) TimerEvent: {}
+[5.750369] (-) TimerEvent: {}
+[5.851460] (-) TimerEvent: {}
+[5.952445] (-) TimerEvent: {}
+[6.053476] (-) TimerEvent: {}
+[6.154162] (-) TimerEvent: {}
+[6.255179] (-) TimerEvent: {}
+[6.356053] (-) TimerEvent: {}
+[6.457285] (-) TimerEvent: {}
+[6.558157] (-) TimerEvent: {}
+[6.659129] (-) TimerEvent: {}
+[6.760061] (-) TimerEvent: {}
+[6.861156] (-) TimerEvent: {}
+[6.962686] (-) TimerEvent: {}
+[7.063516] (-) TimerEvent: {}
+[7.164412] (-) TimerEvent: {}
+[7.265538] (-) TimerEvent: {}
+[7.366728] (-) TimerEvent: {}
+[7.467580] (-) TimerEvent: {}
+[7.568119] (-) TimerEvent: {}
+[7.668708] (-) TimerEvent: {}
+[7.769227] (-) TimerEvent: {}
+[7.869824] (-) TimerEvent: {}
+[7.970511] (-) TimerEvent: {}
+[8.071204] (-) TimerEvent: {}
+[8.171865] (-) TimerEvent: {}
+[8.272548] (-) TimerEvent: {}
+[8.373166] (-) TimerEvent: {}
+[8.465719] (mission) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'egg_info', '--egg-base', '../../../../../build/mission', 'build', '--build-base', '/home/tom/aeac-2026/packages/build/mission/build', 'install', '--record', '/home/tom/aeac-2026/packages/build/mission/install.log', '--single-version-externally-managed', 'install_data'], 'cwd': '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/mission', 'env': {'PYTHON_BASIC_REPL': '1', 'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'tom', 'ROS_PACKAGE_PATH': '/home/tom/aeac-2026/packages/install/custom_interfaces/share', 'GIT_ASKPASS': '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/extensions/git/dist/askpass.sh', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/home/tom/aeac-2026/packages/install/custom_interfaces/lib:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib', 'MOTD_SHOWN': 'update-motd', 'HOME': '/home/tom', 'OLDPWD': '/home/tom/aeac-2026/packages', 'TERM_PROGRAM_VERSION': '1.108.0', 'VSCODE_IPC_HOOK_CLI': '/run/user/1000/vscode-ipc-a5f7f2a1-b7dc-40a0-a4ae-6872bd90c736.sock', 'ROS_PYTHON_VERSION': '3', 'VSCODE_GIT_ASKPASS_MAIN': '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/extensions/git/dist/askpass-main.js', 'VSCODE_GIT_ASKPASS_NODE': '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/node', 'PYDEVD_DISABLE_FILE_VALIDATION': '1', 'BUNDLED_DEBUGPY_PATH': '/home/tom/.vscode-server/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy', 'VSCODE_PYTHON_AUTOACTIVATE_GUARD': '1', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', 'WSL_DISTRO_NAME': 'Ubuntu-22.04', 'WAYLAND_DISPLAY': 'wayland-0', 'COLCON_PREFIX_PATH': '/home/tom/aeac-2026/packages/install:/home/tom/ros2_ws/install', 'ROS_DISTRO': 'humble', 'LOGNAME': 'tom', 'NAME': 'LAPTOP-I7UUP03M', 'WSL_INTEROP': '/run/WSL/707_interop', 'PULSE_SERVER': 'unix:/mnt/wslg/PulseServer', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'PKG_CONFIG_PATH': '/home/tom/aeac-2026/packages/install/custom_interfaces/lib/x86_64-linux-gnu/pkgconfig:/home/tom/aeac-2026/packages/install/custom_interfaces/lib/pkgconfig', 'TERM': 'xterm-256color', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/bin/remote-cli:/home/tom/.local/bin:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files (x86)/dotnet/:/mnt/c/Program Files/PuTTY/:/mnt/c/Program Files/MATLAB/MATLAB Runtime/v93/runtime/win64:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files/dotnet/:/mnt/c/ProgramData/Microsoft/Windows/Start Menu/Programs:/mnt/c/Users/Tommy/Desktop/BatimentType/env/Scripts:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/Scripts/:/mnt/c/Users/Tommy/AppData/Local/Programs/MiKTeX/miktex/bin/x64/miktex-console.exe:/mnt/c/Program Files/MATLAB/R2025a/runtime/win64:/mnt/c/Program Files/MATLAB/R2025a/bin:/mnt/c/Program Files/PVsyst8.0.12/:/mnt/c/Users/Tommy/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/Tommy/.dotnet/tools:/mnt/c/Users/Tommy/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python311:/mnt/c/ffmpeg/bin:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/Scripts/:/mnt/c/Users/Tommy/AppData/Local/Programs/MiKTeX/miktex/bin/x64/:/mnt/c/Users/Tommy/AppData/Local/Pandoc/:/snap/bin:/home/tom/.vscode-server/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/scripts/noConfigScripts', 'XDG_RUNTIME_DIR': '/run/user/1000/', 'DISPLAY': ':0', 'VSCODE_DEBUGPY_ADAPTER_ENDPOINTS': '/home/tom/.vscode-server/extensions/ms-python.debugpy-2025.18.0-linux-x64/.noConfigDebugAdapterEndpoints/endpoint-afb8dbf0d2cdbe3a.txt', 'LANG': 'en_US.UTF-8', 'PYTHONSTARTUP': '/home/tom/.vscode-server/data/User/workspaceStorage/aa24c71cad9e2ed24d993d3dea5efb80-1/ms-python.python/pythonrc.py', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'VSCODE_GIT_IPC_HANDLE': '/run/user/1000/vscode-git-6b130a5a25.sock', 'TERM_PROGRAM': 'vscode', 'AMENT_PREFIX_PATH': '/home/tom/aeac-2026/packages/install/mission:/home/tom/aeac-2026/packages/install/bringup:/home/tom/ros2_ws/install/bme_ros2_tutorials_py:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces:/home/tom/ros2_ws/install/bme_ros2_tutorials_cpp:/home/tom/ros2_ws/install/bme_ros2_tutorials_bringup:/opt/ros/humble', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'VSCODE_GIT_ASKPASS_EXTRA_ARGS': '', 'PWD': '/home/tom/aeac-2026/packages/build/mission', 'XDG_DATA_DIRS': '/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/tom/aeac-2026/packages/build/mission/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages:/home/tom/aeac-2026/packages/build/mission:/home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages:/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages:/home/tom/aeac-2026/packages/build/bringup:/home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages:/home/tom/ros2_ws/install/bme_ros2_tutorials_py/lib/python3.10/site-packages:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'COLCON': '1', 'WSL2_GUI_APPS_ENABLED': '1', 'HOSTTYPE': 'x86_64', 'CMAKE_PREFIX_PATH': '/home/tom/aeac-2026/packages/install/custom_interfaces:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces:/home/tom/ros2_ws/install/bme_ros2_tutorials_cpp:/home/tom/ros2_ws/install/bme_ros2_tutorials_bringup', 'WSLENV': 'VSCODE_WSL_EXT_LOCATION/up:VSCODE_SERVER_TAR/up'}, 'shell': False}
+[8.489738] (-) TimerEvent: {}
+[8.590324] (-) TimerEvent: {}
+[8.684115] (bringup) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'egg_info', '--egg-base', '../../../../../build/bringup', 'build', '--build-base', '/home/tom/aeac-2026/packages/build/bringup/build', 'install', '--record', '/home/tom/aeac-2026/packages/build/bringup/install.log', '--single-version-externally-managed', 'install_data'], 'cwd': '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/bringup', 'env': {'PYTHON_BASIC_REPL': '1', 'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'tom', 'ROS_PACKAGE_PATH': '/home/tom/aeac-2026/packages/install/custom_interfaces/share', 'GIT_ASKPASS': '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/extensions/git/dist/askpass.sh', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/home/tom/aeac-2026/packages/install/custom_interfaces/lib:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib', 'MOTD_SHOWN': 'update-motd', 'HOME': '/home/tom', 'OLDPWD': '/home/tom/aeac-2026/packages', 'TERM_PROGRAM_VERSION': '1.108.0', 'VSCODE_IPC_HOOK_CLI': '/run/user/1000/vscode-ipc-a5f7f2a1-b7dc-40a0-a4ae-6872bd90c736.sock', 'ROS_PYTHON_VERSION': '3', 'VSCODE_GIT_ASKPASS_MAIN': '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/extensions/git/dist/askpass-main.js', 'VSCODE_GIT_ASKPASS_NODE': '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/node', 'PYDEVD_DISABLE_FILE_VALIDATION': '1', 'BUNDLED_DEBUGPY_PATH': '/home/tom/.vscode-server/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy', 'VSCODE_PYTHON_AUTOACTIVATE_GUARD': '1', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', 'WSL_DISTRO_NAME': 'Ubuntu-22.04', 'WAYLAND_DISPLAY': 'wayland-0', 'COLCON_PREFIX_PATH': '/home/tom/aeac-2026/packages/install:/home/tom/ros2_ws/install', 'ROS_DISTRO': 'humble', 'LOGNAME': 'tom', 'NAME': 'LAPTOP-I7UUP03M', 'WSL_INTEROP': '/run/WSL/707_interop', 'PULSE_SERVER': 'unix:/mnt/wslg/PulseServer', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'PKG_CONFIG_PATH': '/home/tom/aeac-2026/packages/install/custom_interfaces/lib/x86_64-linux-gnu/pkgconfig:/home/tom/aeac-2026/packages/install/custom_interfaces/lib/pkgconfig', 'TERM': 'xterm-256color', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/bin/remote-cli:/home/tom/.local/bin:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files (x86)/dotnet/:/mnt/c/Program Files/PuTTY/:/mnt/c/Program Files/MATLAB/MATLAB Runtime/v93/runtime/win64:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files/dotnet/:/mnt/c/ProgramData/Microsoft/Windows/Start Menu/Programs:/mnt/c/Users/Tommy/Desktop/BatimentType/env/Scripts:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/Scripts/:/mnt/c/Users/Tommy/AppData/Local/Programs/MiKTeX/miktex/bin/x64/miktex-console.exe:/mnt/c/Program Files/MATLAB/R2025a/runtime/win64:/mnt/c/Program Files/MATLAB/R2025a/bin:/mnt/c/Program Files/PVsyst8.0.12/:/mnt/c/Users/Tommy/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/Tommy/.dotnet/tools:/mnt/c/Users/Tommy/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python311:/mnt/c/ffmpeg/bin:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/Scripts/:/mnt/c/Users/Tommy/AppData/Local/Programs/MiKTeX/miktex/bin/x64/:/mnt/c/Users/Tommy/AppData/Local/Pandoc/:/snap/bin:/home/tom/.vscode-server/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/scripts/noConfigScripts', 'XDG_RUNTIME_DIR': '/run/user/1000/', 'DISPLAY': ':0', 'VSCODE_DEBUGPY_ADAPTER_ENDPOINTS': '/home/tom/.vscode-server/extensions/ms-python.debugpy-2025.18.0-linux-x64/.noConfigDebugAdapterEndpoints/endpoint-afb8dbf0d2cdbe3a.txt', 'LANG': 'en_US.UTF-8', 'PYTHONSTARTUP': '/home/tom/.vscode-server/data/User/workspaceStorage/aa24c71cad9e2ed24d993d3dea5efb80-1/ms-python.python/pythonrc.py', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'VSCODE_GIT_IPC_HANDLE': '/run/user/1000/vscode-git-6b130a5a25.sock', 'TERM_PROGRAM': 'vscode', 'AMENT_PREFIX_PATH': '/home/tom/aeac-2026/packages/install/mission:/home/tom/aeac-2026/packages/install/bringup:/home/tom/ros2_ws/install/bme_ros2_tutorials_py:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces:/home/tom/ros2_ws/install/bme_ros2_tutorials_cpp:/home/tom/ros2_ws/install/bme_ros2_tutorials_bringup:/opt/ros/humble', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'VSCODE_GIT_ASKPASS_EXTRA_ARGS': '', 'PWD': '/home/tom/aeac-2026/packages/build/bringup', 'XDG_DATA_DIRS': '/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/tom/aeac-2026/packages/build/bringup/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages:/home/tom/aeac-2026/packages/build/mission:/home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages:/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages:/home/tom/aeac-2026/packages/build/bringup:/home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages:/home/tom/ros2_ws/install/bme_ros2_tutorials_py/lib/python3.10/site-packages:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'COLCON': '1', 'WSL2_GUI_APPS_ENABLED': '1', 'HOSTTYPE': 'x86_64', 'CMAKE_PREFIX_PATH': '/home/tom/aeac-2026/packages/install/custom_interfaces:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces:/home/tom/ros2_ws/install/bme_ros2_tutorials_cpp:/home/tom/ros2_ws/install/bme_ros2_tutorials_bringup', 'WSLENV': 'VSCODE_WSL_EXT_LOCATION/up:VSCODE_SERVER_TAR/up'}, 'shell': False}
+[8.690455] (-) TimerEvent: {}
+[8.772986] (custom_interfaces) StdoutLine: {'line': b'-- The CXX compiler identification is GNU 11.4.0\n'}
+[8.790619] (-) TimerEvent: {}
+[8.891240] (-) TimerEvent: {}
+[8.991886] (-) TimerEvent: {}
+[9.092642] (-) TimerEvent: {}
+[9.194344] (-) TimerEvent: {}
+[9.295001] (-) TimerEvent: {}
+[9.395721] (-) TimerEvent: {}
+[9.496462] (-) TimerEvent: {}
+[9.599102] (-) TimerEvent: {}
+[9.699649] (-) TimerEvent: {}
+[9.745419] (mission) StdoutLine: {'line': b'running egg_info\n'}
+[9.748048] (mission) StdoutLine: {'line': b'creating ../../../../../build/mission/mission.egg-info\n'}
+[9.752288] (mission) StdoutLine: {'line': b'writing ../../../../../build/mission/mission.egg-info/PKG-INFO\n'}
+[9.754262] (mission) StdoutLine: {'line': b'writing dependency_links to ../../../../../build/mission/mission.egg-info/dependency_links.txt\n'}
+[9.754599] (mission) StdoutLine: {'line': b'writing entry points to ../../../../../build/mission/mission.egg-info/entry_points.txt\n'}
+[9.755246] (mission) StdoutLine: {'line': b'writing requirements to ../../../../../build/mission/mission.egg-info/requires.txt\n'}
+[9.755604] (mission) StdoutLine: {'line': b'writing top-level names to ../../../../../build/mission/mission.egg-info/top_level.txt\n'}
+[9.760357] (mission) StdoutLine: {'line': b"writing manifest file '../../../../../build/mission/mission.egg-info/SOURCES.txt'\n"}
+[9.763110] (mission) StdoutLine: {'line': b"reading manifest file '../../../../../build/mission/mission.egg-info/SOURCES.txt'\n"}
+[9.769488] (mission) StdoutLine: {'line': b"writing manifest file '../../../../../build/mission/mission.egg-info/SOURCES.txt'\n"}
+[9.770170] (mission) StdoutLine: {'line': b'running build\n'}
+[9.770427] (mission) StdoutLine: {'line': b'running build_py\n'}
+[9.772074] (mission) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/build/mission/build\n'}
+[9.772407] (mission) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/build/mission/build/lib\n'}
+[9.773667] (mission) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/build/mission/build/lib/mission\n'}
+[9.775262] (mission) StdoutLine: {'line': b'copying mission/connection.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission\n'}
+[9.776715] (mission) StdoutLine: {'line': b'copying mission/helpers.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission\n'}
+[9.779592] (mission) StdoutLine: {'line': b'copying mission/laps.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission\n'}
+[9.781259] (mission) StdoutLine: {'line': b'copying mission/takeoff.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission\n'}
+[9.783451] (mission) StdoutLine: {'line': b'copying mission/lapsDeBase.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission\n'}
+[9.783730] (mission) StdoutLine: {'line': b'copying mission/gps_to_local.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission\n'}
+[9.783884] (mission) StdoutLine: {'line': b'copying mission/__init__.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission\n'}
+[9.784029] (mission) StdoutLine: {'line': b'copying mission/data.py -> /home/tom/aeac-2026/packages/build/mission/build/lib/mission\n'}
+[9.784266] (mission) StdoutLine: {'line': b'running install\n'}
+[9.784987] (mission) StdoutLine: {'line': b'running install_lib\n'}
+[9.787079] (mission) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission\n'}
+[9.789312] (mission) StdoutLine: {'line': b'copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/connection.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission\n'}
+[9.789597] (mission) StdoutLine: {'line': b'copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/helpers.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission\n'}
+[9.789882] (mission) StdoutLine: {'line': b'copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/laps.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission\n'}
+[9.790452] (mission) StdoutLine: {'line': b'copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/takeoff.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission\n'}
+[9.792043] (mission) StdoutLine: {'line': b'copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/lapsDeBase.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission\n'}
+[9.794422] (mission) StdoutLine: {'line': b'copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/gps_to_local.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission\n'}
+[9.794824] (mission) StdoutLine: {'line': b'copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/__init__.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission\n'}
+[9.795021] (mission) StdoutLine: {'line': b'copying /home/tom/aeac-2026/packages/build/mission/build/lib/mission/data.py -> /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission\n'}
+[9.800208] (mission) StdoutLine: {'line': b'byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/connection.py to connection.cpython-310.pyc\n'}
+[9.800618] (-) TimerEvent: {}
+[9.800920] (mission) StdoutLine: {'line': b'byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/helpers.py to helpers.cpython-310.pyc\n'}
+[9.802748] (mission) StdoutLine: {'line': b'byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/laps.py to laps.cpython-310.pyc\n'}
+[9.804093] (mission) StdoutLine: {'line': b'byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/takeoff.py to takeoff.cpython-310.pyc\n'}
+[9.804993] (mission) StdoutLine: {'line': b'byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/lapsDeBase.py to lapsDeBase.cpython-310.pyc\n'}
+[9.812810] (mission) StdoutLine: {'line': b'byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/gps_to_local.py to gps_to_local.cpython-310.pyc\n'}
+[9.813283] (mission) StdoutLine: {'line': b'byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/__init__.py to __init__.cpython-310.pyc\n'}
+[9.813750] (mission) StdoutLine: {'line': b'byte-compiling /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission/data.py to data.cpython-310.pyc\n'}
+[9.814006] (mission) StdoutLine: {'line': b'running install_data\n'}
+[9.814228] (mission) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/install/mission/share/ament_index\n'}
+[9.815075] (mission) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/install/mission/share/ament_index/resource_index\n'}
+[9.820177] (mission) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/install/mission/share/ament_index/resource_index/packages\n'}
+[9.823414] (mission) StdoutLine: {'line': b'copying resource/mission -> /home/tom/aeac-2026/packages/install/mission/share/ament_index/resource_index/packages\n'}
+[9.823965] (mission) StdoutLine: {'line': b'copying package.xml -> /home/tom/aeac-2026/packages/install/mission/share/mission\n'}
+[9.824363] (mission) StdoutLine: {'line': b'running install_egg_info\n'}
+[9.826801] (mission) StdoutLine: {'line': b'Copying ../../../../../build/mission/mission.egg-info to /home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages/mission-0.0.0-py3.10.egg-info\n'}
+[9.834899] (mission) StdoutLine: {'line': b'running install_scripts\n'}
+[9.882619] (bringup) StdoutLine: {'line': b'running egg_info\n'}
+[9.884332] (bringup) StdoutLine: {'line': b'creating ../../../../../build/bringup/bringup.egg-info\n'}
+[9.886398] (bringup) StdoutLine: {'line': b'writing ../../../../../build/bringup/bringup.egg-info/PKG-INFO\n'}
+[9.887189] (bringup) StdoutLine: {'line': b'writing dependency_links to ../../../../../build/bringup/bringup.egg-info/dependency_links.txt\n'}
+[9.888190] (bringup) StdoutLine: {'line': b'writing requirements to ../../../../../build/bringup/bringup.egg-info/requires.txt\n'}
+[9.888664] (bringup) StdoutLine: {'line': b'writing top-level names to ../../../../../build/bringup/bringup.egg-info/top_level.txt\n'}
+[9.890735] (mission) StdoutLine: {'line': b'Installing gps_to_local script to /home/tom/aeac-2026/packages/install/mission/lib/mission\n'}
+[9.891463] (bringup) StdoutLine: {'line': b"writing manifest file '../../../../../build/bringup/bringup.egg-info/SOURCES.txt'\n"}
+[9.892892] (mission) StdoutLine: {'line': b'Installing laps script to /home/tom/aeac-2026/packages/install/mission/lib/mission\n'}
+[9.894327] (mission) StdoutLine: {'line': b"writing list of installed files to '/home/tom/aeac-2026/packages/build/mission/install.log'\n"}
+[9.896685] (bringup) StdoutLine: {'line': b"reading manifest file '../../../../../build/bringup/bringup.egg-info/SOURCES.txt'\n"}
+[9.898968] (bringup) StdoutLine: {'line': b"writing manifest file '../../../../../build/bringup/bringup.egg-info/SOURCES.txt'\n"}
+[9.900499] (bringup) StdoutLine: {'line': b'running build\n'}
+[9.901149] (-) TimerEvent: {}
+[9.901800] (bringup) StdoutLine: {'line': b'running build_py\n'}
+[9.902349] (bringup) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/build/bringup/build\n'}
+[9.906436] (bringup) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/build/bringup/build/lib\n'}
+[9.908880] (bringup) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/build/bringup/build/lib/bringup\n'}
+[9.911276] (bringup) StdoutLine: {'line': b'copying bringup/__init__.py -> /home/tom/aeac-2026/packages/build/bringup/build/lib/bringup\n'}
+[9.912093] (bringup) StdoutLine: {'line': b'running install\n'}
+[9.913462] (bringup) StdoutLine: {'line': b'running install_lib\n'}
+[9.915955] (bringup) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages/bringup\n'}
+[9.917835] (bringup) StdoutLine: {'line': b'copying /home/tom/aeac-2026/packages/build/bringup/build/lib/bringup/__init__.py -> /home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages/bringup\n'}
+[9.922501] (bringup) StdoutLine: {'line': b'byte-compiling /home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages/bringup/__init__.py to __init__.cpython-310.pyc\n'}
+[9.926549] (bringup) StdoutLine: {'line': b'running install_data\n'}
+[9.928072] (bringup) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/install/bringup/share/ament_index\n'}
+[9.932503] (bringup) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/install/bringup/share/ament_index/resource_index\n'}
+[9.935184] (bringup) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/install/bringup/share/ament_index/resource_index/packages\n'}
+[9.937553] (bringup) StdoutLine: {'line': b'copying resource/bringup -> /home/tom/aeac-2026/packages/install/bringup/share/ament_index/resource_index/packages\n'}
+[9.938175] (bringup) StdoutLine: {'line': b'copying package.xml -> /home/tom/aeac-2026/packages/install/bringup/share/bringup\n'}
+[9.939088] (bringup) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/install/bringup/share/bringup/launch\n'}
+[9.941231] (bringup) StdoutLine: {'line': b'copying launch/phase1.launch.py -> /home/tom/aeac-2026/packages/install/bringup/share/bringup/launch\n'}
+[9.941794] (bringup) StdoutLine: {'line': b'creating /home/tom/aeac-2026/packages/install/bringup/share/bringup/config\n'}
+[9.943722] (bringup) StdoutLine: {'line': b'copying config/trajectoirePhase1.json -> /home/tom/aeac-2026/packages/install/bringup/share/bringup/config\n'}
+[9.945298] (bringup) StdoutLine: {'line': b'running install_egg_info\n'}
+[9.949593] (bringup) StdoutLine: {'line': b'Copying ../../../../../build/bringup/bringup.egg-info to /home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages/bringup-0.0.0-py3.10.egg-info\n'}
+[9.953007] (bringup) StdoutLine: {'line': b'running install_scripts\n'}
+[9.993578] (mission) CommandEnded: {'returncode': 0}
+[10.001296] (-) TimerEvent: {}
+[10.019552] (bringup) StdoutLine: {'line': b"writing list of installed files to '/home/tom/aeac-2026/packages/build/bringup/install.log'\n"}
+[10.041319] (mission) JobEnded: {'identifier': 'mission', 'rc': 0}
+[10.101431] (-) TimerEvent: {}
+[10.121841] (bringup) CommandEnded: {'returncode': 0}
+[10.158598] (bringup) JobEnded: {'identifier': 'bringup', 'rc': 0}
+[10.201681] (-) TimerEvent: {}
+[10.302511] (-) TimerEvent: {}
+[10.403399] (-) TimerEvent: {}
+[10.436733] (custom_interfaces) StdoutLine: {'line': b'-- Detecting C compiler ABI info\n'}
+[10.503544] (-) TimerEvent: {}
+[10.604229] (-) TimerEvent: {}
+[10.705061] (-) TimerEvent: {}
+[10.805672] (-) TimerEvent: {}
+[10.912913] (-) TimerEvent: {}
+[11.013424] (-) TimerEvent: {}
+[11.114323] (-) TimerEvent: {}
+[11.200715] (custom_interfaces) StdoutLine: {'line': b'-- Detecting C compiler ABI info - done\n'}
+[11.214461] (-) TimerEvent: {}
+[11.218236] (custom_interfaces) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc - skipped\n'}
+[11.218945] (custom_interfaces) StdoutLine: {'line': b'-- Detecting C compile features\n'}
+[11.220010] (custom_interfaces) StdoutLine: {'line': b'-- Detecting C compile features - done\n'}
+[11.230724] (custom_interfaces) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info\n'}
+[11.315236] (-) TimerEvent: {}
+[11.415894] (-) TimerEvent: {}
+[11.516560] (-) TimerEvent: {}
+[11.617270] (-) TimerEvent: {}
+[11.717885] (-) TimerEvent: {}
+[11.818540] (-) TimerEvent: {}
+[11.919189] (-) TimerEvent: {}
+[11.972257] (custom_interfaces) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info - done\n'}
+[11.991642] (custom_interfaces) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++ - skipped\n'}
+[11.992659] (custom_interfaces) StdoutLine: {'line': b'-- Detecting CXX compile features\n'}
+[11.994562] (custom_interfaces) StdoutLine: {'line': b'-- Detecting CXX compile features - done\n'}
+[12.004643] (custom_interfaces) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[12.019345] (-) TimerEvent: {}
+[12.119940] (-) TimerEvent: {}
+[12.220897] (-) TimerEvent: {}
+[12.321507] (-) TimerEvent: {}
+[12.422149] (-) TimerEvent: {}
+[12.522887] (-) TimerEvent: {}
+[12.566196] (custom_interfaces) StdoutLine: {'line': b'-- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter \n'}
+[12.623110] (-) TimerEvent: {}
+[12.723721] (-) TimerEvent: {}
+[12.824635] (-) TimerEvent: {}
+[12.881147] (custom_interfaces) StdoutLine: {'line': b'-- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)\n'}
+[12.896064] (custom_interfaces) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[12.924902] (-) TimerEvent: {}
+[12.926467] (custom_interfaces) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.7 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[13.025119] (-) TimerEvent: {}
+[13.125765] (-) TimerEvent: {}
+[13.226572] (-) TimerEvent: {}
+[13.327342] (-) TimerEvent: {}
+[13.428029] (-) TimerEvent: {}
+[13.528883] (-) TimerEvent: {}
+[13.571535] (custom_interfaces) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[13.629079] (-) TimerEvent: {}
+[13.729812] (-) TimerEvent: {}
+[13.830495] (-) TimerEvent: {}
+[13.931362] (-) TimerEvent: {}
+[14.032046] (-) TimerEvent: {}
+[14.132828] (-) TimerEvent: {}
+[14.233443] (-) TimerEvent: {}
+[14.334061] (-) TimerEvent: {}
+[14.434864] (-) TimerEvent: {}
+[14.535592] (-) TimerEvent: {}
+[14.636494] (-) TimerEvent: {}
+[14.667091] (custom_interfaces) StdoutLine: {'line': b'-- Found ament_cmake_ros: 0.10.0 (/opt/ros/humble/share/ament_cmake_ros/cmake)\n'}
+[14.736599] (-) TimerEvent: {}
+[14.837404] (-) TimerEvent: {}
+[14.938028] (-) TimerEvent: {}
+[15.038582] (-) TimerEvent: {}
+[15.139291] (-) TimerEvent: {}
+[15.239921] (-) TimerEvent: {}
+[15.278894] (custom_interfaces) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[15.340132] (-) TimerEvent: {}
+[15.440988] (-) TimerEvent: {}
+[15.541673] (-) TimerEvent: {}
+[15.642342] (-) TimerEvent: {}
+[15.743058] (-) TimerEvent: {}
+[15.843639] (-) TimerEvent: {}
+[15.944412] (-) TimerEvent: {}
+[16.045173] (-) TimerEvent: {}
+[16.145942] (-) TimerEvent: {}
+[16.248962] (-) TimerEvent: {}
+[16.349735] (-) TimerEvent: {}
+[16.450640] (-) TimerEvent: {}
+[16.496227] (custom_interfaces) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[16.550911] (-) TimerEvent: {}
+[16.651658] (-) TimerEvent: {}
+[16.752514] (-) TimerEvent: {}
+[16.853117] (-) TimerEvent: {}
+[16.925218] (custom_interfaces) StdoutLine: {'line': b'-- Found PythonInterp: /usr/bin/python3 (found suitable version "3.10.12", minimum required is "3.6") \n'}
+[16.928932] (custom_interfaces) StdoutLine: {'line': b'-- Found python_cmake_module: 0.10.0 (/opt/ros/humble/share/python_cmake_module/cmake)\n'}
+[16.953379] (-) TimerEvent: {}
+[17.054118] (-) TimerEvent: {}
+[17.154824] (-) TimerEvent: {}
+[17.255723] (-) TimerEvent: {}
+[17.356283] (-) TimerEvent: {}
+[17.457161] (-) TimerEvent: {}
+[17.557677] (-) TimerEvent: {}
+[17.658236] (-) TimerEvent: {}
+[17.758847] (-) TimerEvent: {}
+[17.859734] (-) TimerEvent: {}
+[17.960830] (-) TimerEvent: {}
+[18.061505] (-) TimerEvent: {}
+[18.103884] (custom_interfaces) StdoutLine: {'line': b'-- Found PythonLibs: /usr/lib/x86_64-linux-gnu/libpython3.10.so (found suitable version "3.10.12", minimum required is "3.5") \n'}
+[18.104822] (custom_interfaces) StdoutLine: {'line': b'-- Using PYTHON_EXECUTABLE: /usr/bin/python3\n'}
+[18.105330] (custom_interfaces) StdoutLine: {'line': b'-- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10\n'}
+[18.105641] (custom_interfaces) StdoutLine: {'line': b'-- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.10.so\n'}
+[18.159650] (custom_interfaces) StdoutLine: {'line': b'-- Found PythonExtra: .so  \n'}
+[18.161701] (-) TimerEvent: {}
+[18.262460] (-) TimerEvent: {}
+[18.363440] (-) TimerEvent: {}
+[18.464369] (-) TimerEvent: {}
+[18.574943] (-) TimerEvent: {}
+[18.672969] (custom_interfaces) StdoutLine: {'line': b'-- Configuring done\n'}
+[18.675095] (-) TimerEvent: {}
+[18.775781] (-) TimerEvent: {}
+[18.876423] (-) TimerEvent: {}
+[18.916569] (custom_interfaces) StdoutLine: {'line': b'-- Generating done\n'}
+[18.925101] (custom_interfaces) StderrLine: {'line': b'\x1b[33mCMake Warning:\n'}
+[18.925426] (custom_interfaces) StderrLine: {'line': b'  Manually-specified variables were not used by the project:\n'}
+[18.925597] (custom_interfaces) StderrLine: {'line': b'\n'}
+[18.925749] (custom_interfaces) StderrLine: {'line': b'    CATKIN_INSTALL_INTO_PREFIX_ROOT\n'}
+[18.925904] (custom_interfaces) StderrLine: {'line': b'\n'}
+[18.926052] (custom_interfaces) StderrLine: {'line': b'\x1b[0m\n'}
+[18.949102] (custom_interfaces) StdoutLine: {'line': b'-- Build files have been written to: /home/tom/aeac-2026/packages/build/custom_interfaces\n'}
+[18.973049] (custom_interfaces) CommandEnded: {'returncode': 0}
+[18.976450] (custom_interfaces) JobProgress: {'identifier': 'custom_interfaces', 'progress': 'build'}
+[18.976977] (-) TimerEvent: {}
+[18.978200] (custom_interfaces) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/tom/aeac-2026/packages/build/custom_interfaces', '--', '-j8', '-l8'], 'cwd': '/home/tom/aeac-2026/packages/build/custom_interfaces', 'env': OrderedDict([('PYTHON_BASIC_REPL', '1'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'tom'), ('ROS_PACKAGE_PATH', '/home/tom/aeac-2026/packages/install/custom_interfaces/share'), ('GIT_ASKPASS', '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/extensions/git/dist/askpass.sh'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/tom/aeac-2026/packages/install/custom_interfaces/lib:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('MOTD_SHOWN', 'update-motd'), ('HOME', '/home/tom'), ('OLDPWD', '/home/tom/aeac-2026/packages'), ('TERM_PROGRAM_VERSION', '1.108.0'), ('VSCODE_IPC_HOOK_CLI', '/run/user/1000/vscode-ipc-a5f7f2a1-b7dc-40a0-a4ae-6872bd90c736.sock'), ('ROS_PYTHON_VERSION', '3'), ('VSCODE_GIT_ASKPASS_MAIN', '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/extensions/git/dist/askpass-main.js'), ('VSCODE_GIT_ASKPASS_NODE', '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/node'), ('PYDEVD_DISABLE_FILE_VALIDATION', '1'), ('BUNDLED_DEBUGPY_PATH', '/home/tom/.vscode-server/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy'), ('VSCODE_PYTHON_AUTOACTIVATE_GUARD', '1'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('WSL_DISTRO_NAME', 'Ubuntu-22.04'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/tom/aeac-2026/packages/install:/home/tom/ros2_ws/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'tom'), ('NAME', 'LAPTOP-I7UUP03M'), ('WSL_INTEROP', '/run/WSL/707_interop'), ('PULSE_SERVER', 'unix:/mnt/wslg/PulseServer'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('PKG_CONFIG_PATH', '/home/tom/aeac-2026/packages/install/custom_interfaces/lib/x86_64-linux-gnu/pkgconfig:/home/tom/aeac-2026/packages/install/custom_interfaces/lib/pkgconfig'), ('TERM', 'xterm-256color'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/bin/remote-cli:/home/tom/.local/bin:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files (x86)/dotnet/:/mnt/c/Program Files/PuTTY/:/mnt/c/Program Files/MATLAB/MATLAB Runtime/v93/runtime/win64:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files/dotnet/:/mnt/c/ProgramData/Microsoft/Windows/Start Menu/Programs:/mnt/c/Users/Tommy/Desktop/BatimentType/env/Scripts:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/Scripts/:/mnt/c/Users/Tommy/AppData/Local/Programs/MiKTeX/miktex/bin/x64/miktex-console.exe:/mnt/c/Program Files/MATLAB/R2025a/runtime/win64:/mnt/c/Program Files/MATLAB/R2025a/bin:/mnt/c/Program Files/PVsyst8.0.12/:/mnt/c/Users/Tommy/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/Tommy/.dotnet/tools:/mnt/c/Users/Tommy/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python311:/mnt/c/ffmpeg/bin:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/Scripts/:/mnt/c/Users/Tommy/AppData/Local/Programs/MiKTeX/miktex/bin/x64/:/mnt/c/Users/Tommy/AppData/Local/Pandoc/:/snap/bin:/home/tom/.vscode-server/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/scripts/noConfigScripts'), ('XDG_RUNTIME_DIR', '/run/user/1000/'), ('DISPLAY', ':0'), ('VSCODE_DEBUGPY_ADAPTER_ENDPOINTS', '/home/tom/.vscode-server/extensions/ms-python.debugpy-2025.18.0-linux-x64/.noConfigDebugAdapterEndpoints/endpoint-afb8dbf0d2cdbe3a.txt'), ('LANG', 'en_US.UTF-8'), ('PYTHONSTARTUP', '/home/tom/.vscode-server/data/User/workspaceStorage/aa24c71cad9e2ed24d993d3dea5efb80-1/ms-python.python/pythonrc.py'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-6b130a5a25.sock'), ('TERM_PROGRAM', 'vscode'), ('AMENT_PREFIX_PATH', '/home/tom/aeac-2026/packages/install/mission:/home/tom/aeac-2026/packages/install/bringup:/home/tom/ros2_ws/install/bme_ros2_tutorials_py:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces:/home/tom/ros2_ws/install/bme_ros2_tutorials_cpp:/home/tom/ros2_ws/install/bme_ros2_tutorials_bringup:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', ''), ('PWD', '/home/tom/aeac-2026/packages/build/custom_interfaces'), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/tom/aeac-2026/packages/build/mission:/home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages:/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages:/home/tom/aeac-2026/packages/build/bringup:/home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages:/home/tom/ros2_ws/install/bme_ros2_tutorials_py/lib/python3.10/site-packages:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('WSL2_GUI_APPS_ENABLED', '1'), ('HOSTTYPE', 'x86_64'), ('CMAKE_PREFIX_PATH', '/home/tom/aeac-2026/packages/install/custom_interfaces:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces:/home/tom/ros2_ws/install/bme_ros2_tutorials_cpp:/home/tom/ros2_ws/install/bme_ros2_tutorials_bringup'), ('WSLENV', 'VSCODE_WSL_EXT_LOCATION/up:VSCODE_SERVER_TAR/up')]), 'shell': False}
+[19.077177] (-) TimerEvent: {}
+[19.107630] (custom_interfaces) StdoutLine: {'line': b'[  3%] \x1b[34m\x1b[1mGenerating C code for ROS interfaces\x1b[0m\n'}
+[19.148594] (custom_interfaces) StdoutLine: {'line': b'[  6%] \x1b[34m\x1b[1mGenerating C++ code for ROS interfaces\x1b[0m\n'}
+[19.179327] (-) TimerEvent: {}
+[19.201018] (custom_interfaces) StdoutLine: {'line': b'[  6%] Built target ament_cmake_python_copy_custom_interfaces\n'}
+[19.280447] (-) TimerEvent: {}
+[19.381211] (-) TimerEvent: {}
+[19.481746] (-) TimerEvent: {}
+[19.587442] (-) TimerEvent: {}
+[19.688114] (-) TimerEvent: {}
+[19.788751] (-) TimerEvent: {}
+[19.889545] (-) TimerEvent: {}
+[19.990296] (-) TimerEvent: {}
+[20.090906] (-) TimerEvent: {}
+[20.191637] (-) TimerEvent: {}
+[20.292423] (-) TimerEvent: {}
+[20.393286] (-) TimerEvent: {}
+[20.496003] (-) TimerEvent: {}
+[20.591167] (custom_interfaces) StdoutLine: {'line': b'[  9%] \x1b[32mBuilding C object CMakeFiles/custom_interfaces__rosidl_generator_c.dir/rosidl_generator_c/custom_interfaces/srv/detail/gps_to_local__functions.c.o\x1b[0m\n'}
+[20.596145] (-) TimerEvent: {}
+[20.684214] (custom_interfaces) StdoutLine: {'line': b'running egg_info\n'}
+[20.686340] (custom_interfaces) StdoutLine: {'line': b'creating custom_interfaces.egg-info\n'}
+[20.702830] (custom_interfaces) StdoutLine: {'line': b'writing custom_interfaces.egg-info/PKG-INFO\n'}
+[20.703204] (-) TimerEvent: {}
+[20.703597] (custom_interfaces) StdoutLine: {'line': b'writing dependency_links to custom_interfaces.egg-info/dependency_links.txt\n'}
+[20.703980] (custom_interfaces) StdoutLine: {'line': b'writing top-level names to custom_interfaces.egg-info/top_level.txt\n'}
+[20.704243] (custom_interfaces) StdoutLine: {'line': b"writing manifest file 'custom_interfaces.egg-info/SOURCES.txt'\n"}
+[20.704692] (custom_interfaces) StdoutLine: {'line': b"reading manifest file 'custom_interfaces.egg-info/SOURCES.txt'\n"}
+[20.707872] (custom_interfaces) StdoutLine: {'line': b"writing manifest file 'custom_interfaces.egg-info/SOURCES.txt'\n"}
+[20.754717] (custom_interfaces) StdoutLine: {'line': b'[  9%] Built target custom_interfaces__cpp\n'}
+[20.804966] (-) TimerEvent: {}
+[20.844888] (custom_interfaces) StdoutLine: {'line': b'[ 12%] \x1b[34m\x1b[1mGenerating C++ type support for eProsima Fast-RTPS\x1b[0m\n'}
+[20.852803] (custom_interfaces) StdoutLine: {'line': b'[ 16%] \x1b[34m\x1b[1mGenerating C++ introspection for ROS interfaces\x1b[0m\n'}
+[20.882144] (custom_interfaces) StdoutLine: {'line': b'[ 19%] \x1b[34m\x1b[1mGenerating C++ type support dispatch for ROS interfaces\x1b[0m\n'}
+[20.905104] (-) TimerEvent: {}
+[20.916636] (custom_interfaces) StdoutLine: {'line': b'[ 19%] Built target ament_cmake_python_build_custom_interfaces_egg\n'}
+[21.005346] (-) TimerEvent: {}
+[21.016917] (custom_interfaces) StdoutLine: {'line': b'[ 22%] \x1b[32m\x1b[1mLinking C shared library libcustom_interfaces__rosidl_generator_c.so\x1b[0m\n'}
+[21.105652] (-) TimerEvent: {}
+[21.219868] (-) TimerEvent: {}
+[21.320493] (-) TimerEvent: {}
+[21.421267] (-) TimerEvent: {}
+[21.521967] (-) TimerEvent: {}
+[21.622702] (-) TimerEvent: {}
+[21.726654] (-) TimerEvent: {}
+[21.827635] (-) TimerEvent: {}
+[21.928341] (-) TimerEvent: {}
+[22.029048] (-) TimerEvent: {}
+[22.130002] (-) TimerEvent: {}
+[22.230843] (-) TimerEvent: {}
+[22.331634] (-) TimerEvent: {}
+[22.432430] (-) TimerEvent: {}
+[22.533217] (-) TimerEvent: {}
+[22.558779] (custom_interfaces) StdoutLine: {'line': b'[ 22%] Built target custom_interfaces__rosidl_generator_c\n'}
+[22.630404] (custom_interfaces) StdoutLine: {'line': b'[ 25%] \x1b[34m\x1b[1mGenerating C type support dispatch for ROS interfaces\x1b[0m\n'}
+[22.633795] (-) TimerEvent: {}
+[22.643731] (custom_interfaces) StdoutLine: {'line': b'[ 29%] \x1b[34m\x1b[1mGenerating C introspection for ROS interfaces\x1b[0m\n'}
+[22.645242] (custom_interfaces) StdoutLine: {'line': b'[ 32%] \x1b[34m\x1b[1mGenerating C type support for eProsima Fast-RTPS\x1b[0m\n'}
+[22.737004] (-) TimerEvent: {}
+[22.738991] (custom_interfaces) StdoutLine: {'line': b'[ 35%] \x1b[32mBuilding CXX object CMakeFiles/custom_interfaces__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_interfaces/srv/detail/dds_fastrtps/gps_to_local__type_support.cpp.o\x1b[0m\n'}
+[22.837178] (-) TimerEvent: {}
+[22.938471] (-) TimerEvent: {}
+[23.019957] (custom_interfaces) StdoutLine: {'line': b'[ 38%] \x1b[32mBuilding CXX object CMakeFiles/custom_interfaces__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/custom_interfaces/srv/gps_to_local__type_support.cpp.o\x1b[0m\n'}
+[23.040870] (-) TimerEvent: {}
+[23.101888] (custom_interfaces) StdoutLine: {'line': b'[ 41%] \x1b[32mBuilding CXX object CMakeFiles/custom_interfaces__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/custom_interfaces/srv/detail/gps_to_local__type_support.cpp.o\x1b[0m\n'}
+[23.142316] (-) TimerEvent: {}
+[23.248013] (-) TimerEvent: {}
+[23.358385] (-) TimerEvent: {}
+[23.461243] (-) TimerEvent: {}
+[23.561823] (-) TimerEvent: {}
+[23.665185] (-) TimerEvent: {}
+[23.776933] (-) TimerEvent: {}
+[23.885089] (-) TimerEvent: {}
+[24.001006] (-) TimerEvent: {}
+[24.102141] (-) TimerEvent: {}
+[24.203823] (-) TimerEvent: {}
+[24.311238] (-) TimerEvent: {}
+[24.419197] (-) TimerEvent: {}
+[24.521176] (-) TimerEvent: {}
+[24.622590] (-) TimerEvent: {}
+[24.682314] (custom_interfaces) StdoutLine: {'line': b'[ 45%] \x1b[32mBuilding CXX object CMakeFiles/custom_interfaces__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/custom_interfaces/srv/detail/gps_to_local__type_support_c.cpp.o\x1b[0m\n'}
+[24.722881] (-) TimerEvent: {}
+[24.823809] (-) TimerEvent: {}
+[24.944918] (-) TimerEvent: {}
+[25.045897] (-) TimerEvent: {}
+[25.146804] (-) TimerEvent: {}
+[25.179635] (custom_interfaces) StdoutLine: {'line': b'[ 48%] \x1b[32mBuilding CXX object CMakeFiles/custom_interfaces__rosidl_typesupport_c.dir/rosidl_typesupport_c/custom_interfaces/srv/gps_to_local__type_support.cpp.o\x1b[0m\n'}
+[25.246969] (-) TimerEvent: {}
+[25.352417] (-) TimerEvent: {}
+[25.453387] (-) TimerEvent: {}
+[25.557016] (-) TimerEvent: {}
+[25.661231] (-) TimerEvent: {}
+[25.754878] (custom_interfaces) StdoutLine: {'line': b'[ 51%] \x1b[32mBuilding C object CMakeFiles/custom_interfaces__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/custom_interfaces/srv/detail/gps_to_local__type_support.c.o\x1b[0m\n'}
+[25.761493] (-) TimerEvent: {}
+[25.835465] (custom_interfaces) StdoutLine: {'line': b'[ 54%] \x1b[32m\x1b[1mLinking CXX shared library libcustom_interfaces__rosidl_typesupport_c.so\x1b[0m\n'}
+[25.866547] (-) TimerEvent: {}
+[25.969401] (-) TimerEvent: {}
+[26.079825] (-) TimerEvent: {}
+[26.184656] (-) TimerEvent: {}
+[26.306671] (-) TimerEvent: {}
+[26.419548] (-) TimerEvent: {}
+[26.449080] (custom_interfaces) StdoutLine: {'line': b'[ 58%] \x1b[32m\x1b[1mLinking C shared library libcustom_interfaces__rosidl_typesupport_introspection_c.so\x1b[0m\n'}
+[26.519696] (-) TimerEvent: {}
+[26.621500] (-) TimerEvent: {}
+[26.645968] (custom_interfaces) StdoutLine: {'line': b'[ 61%] \x1b[32m\x1b[1mLinking CXX shared library libcustom_interfaces__rosidl_typesupport_cpp.so\x1b[0m\n'}
+[26.721805] (-) TimerEvent: {}
+[26.826272] (-) TimerEvent: {}
+[26.927582] (-) TimerEvent: {}
+[27.035537] (-) TimerEvent: {}
+[27.136586] (-) TimerEvent: {}
+[27.237517] (-) TimerEvent: {}
+[27.342172] (-) TimerEvent: {}
+[27.382606] (custom_interfaces) StdoutLine: {'line': b'[ 64%] \x1b[32m\x1b[1mLinking CXX shared library libcustom_interfaces__rosidl_typesupport_introspection_cpp.so\x1b[0m\n'}
+[27.464198] (-) TimerEvent: {}
+[27.569907] (-) TimerEvent: {}
+[27.613948] (custom_interfaces) StdoutLine: {'line': b'[ 64%] Built target custom_interfaces__rosidl_typesupport_c\n'}
+[27.640613] (custom_interfaces) StdoutLine: {'line': b'[ 67%] \x1b[32m\x1b[1mLinking CXX shared library libcustom_interfaces__rosidl_typesupport_fastrtps_cpp.so\x1b[0m\n'}
+[27.673637] (-) TimerEvent: {}
+[27.774967] (-) TimerEvent: {}
+[27.875878] (-) TimerEvent: {}
+[27.976875] (-) TimerEvent: {}
+[28.077916] (-) TimerEvent: {}
+[28.097218] (custom_interfaces) StdoutLine: {'line': b'[ 67%] Built target custom_interfaces__rosidl_typesupport_introspection_c\n'}
+[28.178162] (-) TimerEvent: {}
+[28.278993] (-) TimerEvent: {}
+[28.309781] (custom_interfaces) StdoutLine: {'line': b'[ 67%] Built target custom_interfaces__rosidl_typesupport_cpp\n'}
+[28.379205] (-) TimerEvent: {}
+[28.483785] (-) TimerEvent: {}
+[28.584859] (-) TimerEvent: {}
+[28.685975] (-) TimerEvent: {}
+[28.786927] (-) TimerEvent: {}
+[28.820997] (custom_interfaces) StdoutLine: {'line': b'[ 67%] Built target custom_interfaces__rosidl_typesupport_introspection_cpp\n'}
+[28.887225] (-) TimerEvent: {}
+[28.991462] (-) TimerEvent: {}
+[29.094817] (-) TimerEvent: {}
+[29.195770] (-) TimerEvent: {}
+[29.235810] (custom_interfaces) StdoutLine: {'line': b'[ 67%] Built target custom_interfaces__rosidl_typesupport_fastrtps_cpp\n'}
+[29.248201] (custom_interfaces) StdoutLine: {'line': b'[ 70%] \x1b[32m\x1b[1mLinking CXX shared library libcustom_interfaces__rosidl_typesupport_fastrtps_c.so\x1b[0m\n'}
+[29.296058] (-) TimerEvent: {}
+[29.397117] (-) TimerEvent: {}
+[29.497870] (-) TimerEvent: {}
+[29.598807] (-) TimerEvent: {}
+[29.699750] (-) TimerEvent: {}
+[29.801032] (-) TimerEvent: {}
+[29.901989] (-) TimerEvent: {}
+[30.002786] (-) TimerEvent: {}
+[30.103995] (-) TimerEvent: {}
+[30.205228] (-) TimerEvent: {}
+[30.263196] (custom_interfaces) StdoutLine: {'line': b'[ 70%] Built target custom_interfaces__rosidl_typesupport_fastrtps_c\n'}
+[30.305428] (-) TimerEvent: {}
+[30.332628] (custom_interfaces) StdoutLine: {'line': b'[ 70%] Built target custom_interfaces\n'}
+[30.394866] (custom_interfaces) StdoutLine: {'line': b'[ 74%] \x1b[34m\x1b[1mGenerating Python code for ROS interfaces\x1b[0m\n'}
+[30.405551] (-) TimerEvent: {}
+[30.506263] (-) TimerEvent: {}
+[30.606866] (-) TimerEvent: {}
+[30.707555] (-) TimerEvent: {}
+[30.808804] (-) TimerEvent: {}
+[30.909518] (-) TimerEvent: {}
+[31.010217] (-) TimerEvent: {}
+[31.111594] (-) TimerEvent: {}
+[31.212312] (-) TimerEvent: {}
+[31.313019] (-) TimerEvent: {}
+[31.413907] (-) TimerEvent: {}
+[31.514828] (-) TimerEvent: {}
+[31.615311] (-) TimerEvent: {}
+[31.670406] (custom_interfaces) StdoutLine: {'line': b'[ 74%] Built target custom_interfaces__py\n'}
+[31.715482] (-) TimerEvent: {}
+[31.742950] (custom_interfaces) StdoutLine: {'line': b'[ 77%] \x1b[32mBuilding C object CMakeFiles/custom_interfaces__rosidl_generator_py.dir/rosidl_generator_py/custom_interfaces/srv/_gps_to_local_s.c.o\x1b[0m\n'}
+[31.815859] (-) TimerEvent: {}
+[31.917144] (-) TimerEvent: {}
+[32.018274] (-) TimerEvent: {}
+[32.119411] (-) TimerEvent: {}
+[32.220389] (-) TimerEvent: {}
+[32.321177] (-) TimerEvent: {}
+[32.406837] (custom_interfaces) StdoutLine: {'line': b'[ 80%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/custom_interfaces/libcustom_interfaces__rosidl_generator_py.so\x1b[0m\n'}
+[32.425218] (-) TimerEvent: {}
+[32.526045] (-) TimerEvent: {}
+[32.627896] (-) TimerEvent: {}
+[32.728633] (-) TimerEvent: {}
+[32.829462] (-) TimerEvent: {}
+[32.930365] (-) TimerEvent: {}
+[33.031219] (-) TimerEvent: {}
+[33.132046] (-) TimerEvent: {}
+[33.135732] (custom_interfaces) StdoutLine: {'line': b'[ 80%] Built target custom_interfaces__rosidl_generator_py\n'}
+[33.232276] (-) TimerEvent: {}
+[33.332858] (custom_interfaces) StdoutLine: {'line': b'[ 83%] \x1b[32mBuilding C object CMakeFiles/custom_interfaces__rosidl_typesupport_introspection_c__pyext.dir/rosidl_generator_py/custom_interfaces/_custom_interfaces_s.ep.rosidl_typesupport_introspection_c.c.o\x1b[0m\n'}
+[33.333403] (-) TimerEvent: {}
+[33.402408] (custom_interfaces) StdoutLine: {'line': b'[ 87%] \x1b[32mBuilding C object CMakeFiles/custom_interfaces__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_generator_py/custom_interfaces/_custom_interfaces_s.ep.rosidl_typesupport_fastrtps_c.c.o\x1b[0m\n'}
+[33.433631] (-) TimerEvent: {}
+[33.534355] (-) TimerEvent: {}
+[33.558067] (custom_interfaces) StdoutLine: {'line': b'[ 90%] \x1b[32mBuilding C object CMakeFiles/custom_interfaces__rosidl_typesupport_c__pyext.dir/rosidl_generator_py/custom_interfaces/_custom_interfaces_s.ep.rosidl_typesupport_c.c.o\x1b[0m\n'}
+[33.634616] (-) TimerEvent: {}
+[33.735504] (-) TimerEvent: {}
+[33.836334] (-) TimerEvent: {}
+[33.937303] (-) TimerEvent: {}
+[34.039171] (-) TimerEvent: {}
+[34.140172] (-) TimerEvent: {}
+[34.240977] (-) TimerEvent: {}
+[34.341789] (-) TimerEvent: {}
+[34.386084] (custom_interfaces) StdoutLine: {'line': b'[ 93%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/custom_interfaces/custom_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\x1b[0m\n'}
+[34.429907] (custom_interfaces) StdoutLine: {'line': b'[ 96%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/custom_interfaces/custom_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\x1b[0m\n'}
+[34.442987] (-) TimerEvent: {}
+[34.543981] (-) TimerEvent: {}
+[34.644980] (-) TimerEvent: {}
+[34.651821] (custom_interfaces) StdoutLine: {'line': b'[100%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/custom_interfaces/custom_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\x1b[0m\n'}
+[34.745210] (-) TimerEvent: {}
+[34.846018] (-) TimerEvent: {}
+[34.946958] (-) TimerEvent: {}
+[35.047994] (-) TimerEvent: {}
+[35.117453] (custom_interfaces) StdoutLine: {'line': b'[100%] Built target custom_interfaces__rosidl_typesupport_introspection_c__pyext\n'}
+[35.143590] (custom_interfaces) StdoutLine: {'line': b'[100%] Built target custom_interfaces__rosidl_typesupport_fastrtps_c__pyext\n'}
+[35.148274] (-) TimerEvent: {}
+[35.249343] (-) TimerEvent: {}
+[35.350370] (-) TimerEvent: {}
+[35.441106] (custom_interfaces) StdoutLine: {'line': b'[100%] Built target custom_interfaces__rosidl_typesupport_c__pyext\n'}
+[35.450755] (-) TimerEvent: {}
+[35.524344] (custom_interfaces) CommandEnded: {'returncode': 0}
+[35.527286] (custom_interfaces) JobProgress: {'identifier': 'custom_interfaces', 'progress': 'install'}
+[35.550983] (-) TimerEvent: {}
+[35.557477] (custom_interfaces) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/tom/aeac-2026/packages/build/custom_interfaces'], 'cwd': '/home/tom/aeac-2026/packages/build/custom_interfaces', 'env': OrderedDict([('PYTHON_BASIC_REPL', '1'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'tom'), ('ROS_PACKAGE_PATH', '/home/tom/aeac-2026/packages/install/custom_interfaces/share'), ('GIT_ASKPASS', '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/extensions/git/dist/askpass.sh'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/tom/aeac-2026/packages/install/custom_interfaces/lib:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('MOTD_SHOWN', 'update-motd'), ('HOME', '/home/tom'), ('OLDPWD', '/home/tom/aeac-2026/packages'), ('TERM_PROGRAM_VERSION', '1.108.0'), ('VSCODE_IPC_HOOK_CLI', '/run/user/1000/vscode-ipc-a5f7f2a1-b7dc-40a0-a4ae-6872bd90c736.sock'), ('ROS_PYTHON_VERSION', '3'), ('VSCODE_GIT_ASKPASS_MAIN', '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/extensions/git/dist/askpass-main.js'), ('VSCODE_GIT_ASKPASS_NODE', '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/node'), ('PYDEVD_DISABLE_FILE_VALIDATION', '1'), ('BUNDLED_DEBUGPY_PATH', '/home/tom/.vscode-server/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy'), ('VSCODE_PYTHON_AUTOACTIVATE_GUARD', '1'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('WSL_DISTRO_NAME', 'Ubuntu-22.04'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/tom/aeac-2026/packages/install:/home/tom/ros2_ws/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'tom'), ('NAME', 'LAPTOP-I7UUP03M'), ('WSL_INTEROP', '/run/WSL/707_interop'), ('PULSE_SERVER', 'unix:/mnt/wslg/PulseServer'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('PKG_CONFIG_PATH', '/home/tom/aeac-2026/packages/install/custom_interfaces/lib/x86_64-linux-gnu/pkgconfig:/home/tom/aeac-2026/packages/install/custom_interfaces/lib/pkgconfig'), ('TERM', 'xterm-256color'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/tom/.vscode-server/bin/94e8ae2b28cb5cc932b86e1070569c4463565c37/bin/remote-cli:/home/tom/.local/bin:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files (x86)/dotnet/:/mnt/c/Program Files/PuTTY/:/mnt/c/Program Files/MATLAB/MATLAB Runtime/v93/runtime/win64:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files/dotnet/:/mnt/c/ProgramData/Microsoft/Windows/Start Menu/Programs:/mnt/c/Users/Tommy/Desktop/BatimentType/env/Scripts:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/Scripts/:/mnt/c/Users/Tommy/AppData/Local/Programs/MiKTeX/miktex/bin/x64/miktex-console.exe:/mnt/c/Program Files/MATLAB/R2025a/runtime/win64:/mnt/c/Program Files/MATLAB/R2025a/bin:/mnt/c/Program Files/PVsyst8.0.12/:/mnt/c/Users/Tommy/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/Tommy/.dotnet/tools:/mnt/c/Users/Tommy/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python311:/mnt/c/ffmpeg/bin:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/:/mnt/c/Users/Tommy/AppData/Local/Programs/Python/Python39/Scripts/:/mnt/c/Users/Tommy/AppData/Local/Programs/MiKTeX/miktex/bin/x64/:/mnt/c/Users/Tommy/AppData/Local/Pandoc/:/snap/bin:/home/tom/.vscode-server/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/scripts/noConfigScripts'), ('XDG_RUNTIME_DIR', '/run/user/1000/'), ('DISPLAY', ':0'), ('VSCODE_DEBUGPY_ADAPTER_ENDPOINTS', '/home/tom/.vscode-server/extensions/ms-python.debugpy-2025.18.0-linux-x64/.noConfigDebugAdapterEndpoints/endpoint-afb8dbf0d2cdbe3a.txt'), ('LANG', 'en_US.UTF-8'), ('PYTHONSTARTUP', '/home/tom/.vscode-server/data/User/workspaceStorage/aa24c71cad9e2ed24d993d3dea5efb80-1/ms-python.python/pythonrc.py'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-6b130a5a25.sock'), ('TERM_PROGRAM', 'vscode'), ('AMENT_PREFIX_PATH', '/home/tom/aeac-2026/packages/install/mission:/home/tom/aeac-2026/packages/install/bringup:/home/tom/ros2_ws/install/bme_ros2_tutorials_py:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces:/home/tom/ros2_ws/install/bme_ros2_tutorials_cpp:/home/tom/ros2_ws/install/bme_ros2_tutorials_bringup:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', ''), ('PWD', '/home/tom/aeac-2026/packages/build/custom_interfaces'), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/tom/aeac-2026/packages/build/mission:/home/tom/aeac-2026/packages/install/mission/lib/python3.10/site-packages:/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages:/home/tom/aeac-2026/packages/build/bringup:/home/tom/aeac-2026/packages/install/bringup/lib/python3.10/site-packages:/home/tom/ros2_ws/install/bme_ros2_tutorials_py/lib/python3.10/site-packages:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('WSL2_GUI_APPS_ENABLED', '1'), ('HOSTTYPE', 'x86_64'), ('CMAKE_PREFIX_PATH', '/home/tom/aeac-2026/packages/install/custom_interfaces:/home/tom/ros2_ws/install/bme_ros2_tutorials_interfaces:/home/tom/ros2_ws/install/bme_ros2_tutorials_cpp:/home/tom/ros2_ws/install/bme_ros2_tutorials_bringup'), ('WSLENV', 'VSCODE_WSL_EXT_LOCATION/up:VSCODE_SERVER_TAR/up')]), 'shell': False}
+[35.604058] (custom_interfaces) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[35.615086] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/ament_index/resource_index/rosidl_interfaces/custom_interfaces\n'}
+[35.618935] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces\n'}
+[35.629341] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg\n'}
+[35.632749] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg/rosidl_generator_c__visibility_control.h\n'}
+[35.636255] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv\n'}
+[35.640634] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail\n'}
+[35.648013] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__functions.c\n'}
+[35.648715] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__type_support.h\n'}
+[35.649266] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__functions.h\n'}
+[35.650111] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__struct.h\n'}
+[35.651002] (-) TimerEvent: {}
+[35.651584] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/gps_to_local.h\n'}
+[35.657159] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/library_path.sh\n'}
+[35.658834] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/library_path.dsv\n'}
+[35.663296] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_generator_c.so\n'}
+[35.665585] (custom_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_generator_c.so" to ""\n'}
+[35.666974] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces\n'}
+[35.668357] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg\n'}
+[35.668956] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg/rosidl_typesupport_fastrtps_c__visibility_control.h\n'}
+[35.669406] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv\n'}
+[35.669956] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail\n'}
+[35.670730] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__rosidl_typesupport_fastrtps_c.h\n'}
+[35.670978] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_fastrtps_c.so\n'}
+[35.674760] (custom_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_fastrtps_c.so" to ""\n'}
+[35.677077] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces\n'}
+[35.682466] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg\n'}
+[35.683062] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg/rosidl_typesupport_introspection_c__visibility_control.h\n'}
+[35.683806] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv\n'}
+[35.684395] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail\n'}
+[35.684971] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__rosidl_typesupport_introspection_c.h\n'}
+[35.685455] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__type_support.c\n'}
+[35.685827] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_introspection_c.so\n'}
+[35.686199] (custom_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_introspection_c.so" to ""\n'}
+[35.686494] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_c.so\n'}
+[35.687206] (custom_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_c.so" to ""\n'}
+[35.688635] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces\n'}
+[35.703746] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg\n'}
+[35.704489] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg/rosidl_generator_cpp__visibility_control.hpp\n'}
+[35.705150] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv\n'}
+[35.705510] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/gps_to_local.hpp\n'}
+[35.706082] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail\n'}
+[35.706501] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__struct.hpp\n'}
+[35.706917] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__type_support.hpp\n'}
+[35.707153] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__builder.hpp\n'}
+[35.707464] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__traits.hpp\n'}
+[35.707817] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces\n'}
+[35.708176] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg\n'}
+[35.708558] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h\n'}
+[35.709450] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv\n'}
+[35.709800] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail\n'}
+[35.710067] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/dds_fastrtps\n'}
+[35.710509] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[35.711762] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_fastrtps_cpp.so\n'}
+[35.714417] (custom_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_fastrtps_cpp.so" to ""\n'}
+[35.715309] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces\n'}
+[35.716715] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv\n'}
+[35.717278] (custom_interfaces) StdoutLine: {'line': b'-- Up-to-date: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail\n'}
+[35.717623] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__type_support.cpp\n'}
+[35.717902] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__rosidl_typesupport_introspection_cpp.hpp\n'}
+[35.718664] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_introspection_cpp.so\n'}
+[35.721126] (custom_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_introspection_cpp.so" to ""\n'}
+[35.722851] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_cpp.so\n'}
+[35.727115] (custom_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_cpp.so" to ""\n'}
+[35.727856] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/pythonpath.sh\n'}
+[35.729051] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/pythonpath.dsv\n'}
+[35.729898] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces-0.0.0-py3.10.egg-info\n'}
+[35.737768] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces-0.0.0-py3.10.egg-info/PKG-INFO\n'}
+[35.738584] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces-0.0.0-py3.10.egg-info/SOURCES.txt\n'}
+[35.739662] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces-0.0.0-py3.10.egg-info/dependency_links.txt\n'}
+[35.740306] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces-0.0.0-py3.10.egg-info/top_level.txt\n'}
+[35.741131] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces\n'}
+[35.743320] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\n'}
+[35.743921] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\n'}
+[35.744538] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\n'}
+[35.745391] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/libcustom_interfaces__rosidl_generator_py.so\n'}
+[35.746655] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv\n'}
+[35.749090] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv/_gps_to_local_s.c\n'}
+[35.750635] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv/_gps_to_local.py\n'}
+[35.751237] (-) TimerEvent: {}
+[35.751843] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv/__init__.py\n'}
+[35.752418] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/_custom_interfaces_s.ep.rosidl_typesupport_c.c\n'}
+[35.754927] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/_custom_interfaces_s.ep.rosidl_typesupport_fastrtps_c.c\n'}
+[35.755653] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/__init__.py\n'}
+[35.756577] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/_custom_interfaces_s.ep.rosidl_typesupport_introspection_c.c\n'}
+[35.851584] (-) TimerEvent: {}
+[35.952851] (-) TimerEvent: {}
+[36.049447] (custom_interfaces) StdoutLine: {'line': b"Listing '/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces'...\n"}
+[36.050156] (custom_interfaces) StdoutLine: {'line': b"Compiling '/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/__init__.py'...\n"}
+[36.050550] (custom_interfaces) StdoutLine: {'line': b"Listing '/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv'...\n"}
+[36.050960] (custom_interfaces) StdoutLine: {'line': b"Compiling '/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv/__init__.py'...\n"}
+[36.051344] (custom_interfaces) StdoutLine: {'line': b"Compiling '/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv/_gps_to_local.py'...\n"}
+[36.053101] (-) TimerEvent: {}
+[36.099625] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\n'}
+[36.101574] (custom_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so" to ""\n'}
+[36.102686] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\n'}
+[36.104480] (custom_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so" to ""\n'}
+[36.105536] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\n'}
+[36.107779] (custom_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so" to ""\n'}
+[36.108351] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_generator_py.so\n'}
+[36.119421] (custom_interfaces) StdoutLine: {'line': b'-- Set runtime path of "/home/tom/aeac-2026/packages/install/custom_interfaces/lib/libcustom_interfaces__rosidl_generator_py.so" to ""\n'}
+[36.125289] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/srv/GpsToLocal.idl\n'}
+[36.137445] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/srv/GpsToLocal.srv\n'}
+[36.138055] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/srv/GpsToLocal_Request.msg\n'}
+[36.138318] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/srv/GpsToLocal_Response.msg\n'}
+[36.143627] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/ament_index/resource_index/package_run_dependencies/custom_interfaces\n'}
+[36.146660] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/ament_index/resource_index/parent_prefix_path/custom_interfaces\n'}
+[36.147537] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/ament_prefix_path.sh\n'}
+[36.153282] (-) TimerEvent: {}
+[36.155208] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/ament_prefix_path.dsv\n'}
+[36.156161] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/path.sh\n'}
+[36.157521] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/environment/path.dsv\n'}
+[36.160351] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/local_setup.bash\n'}
+[36.167216] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/local_setup.sh\n'}
+[36.168129] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/local_setup.zsh\n'}
+[36.169073] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/local_setup.dsv\n'}
+[36.169941] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/package.dsv\n'}
+[36.181211] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/ament_index/resource_index/packages/custom_interfaces\n'}
+[36.184461] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_generator_cExport.cmake\n'}
+[36.185475] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_generator_cExport-noconfig.cmake\n'}
+[36.186476] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_typesupport_fastrtps_cExport.cmake\n'}
+[36.187693] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_typesupport_fastrtps_cExport-noconfig.cmake\n'}
+[36.189018] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_introspection_cExport.cmake\n'}
+[36.196518] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_introspection_cExport-noconfig.cmake\n'}
+[36.198845] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_cExport.cmake\n'}
+[36.200109] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_cExport-noconfig.cmake\n'}
+[36.201199] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_generator_cppExport.cmake\n'}
+[36.202431] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_typesupport_fastrtps_cppExport.cmake\n'}
+[36.203336] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake\n'}
+[36.204714] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_introspection_cppExport.cmake\n'}
+[36.211118] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_introspection_cppExport-noconfig.cmake\n'}
+[36.211993] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_cppExport.cmake\n'}
+[36.213626] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_cppExport-noconfig.cmake\n'}
+[36.215220] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_generator_pyExport.cmake\n'}
+[36.216872] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_generator_pyExport-noconfig.cmake\n'}
+[36.218259] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/rosidl_cmake-extras.cmake\n'}
+[36.225246] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/ament_cmake_export_include_directories-extras.cmake\n'}
+[36.227183] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/ament_cmake_export_libraries-extras.cmake\n'}
+[36.227421] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/ament_cmake_export_targets-extras.cmake\n'}
+[36.227991] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake\n'}
+[36.233543] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/ament_cmake_export_dependencies-extras.cmake\n'}
+[36.234166] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake\n'}
+[36.235167] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfacesConfig.cmake\n'}
+[36.237877] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfacesConfig-version.cmake\n'}
+[36.241587] (custom_interfaces) StdoutLine: {'line': b'-- Installing: /home/tom/aeac-2026/packages/install/custom_interfaces/share/custom_interfaces/package.xml\n'}
+[36.251339] (custom_interfaces) CommandEnded: {'returncode': 0}
+[36.254005] (-) TimerEvent: {}
+[36.363749] (-) TimerEvent: {}
+[36.467066] (custom_interfaces) JobEnded: {'identifier': 'custom_interfaces', 'rc': 0}
+[36.472534] (-) TimerEvent: {}
+[36.472910] (-) EventReactorShutdown: {}

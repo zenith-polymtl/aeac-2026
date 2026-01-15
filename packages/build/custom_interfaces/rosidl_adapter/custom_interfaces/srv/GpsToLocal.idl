@@ -1,0 +1,23 @@
+// generated from rosidl_adapter/resource/srv.idl.em
+// with input from custom_interfaces/srv/GpsToLocal.srv
+// generated code does not contain a copyright notice
+
+
+module custom_interfaces {
+  module srv {
+    struct GpsToLocal_Request {
+      double latitude;
+
+      double longitude;
+
+      double altitude;
+    };
+    struct GpsToLocal_Response {
+      double north;
+
+      double east;
+
+      double down;
+    };
+  };
+};
