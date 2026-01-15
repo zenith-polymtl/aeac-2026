@@ -23,7 +23,8 @@ RUN apt-get update && apt-get install -y \
 RUN /opt/ros/humble/lib/mavros/install_geographiclib_datasets.sh  
 
 RUN apt-get update && apt-get install -y \
-    ros-humble-rmw-cyclonedds-cpp \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+    ros-${ROS_DISTRO}-rmw-zenoh-cpp \
  && rm -rf /var/lib/apt/lists/*
 
  
@@ -44,6 +45,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     python3-numpy \
+    python3-geopy \
     && python3 -m pip install --upgrade pip \
     && rm -rf /var/lib/apt/lists/*
 
