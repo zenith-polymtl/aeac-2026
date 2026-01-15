@@ -53,6 +53,7 @@ class ControlNav(Node):
             raise
                 
         self.moving_to_position = False
+        self.current_point_objectif = Point()
         
         qos_profile = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
@@ -61,7 +62,8 @@ class ControlNav(Node):
             depth=1
         )
 
-        self.position_pub = self.create_publisher(PoseStamped, '/mavros/setpoint_position/local', qos_profile)
+        # self.position_pub = self.create_publisher(PoseStamped, '/mavros/setpoint_position/local', qos_profile)
+        self.publisher_raw = self.create_publisher(PositionTarget, '/mavros/setpoint_raw/local', 10)
         
         self.start_lap_sub = self.create_subscription(Bool, '/mission/lap', self.start_laps, 10)
 
@@ -96,18 +98,40 @@ class ControlNav(Node):
         self.position_check_timer = self.create_timer(DELAIS_FOR_POSITION_CHECK, self.position_check_timer_callback)
 
     def move_to_pose(self, wp):
-        self.current_point_objectif = Point()
+        # self.current_point_objectif = Point()
+        # self.current_point_objectif = wp.pose.position
+        
+        # self.target_pose = PoseStamped()
+        # self.target_pose.header.frame_id = 'map'
+        # self.target_pose.pose.position = self.current_point_objectif
+        # self.target_pose.pose.orientation.w = 1.0
+
+        # self.get_logger().info(f"Currently moving to : x={wp.pose.position.x}, y={wp.pose.position.y}, z={wp.pose.position.z}")
+        
+        # self.target_pose.header.stamp = self.get_clock().now().to_msg()
+        # self.position_pub.publish(self.target_pose)
+        
         self.current_point_objectif = wp.pose.position
         
-        self.target_pose = PoseStamped()
-        self.target_pose.header.frame_id = 'map'
-        self.target_pose.pose.position = self.current_point_objectif
-        self.target_pose.pose.orientation.w = 1.0
-
-        self.get_logger().info(f"Currently moving to : x={wp.pose.position.x}, y={wp.pose.position.y}, z={wp.pose.position.z}")
+        target = PositionTarget()  
+        target.header.stamp = self.get_clock().now().to_msg()  
+        target.header.frame_id = "map"  
+        target.coordinate_frame = PositionTarget.FRAME_LOCAL_NED
         
-        self.target_pose.header.stamp = self.get_clock().now().to_msg()
-        self.position_pub.publish(self.target_pose)
+        target.type_mask = (
+            PositionTarget.IGNORE_AX |
+            PositionTarget.IGNORE_AY |
+            PositionTarget.IGNORE_AZ |
+            PositionTarget.IGNORE_VX |
+            PositionTarget.IGNORE_VY |
+            PositionTarget.IGNORE_VZ |
+            PositionTarget.IGNORE_YAW |
+            PositionTarget.IGNIRE_YAW_RATE
+        )
+
+        target.postion = self.current_point_objectif
+
+        self.publisher_raw.publish(target)
 
 
     def start_laps(self, _):
@@ -164,7 +188,7 @@ class ControlNav(Node):
         self.target_pose.pose.orientation.w = 1.0
         
         self.target_pose.header.stamp = self.get_clock().now().to_msg()
-        self.position_pub.publish(self.target_pose)
+        # self.position_pub.publish(self.target_pose)
     
     def skip_current_lap(self):
         self.stop_current_lap()
