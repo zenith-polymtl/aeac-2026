@@ -1,5 +1,5 @@
 services:
-  zenoh-bridge:  
+  zenoh-bridge-air:  
     image: eclipse/zenoh-bridge-dds:latest  
     network_mode: host  
     volumes:  
@@ -7,4 +7,4 @@ services:
     command: ["-c", "/config.json5"]  
     environment:  
       - ROS_DOMAIN_ID=2  
-      - RUST_LOG=info
+      - RUST_LOG=debug
