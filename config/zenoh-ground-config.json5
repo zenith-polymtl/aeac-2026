@@ -4,7 +4,7 @@
       domain: 3,                    // Use domain 2 as you specified  
       scope: "GroundStation",  
       localhost_only: true,         // Restrict DDS to localhost  
-      forward_discovery: true       // Enable full ROS graph visibility  
+      forward_discovery: false       // Enable full ROS graph visibility  
     }  
   },  
   mode: "client",  

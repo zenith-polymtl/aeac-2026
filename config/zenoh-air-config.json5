@@ -15,7 +15,7 @@
       // allow: [],  
       // deny: [],  
         
-      forward_discovery: true,  
+      forward_discovery: false,  
       reliable_routes_blocking: false,  
       queries_timeout: 3.0  
     }  
