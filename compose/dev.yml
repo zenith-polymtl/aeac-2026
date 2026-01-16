@@ -15,6 +15,6 @@ services:
     working_dir: /aeac/workspaces    # set WS in .env, e.g. workspaces/small_ws
     command: ["bash","-lc","while :; do sleep 86400; done"]
     environment:  
-      - ROS_DOMAIN_ID=2
+      - ROS_DOMAIN_ID=3
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
   

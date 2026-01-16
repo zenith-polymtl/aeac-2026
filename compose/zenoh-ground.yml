@@ -6,5 +6,5 @@ services:
       - ../config/zenoh-ground-config.json5:/config.json5:ro  
     command: ["-c", "/config.json5"]  
     environment:  
-      - ROS_DOMAIN_ID=2  
+      - ROS_DOMAIN_ID=3
       - RUST_LOG=info

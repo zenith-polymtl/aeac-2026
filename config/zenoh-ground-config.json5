@@ -1,12 +1,14 @@
 {  
   plugins: {  
     dds: {  
-      domain: 2,  
-      scope: "drone1"  
+      domain: 2,                    // Use domain 2 as you specified  
+      scope: "GroundStation",  
+      localhost_only: true,         // Restrict DDS to localhost  
+      forward_discovery: true       // Enable full ROS graph visibility  
     }  
   },  
   mode: "client",  
   connect: {  
-    endpoints: ["tcp/drone.local:7447"]  
-    }  
+    endpoints: ["tcp/192.168.30.204:7447"]  
+  }  
 }

@@ -2,64 +2,27 @@
   plugins: {  
     dds: {  
       domain: 2,  
-      scope: "drone1",  
+      scope: "drone",  
+      localhost_only: true,  
         
-      // Rate limiting for different network types  
+      // Simple rate limiting - just 2 topics for testing  
       max_frequencies: [  
-        // LTE - very limited bandwidth  
-        "rt/.*/zed/.*=5.0",           // ZED camera at 5 Hz on LTE  
-        "rt/.*/mavros/.*=20.0",        // MAVROS at 20 Hz on LTE  
-        "rt/.*/image_raw=1.0",         // Raw images at 1 Hz on LTE  
-        "rt/.*/diagnostics=0.5",       // Diagnostics at 0.5 Hz on LTE  
-          
-        // WiFi - moderate bandwidth    
-        "rt/.*/zed/.*=15.0",          // ZED camera at 15 Hz on WiFi  
-        "rt/.*/mavros/.*=50.0",       // MAVROS at 50 Hz on WiFi  
-        "rt/.*/image_raw=10.0",       // Raw images at 10 Hz on WiFi  
-        "rt/.*/camera_info=15.0",     // Camera info at 15 Hz on WiFi  
-          
-        // Antenna - high bandwidth  
-        "rt/.*/zed/.*=30.0",          // ZED camera at 30 Hz on antenna  
-        "rt/.*/mavros/.*=100.0",      // MAVROS at 100 Hz on antenna  
-        "rt/.*/image_raw=30.0",       // Raw images at 30 Hz on antenna  
+        "rt/.*/image_raw=2.0",    // Limit images to 2 Hz  
+        "rt/.*/diagnostics=1.0"   // Limit diagnostics to 1 Hz  
       ],  
         
-      // Topic filtering for bandwidth management  
-      allow: [  
-        "rt/.*/mavros/.*",            // Always allow MAVROS  
-        "rt/.*/cmd_vel",              // Control commands  
-        "rt/.*/diagnostics",          // System diagnostics  
-        "rq/.*",                      // Request/response  
-        "rr/.*"                       // Reply  
-      ],  
+      // Allow all topics (remove filtering for testing)  
+      // allow: [],  
+      // deny: [],  
         
-      deny: [  
-        "rt/.*/internal/.*",          // Internal topics  
-        "rt/.*/debug/.*",             // Debug topics  
-        "rt/.*/parameter_events"      // Parameter updates (use sparingly)  
-      ],  
-        
-      // Network optimization  
       forward_discovery: true,  
       reliable_routes_blocking: false,  
       queries_timeout: 3.0  
     }  
   },  
     
-  // Multi-network endpoints configuration  
   mode: "peer",  
-    
-  // Listen on all available interfaces  
   listen: {  
     endpoints: ["tcp/0.0.0.0:7447"]  
-  },  
-    
-  // Connection endpoints for different networks  
-  connect: {  
-    endpoints: [  
-      // Primary antenna connection  
-      "tcp/0.0.0.0:7447",   
-    ]  
-  }, 
-
+  }  
 }
