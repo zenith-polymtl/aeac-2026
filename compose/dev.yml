@@ -17,4 +17,5 @@ services:
     environment:  
       - ROS_DOMAIN_ID=3
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST  # Add this 
   

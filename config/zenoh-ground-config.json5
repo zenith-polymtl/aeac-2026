@@ -1,14 +1,13 @@
 {  
   plugins: {  
-    dds: {  
+    ros2dds: {  
       domain: 3,                    // Use domain 2 as you specified  
       scope: "GroundStation",  
-      localhost_only: true,         // Restrict DDS to localhost  
-      forward_discovery: false       // Enable full ROS graph visibility  
+      ros_localhost_only: true,         // Restrict DDS to localhost       // Enable full ROS graph visibility  
     }  
   },  
   mode: "client",  
   connect: {  
-    endpoints: ["tcp/192.168.0.19:7447"]  
+    endpoints: ["tcp/192.168.30.204:7447"]  
   }  
 }

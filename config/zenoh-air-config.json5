@@ -1,10 +1,9 @@
 {  
   plugins: {  
-    dds: {  
+    ros2dds: {  
       domain: 2,  
       scope: "drone",  
-      localhost_only: true,  
-      forward_discovery: true  
+      ros_localhost_only: true
     }  
   },  
   mode: "peer",  
