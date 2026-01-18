@@ -1,9 +1,3 @@
-path: /content/training_data
-train: train/images
-val: val/images
-test: test/images
-
-nc: 8
 names:
   0: window
   1: door
