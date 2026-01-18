@@ -1,6 +1,6 @@
 services:
   zenoh-bridge-air:  
-    image: eclipse/zenoh-bridge-dds:latest  
+    image: eclipse/zenoh-bridge-ros2dds:latest  
     network_mode: host  
     volumes:  
       - ../config/zenoh-air-config.json5:/config.json5:ro  
