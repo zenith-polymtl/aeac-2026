@@ -20,6 +20,7 @@ services:
       - /usr/local/zed/resources/:/usr/local/zed/resources/    
       - /usr/local/zed/settings/:/usr/local/zed/settings/    
       - ../config:/root/ros2_ws/config  
+      - ../models:/root/ros2_ws/models  
     command: ["bash", "-lc", "sleep infinity"]
     #launch zed with :
     #ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml

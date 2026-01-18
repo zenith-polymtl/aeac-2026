@@ -52,7 +52,7 @@
         object_detection:  
             od_enabled: true 
             model: 'CUSTOM_YOLOLIKE_BOX_OBJECTS'  
-            custom_onnx_file: 'models/phase1_nano.onnx'  
+            custom_onnx_file: '/root/ros2_ws/models/phase1_nano.onnx'  
             custom_onnx_input_size: 640  
             custom_class_count: 8
             
