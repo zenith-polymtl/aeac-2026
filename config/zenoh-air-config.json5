@@ -2,7 +2,7 @@
   plugins: {  
     ros2dds: {  
       domain: 2,  
-      scope: "drone",  
+      namespace: "drone",  
       ros_localhost_only: true
     }  
   },  
