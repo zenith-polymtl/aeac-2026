@@ -4,23 +4,9 @@
       domain: 2,  
       scope: "drone",  
       localhost_only: true,  
-        
-      // Simple rate limiting - just 2 topics for testing  
-      max_frequencies: [  
-        "rt/.*/image_raw=2.0",    // Limit images to 2 Hz  
-        "rt/.*/diagnostics=1.0"   // Limit diagnostics to 1 Hz  
-      ],  
-        
-      // Allow all topics (remove filtering for testing)  
-      // allow: [],  
-      // deny: [],  
-        
-      forward_discovery: false,  
-      reliable_routes_blocking: false,  
-      queries_timeout: 3.0  
+      forward_discovery: true  
     }  
   },  
-    
   mode: "peer",  
   listen: {  
     endpoints: ["tcp/0.0.0.0:7447"]  
