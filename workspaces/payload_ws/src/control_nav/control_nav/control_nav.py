@@ -39,15 +39,15 @@ class ControlNav(Node):
         
         # Subscribers
         # Lap specific subscriber
-        self.start_lap_sub = self.create_subscription(Bool, '/mission/lap/start', self.start_laps, 10)
-        self.finish_lap_sub = self.create_subscription(Bool, '/mission/lap/finish_lap', self.finish_current_lap_and_stop, 10)
+        self.start_lap_sub = self.create_subscription(Bool, '/mission/control_nav/lap/start', self.start_laps, 10)
+        self.finish_lap_sub = self.create_subscription(Bool, '/mission/control_nav/lap/finish', self.finish_current_lap_and_stop, 10)
         
         # Object delivery specific subscriber
         self.move_to_ladder_sub = self.create_subscription(Bool, '/mission/control_nav/move_to_ladder', self.move_to_ladder_procedure, 10)
         self.move_to_tank_sub = self.create_subscription(Bool, '/mission/control_nav/move_to_tank', self.move_to_tank_procedure, 10)
         
         # Genretal controle subscriber
-        self.stop_drone_sub = self.create_subscription(Bool, '/mission/control_nav/stop', self.stop_drone, 10)
+        self.abort_all_sub = self.create_subscription(Bool, '/mission/abort_all', self.stop_drone, 10)
 
         self.drone_position_sub = self.create_subscription(
             PoseStamped, "/mavros/local_position/pose", self.drone_pose_callback, qos_profile_BE
@@ -163,6 +163,9 @@ class ControlNav(Node):
         self.waypoint_convert_gps_to_local()
         
     def move_to_ladder_procedure(self, _):
+        self.is_doing_laps = False
+        self.lap_waypoint_index = 0
+        self.current_lap = 0
         ladder_conversion_request = ConvertGpsToLocal.Request()
         ladder_conversion_request.gps_point = NavSatFix()
         ladder_conversion_request.gps_point.latitude = self.latitude_of_ladder
@@ -173,6 +176,9 @@ class ControlNav(Node):
         future.add_done_callback(self.object_conversion_callback)
 
     def move_to_tank_procedure(self, _):
+        self.is_doing_laps = False
+        self.lap_waypoint_index = 0
+        self.current_lap = 0
         tank_conversion_request = ConvertGpsToLocal.Request()
         tank_conversion_request.gps_point = NavSatFix()
         tank_conversion_request.gps_point.latitude = self.latitude_of_tank
@@ -218,19 +224,19 @@ class ControlNav(Node):
         self.is_doing_laps = True
         self.is_moving_to_position = True
         self.is_last_lap = False
-        self.waypoint_index = 0
+        self.lap_waypoint_index = 0
         
         self.get_logger().info(f"Waypoint lengh: {len(self.waypoints_raw)}")
 
-        self.move_to_pose(self.waypoints_raw[self.waypoint_index].pose.position)
+        self.move_to_pose(self.waypoints_raw[self.lap_waypoint_index].pose.position)
         
     def drone_pose_callback(self, msg):
         self.drone_pose = msg.pose.position
 
     def handle_reach_waypoint(self):
-        self.waypoint_index += 1
-        if len(self.waypoints_raw) == self.waypoint_index:
-            self.waypoint_index = 0
+        self.lap_waypoint_index += 1
+        if len(self.waypoints_raw) == self.lap_waypoint_index:
+            self.lap_waypoint_index = 0
             self.current_lap += 1
             if self.current_lap == self.number_of_laps or self.stop_after_finishing_lap:
                 if not self.is_last_lap:
@@ -242,7 +248,7 @@ class ControlNav(Node):
                 self.get_logger().info("Finised laps")
                 return
                 
-        self.move_to_pose(self.waypoints_raw[self.waypoint_index].pose.position)
+        self.move_to_pose(self.waypoints_raw[self.lap_waypoint_index].pose.position)
         
     def calculate_distance_from_point(self, point_1):
         return math.sqrt(
@@ -306,11 +312,12 @@ class ControlNav(Node):
         self.is_moving_to_position = False
         self.is_doing_laps = False
         self.current_lap = 0
-        self.waypoint_index = 0
+        self.lap_waypoint_index = 0
         
         self.stop_current_lap()
     
     def finish_current_lap_and_stop(self, _):
+        self.get_logger().info(f"Finishing the current lap")
         self.stop_after_finishing_lap = True
 
 def main(args=None):
