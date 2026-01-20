@@ -1,9 +1,8 @@
 {  
   plugins: {  
     ros2dds: {  
-      domain: 3,                    // Use domain 2 as you specified  
-      namespace: "GroundStation",  
-      ros_localhost_only: true,         // Restrict DDS to localhost       // Enable full ROS graph visibility  
+      domain: 3,  
+      namespace: "/GroundStation",  
     }  
   },  
   mode: "client",  

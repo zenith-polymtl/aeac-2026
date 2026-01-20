@@ -8,4 +8,3 @@ services:
     environment:  
       - ROS_DOMAIN_ID=3
       - RUST_LOG=debug
-      - ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST  
