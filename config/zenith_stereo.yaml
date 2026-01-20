@@ -3,26 +3,32 @@
     ros__parameters:  
         # General settings  
         general:  
-            camera_name: 'zed2i'  
-            pub_frame_rate: 15.0
+            camera_name: 'zed2i'
+            grab_resolution: 'HD720'  # Good balance for Jetson, or 'VGA' for maximum performance  
+            pub_frame_rate: 10.0
             pub_resolution: 'CUSTOM'  
-            pub_downscale_factor: 1.5  
+            pub_downscale_factor: 2.0  
             gpu_id: -1  
             enable_image_validity_check: 1  
             async_image_retrieval: false  
+            camera_timeout_sec: 5  
+            camera_max_reconnect: 5  
+            camera_flip: false  
+            self_calib: true
           
         # Video settings - outdoor optimized  
         video:  
+            saturation: 4  # Add this  
+            sharpness: 4   # Add this    
+            gamma: 8       # Add this  
             brightness: 4  
             contrast: 4  
             auto_exposure_gain: true  
-            exposure: 80  
-            gain: 80  
-            auto_whitebalance: true  
+            auto_whitebalance: true
           
         # Sensor settings  
         sensors:  
-            sensors_pub_rate: 100.0  
+            sensors_pub_rate: 25.0  
             publish_imu_tf: false  
             sensors_image_sync: true  
           
@@ -110,8 +116,8 @@
                 is_static: true
             
             allow_reduced_precision_inference: true  
-            max_range: 30.0  
-            confidence_threshold: 50.0  
+            max_range: 20.0  
+            confidence_threshold: 65.0  
             prediction_timeout: 0.2  
             enable_tracking: true  
           

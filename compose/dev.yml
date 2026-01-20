@@ -12,11 +12,12 @@ services:
     stdin_open: true
     volumes:
       - ..:/aeac
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+
     working_dir: /aeac/workspaces    # set WS in .env, e.g. workspaces/small_ws
     command: ["bash","-lc","while :; do sleep 86400; done"]
     environment:  
       - ROS_DOMAIN_ID=3
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-      - ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST  # Add this 
-      - ROS_LOCALHOST_ONLY=1 
+      - DISPLAY=$DISPLAY
   

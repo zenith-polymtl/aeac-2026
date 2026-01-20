@@ -1,12 +1,22 @@
-{  
-  plugins: {  
+{    
+  plugins: {    
     ros2dds: {  
       domain: 3,  
-      namespace: "/GroundStation",  
-    }  
-  },  
-  mode: "client",  
-  connect: {  
-    endpoints: ["tcp/192.168.30.204:7447"]  
-  }  
+      allow: {    
+        // Allow only ZED compressed image topics    
+        publishers: [    
+          "/zed/zed_node/rgb/color/rect/image/compressed",       
+        ],    
+        // Allow subscribers for command topics if needed    
+        subscribers: [    
+          "/zed/zed_node/rgb/color/rect/image/compressed"
+        ]  
+        //These use regular expression, see Regex for more info  
+      }  
+    }    
+  },    
+  mode: "client",    
+  connect: {    
+    endpoints: ["tcp/192.168.0.21:7447"]    
+  }    
 }

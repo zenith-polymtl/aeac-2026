@@ -8,3 +8,4 @@ services:
     environment:  
       - ROS_DOMAIN_ID=2  
       - RUST_LOG=debug
+      - ROS_DISTRO=humble
