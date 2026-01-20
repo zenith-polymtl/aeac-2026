@@ -2,13 +2,25 @@
   plugins: {    
     ros2dds: {  
       domain: 3,  
-      allow: {
-        publishers: "^(/tf|/tf_static|/zed/zed_node/rgb/color/rect/image($|/compressed$)|/zed/zed_node/rgb/color/rect/camera_info$)$",
-        subscribers: "^(/tf|/tf_static|/zed/zed_node/rgb/color/rect/image($|/compressed$)|/zed/zed_node/rgb/color/rect/camera_info$)$"
-      }
+      allow: {  
+        publishers: [  
+          "/tf",  
+          "/tf_static",   
+          "/zed/zed_node/rgb/color/rect/image",  
+          "/zed/zed_node/rgb/color/rect/image/compressed",  
+          "/zed/zed_node/rgb/color/rect/camera_info"  
+        ],  
+        subscribers: [  
+          "/tf",  
+          "/tf_static",  
+          "/zed/zed_node/rgb/color/rect/image",   
+          "/zed/zed_node/rgb/color/rect/image/compressed",  
+          "/zed/zed_node/rgb/color/rect/camera_info"  
+        ]  
+      } 
     }    
   },    
-  mode: "client",    
+  mode: "client",  //Maybe change for peer to have retries  
   connect: {    
     endpoints: ["tcp/192.168.0.21:7447"]    
   }    
