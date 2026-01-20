@@ -12,6 +12,7 @@ find_package(ament_index_cpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(Boost REQUIRED)
 find_package(nlohmann_json REQUIRED)
+find_package(custom_interfaces REQUIRED)
 
 
 set(DEPENDENCIES
@@ -20,13 +21,14 @@ set(DEPENDENCIES
   "ament_index_cpp"
   "Boost"
   "nlohmann_json"
+  "custom_interfaces"
 )
 
 add_library(${PROJECT_NAME}_lib
   src/web_server_node.cpp
 )
 
-ament_target_dependencies(${PROJECT_NAME}_lib std_msgs nlohmann_json rclcpp)
+ament_target_dependencies(${PROJECT_NAME}_lib std_msgs nlohmann_json rclcpp custom_interfaces)
 
 add_executable(web_server_node src/web_server_node.cpp)
 install(TARGETS web_server_node DESTINATION lib/${PROJECT_NAME})

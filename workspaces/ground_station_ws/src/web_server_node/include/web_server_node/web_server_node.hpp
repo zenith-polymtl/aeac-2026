@@ -15,6 +15,7 @@
 #include <boost/beast/http/file_body.hpp>
 #include <boost/beast/websocket.hpp>
 #include <nlohmann/json.hpp>
+#include "custom_interfaces/msg/ui_message.hpp"
 #include <memory>
 
 const std::string WEB_COMPONENT_FOLDER = "/web_components/";
@@ -22,13 +23,18 @@ const int SERVER_PORT = 8080;
 
 // API routes
 const std::string API_MISSION_GO = "/api/mission/go";
-const std::string API_LAP = "/api/mission/lap";
+const std::string API_START_LAP = "/api/mission/lap/start";
+const std::string API_FINISH_LAP = "/api/mission/lap/finish";
+const std::string API_MOVE_TO_LADDER = "/api/mission/move_to_ladder";
+const std::string API_MOVE_TO_TANK = "/api/mission/move_to_tank";
+const std::string API_ABORT_ALL = "/api/mission/abort_all";
 
 namespace beast = boost::beast;
 namespace http = beast::http;
 namespace websocket = beast::websocket;
 namespace net = boost::asio;
 using tcp = boost::asio::ip::tcp;
+using UiMessage = custom_interfaces::msg::UiMessage;
 
 class WebServerNode : public rclcpp::Node
 {
@@ -36,10 +42,12 @@ public:
     WebServerNode();
     ~WebServerNode();
 
-    void initialize_publisher();
     void run_server();
 
 private:
+    void initialize_publisher();
+    void initialize_subscriber();
+
     // Server Configuration
     boost::beast::string_view mime_type(boost::beast::string_view path);
 
@@ -56,7 +64,7 @@ private:
 
     // Socket functions
     void broadcast_status();
-
+    void broadcast_message(const UiMessage msg);
     // Variables
     std::set<websocket::stream<tcp::socket> *> ws_sessions_;
     std::mutex ws_mutex_;
@@ -66,8 +74,17 @@ private:
 
     std::string package_share_dir_;
     std::thread server_thread_;
+
+	rclcpp::Subscription<UiMessage>::SharedPtr message_to_ui_subsciber_;
+
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr mission_go_publisher_;
-    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr lap_publisher_;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr start_lap_publisher_;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr finish_lap_publisher_;
+
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr move_to_ladder_publisher_;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr move_to_tank_publisher_;
+
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr abort_all_mission_publisher_;
 
     boost::asio::io_context ioc_;
     boost::asio::ip::tcp::acceptor acceptor_;

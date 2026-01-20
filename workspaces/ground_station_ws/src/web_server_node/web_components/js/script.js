@@ -1,21 +1,55 @@
-function initalise_buttons() {
-    document.getElementById('/mission/go').onclick = async () => {
-        const response = await fetch('/api/mission/go');
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        console.log(data.message);
-    }
+const API_MISSION_GO = "/api/mission/go";
+const API_START_LAP = "/api/mission/lap/start";
+const API_FINISH_LAP = "/api/mission/lap/finish";
+const API_MOVE_TO_LADDER = "/api/mission/move_to_ladder";
+const API_MOVE_TO_TANK = "/api/mission/move_to_tank";
+const API_ABORT_ALL = "/api/mission/abort_all";
 
-    document.getElementById('/mission/lap').onclick = async () => {
-        const response = await fetch('/api/mission/lap');
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+const statusElement = document.getElementById('status');
+const logElement = document.getElementById('log');
+
+function appendToLog(message, type = 'info') {
+    const p = document.createElement('p');
+    p.textContent = `${new Date().toLocaleString()} - ${message}`;
+    p.classList.add(type);
+    logElement.appendChild(p);
+    logElement.scrollTop = logElement.scrollHeight;
+}
+
+async function sendCommand(endpoint) {
+    statusElement.textContent = 'Status: Sending command...';
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        if (response.ok) {
+            const data = await response.json();
+            const successMessage = `Success: ${JSON.stringify(data)}`;
+            statusElement.textContent = `Status: ${successMessage}`;
+            appendToLog(`Command to ${endpoint}: ${successMessage}`, 'success');
+        } else {
+            const errorMessage = `Error: ${response.statusText}`;
+            statusElement.textContent = `Status: ${errorMessage}`;
+            appendToLog(`Command to ${endpoint}: ${errorMessage}`, 'error');       
         }
-        const data = await response.json();
-        console.log(data.message);
+    } catch (error) {
+        const errorMessage = `Error: ${error.message}`;
+        statusElement.textContent = `Status: ${errorMessage}`;
+        appendToLog(`Command to ${endpoint}: ${errorMessage}`, 'error');    
     }
+}
+
+function initalise_buttons() {
+    document.getElementById('mission-go').addEventListener('click', () => sendCommand(API_MISSION_GO));
+    document.getElementById('start-lap').addEventListener('click', () => sendCommand(API_START_LAP));
+    document.getElementById('finish-lap').addEventListener('click', () => sendCommand(API_FINISH_LAP));
+    document.getElementById('move-to-ladder').addEventListener('click', () => sendCommand(API_MOVE_TO_LADDER));
+    document.getElementById('move-to-tank').addEventListener('click', () => sendCommand(API_MOVE_TO_TANK));
+    document.getElementById('abort-all').addEventListener('click', () => sendCommand(API_ABORT_ALL));
+
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -31,11 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const data = JSON.parse(event.data);
             console.log("Status update:", data);
+            appendToLog(`Received Message: ${data.message}`, data.is_success ? 'info':'error')
             
-            // Update UI
-            document.getElementById("status").textContent = data.status;
-            document.getElementById("battery").textContent = data.battery + "%";
-            document.getElementById("clients").textContent = data.clients;
         } catch (e) {
             console.error("Invalid JSON:", event.data);
         }

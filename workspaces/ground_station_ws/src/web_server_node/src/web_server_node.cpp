@@ -48,6 +48,7 @@ WebServerNode::WebServerNode() : Node("web_server_node"),
                                  acceptor_(ioc_, {net::ip::make_address("0.0.0.0"), SERVER_PORT})
 {
     initialize_publisher();
+    initialize_subscriber();
     package_share_dir_ = ament_index_cpp::get_package_share_directory("web_server_node");
     server_thread_ = std::thread([this]()
                                  { run_server(); });
@@ -65,7 +66,47 @@ WebServerNode::~WebServerNode()
 void WebServerNode::initialize_publisher()
 {
     mission_go_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/go", 10);
-    lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/lap", 10);
+    start_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/lap/start", 10);
+    finish_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/lap/finish", 10);
+
+    move_to_ladder_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/move_to_ladder", 10);
+    move_to_tank_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/move_to_tank", 10);
+    abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/abort_all", 10);
+}
+
+void WebServerNode::initialize_subscriber() 
+{
+    message_to_ui_subsciber_ = create_subscription<UiMessage>(
+		"/send_to_ui", 10, std::bind(&WebServerNode::broadcast_message, this, std::placeholders::_1));
+}
+
+void WebServerNode::broadcast_message(const UiMessage msg)
+{
+    nlohmann::json status_json = {
+        {"is_success", msg.is_success},
+        {"message", msg.message},
+    };
+
+    std::string message = status_json.dump();
+
+    std::lock_guard<std::mutex> lock(ws_mutex_);
+
+    for (auto *ws_ptr : ws_sessions_)
+    {
+        try {
+            beast::error_code ec;
+            ws_ptr->text(true);
+            ws_ptr->write(net::buffer(message), ec);
+            if (ec)
+            {
+                RCLCPP_WARN(get_logger(), "Failed to send to one client: %s", ec.message().c_str());
+            }
+        }
+        catch(...){
+            RCLCPP_WARN(get_logger(), "Error Broadcasting");
+        }
+
+    }
 }
 
 void WebServerNode::run_server()
@@ -151,8 +192,8 @@ WebServerNode::handle_request(
     http::request<http::string_body> &&req)
 {
     // 1. Basic validation
-    if (req.method() != http::verb::get)
-        return make_bad_request(req, "Only GET method is supported");
+    if (req.method() != http::verb::get && req.method() != http::verb::post)
+        return make_bad_request(req, "Only GET and POST methods is supported");
 
     beast::string_view target = req.target();
 
@@ -176,13 +217,11 @@ WebServerNode::try_handle_api(
     beast::string_view target,
     const http::request<http::string_body> &req)
 {
-    // Handle "/api/mission/go"
     if (target == API_MISSION_GO)
     {
         RCLCPP_INFO(get_logger(), "Mission Go received!");
         std_msgs::msg::Bool msg;
         msg.data = true;
-        mission_go_publisher_->publish(msg);
         mission_go_publisher_->publish(msg);
 
         http::response<http::string_body> res{http::status::ok, req.version()};
@@ -193,19 +232,85 @@ WebServerNode::try_handle_api(
         res.keep_alive(req.keep_alive());
         return res;
     }
-    // Handle "/api/mission/lap"
-    if (target == API_LAP)
+    if (target == API_START_LAP)
     {
-        RCLCPP_INFO(get_logger(), "Start Laps!");
+        RCLCPP_INFO(get_logger(), "Starting Laps!");
         std_msgs::msg::Bool msg;
         msg.data = true;
-        mission_go_publisher_->publish(msg);
-        lap_publisher_->publish(msg);
+        start_lap_publisher_->publish(msg);
 
         http::response<http::string_body> res{http::status::ok, req.version()};
         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
         res.set(http::field::content_type, "application/json");
-        res.body() = R"({"message": "Request Lap received"})";
+        res.body() = R"({"message": "Request Start Lap received"})";
+        res.prepare_payload();
+        res.keep_alive(req.keep_alive());
+        return res;
+    }
+
+    // API_MISSION_GO = "/api/mission/go";
+    // const std::string API_START_LAP = "/api/mission/lap/start";
+    // const std::string API_FINISH_LAP = "/api/mission/lap/finish";
+    // const std::string API_MOVE_TO_LADDER = "/api/mission/move_to_ladder";
+    // const std::string API_MOVE_TO_TANK = "/api/mission/move_to_tank";
+    // const std::string API_ABORT_ALL = "/api/mission/abort_all";
+
+    if (target == API_FINISH_LAP)
+    {
+        RCLCPP_INFO(get_logger(), "Finishing the current lap and stopping");
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        finish_lap_publisher_->publish(msg);
+
+        http::response<http::string_body> res{http::status::ok, req.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "application/json");
+        res.body() = R"({"message": "Request Finish Lap received"})";
+        res.prepare_payload();
+        res.keep_alive(req.keep_alive());
+        return res;
+    }
+    if (target == API_MOVE_TO_LADDER)
+    {
+        RCLCPP_INFO(get_logger(), "Starting Ladder movement procedure!");
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        move_to_ladder_publisher_->publish(msg);
+
+        http::response<http::string_body> res{http::status::ok, req.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "application/json");
+        res.body() = R"({"message": "Request Move to Lap received"})";
+        res.prepare_payload();
+        res.keep_alive(req.keep_alive());
+        return res;
+    }
+    if (target == API_MOVE_TO_TANK)
+    {
+        RCLCPP_INFO(get_logger(), "Starting Tank movement procedure!");
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        move_to_tank_publisher_->publish(msg);
+
+        http::response<http::string_body> res{http::status::ok, req.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "application/json");
+        res.body() = R"({"message": "Request Move to Tank received"})";
+        res.prepare_payload();
+        res.keep_alive(req.keep_alive());
+        return res;
+    }
+    if (target == API_ABORT_ALL)
+    {
+        RCLCPP_INFO(get_logger(), "Abort Received!");
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        abort_all_mission_publisher_->publish(msg);
+
+        http::response<http::string_body> res{http::status::ok, req.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "application/json");
+        res.body() = R"({"message": "Abort received"})";
         res.prepare_payload();
         res.keep_alive(req.keep_alive());
         return res;
@@ -269,10 +374,22 @@ void WebServerNode::do_session(tcp::socket socket, std::string const &doc_root)
         {
             return;
         }
+        websocket::stream<tcp::socket> *ws_ptr = &ws;
         {
             std::lock_guard<std::mutex> lock(ws_mutex_);
-            ws_sessions_.insert(&ws);
+            ws_sessions_.insert(ws_ptr);
         }
+        RCLCPP_INFO(get_logger(), "New WebSocket client connected. Total: %zu", ws_sessions_.size());
+
+        auto cleanup = [&]() {
+            std::lock_guard<std::mutex> lock(ws_mutex_);
+            ws_sessions_.erase(ws_ptr);
+            RCLCPP_INFO(get_logger(), "WebSocket client disconnected. Total: %zu", ws_sessions_.size());
+        };
+        struct Guard {
+            std::function<void()> fn;
+            ~Guard() { if (fn) fn(); }
+        } guard{cleanup};
         RCLCPP_INFO(get_logger(), "New WebSocket client connected. Total: %zu", ws_sessions_.size());
         for (;;)
         {
@@ -290,6 +407,11 @@ void WebServerNode::do_session(tcp::socket socket, std::string const &doc_root)
             {
                 return;
             }
+        }
+        ws.close(websocket::close_code::normal, ec);
+        if (ec && ec != websocket::error::closed)
+        {
+            RCLCPP_WARN(get_logger(), "WebSocket close failed: %s", ec.message().c_str());
         }
     }
     else
