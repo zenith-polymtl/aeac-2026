@@ -2,17 +2,10 @@
   plugins: {    
     ros2dds: {  
       domain: 3,  
-      allow: {    
-        // Allow only ZED compressed image topics    
-        publishers: [    
-          "/zed/zed_node/rgb/color/rect/image/compressed",       
-        ],    
-        // Allow subscribers for command topics if needed    
-        subscribers: [    
-          "/zed/zed_node/rgb/color/rect/image/compressed"
-        ]  
-        //These use regular expression, see Regex for more info  
-      }  
+      allow: {
+        publishers: "^(/tf|/tf_static|/zed/zed_node/rgb/color/rect/image($|/compressed$)|/zed/zed_node/rgb/color/rect/camera_info$)$",
+        subscribers: "^(/tf|/tf_static|/zed/zed_node/rgb/color/rect/image($|/compressed$)|/zed/zed_node/rgb/color/rect/camera_info$)$"
+      }
     }    
   },    
   mode: "client",    
