@@ -9,16 +9,11 @@ from mavros_msgs.msg import PositionTarget
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 from geometry_msgs.msg import PoseStamped, Point
 from std_msgs.msg import Bool
-from mavros import setpoint as SP  
-from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
+from rclpy.qos import QoSProfile
 
 from custom_interfaces.srv import ConvertGpsToLocal
 
 import os
-
-NUMBER_OF_LAP = 3
-DELAIS_FOR_POSITION_CHECK = 0.5
-DISTANCE_FROM_OBJECTIF_THREASHOLD = 2
 
 qos_profile_BE = QoSProfile(
     reliability=QoSReliabilityPolicy.BEST_EFFORT,
@@ -30,12 +25,74 @@ class ControlNav(Node):
 
     def __init__(self):
         super().__init__('control_nav')
+        
+        self.initialize_parameters()
+        
+        self.is_moving_to_position = False
+        self.stop_after_finishing_lap = False
+        self.is_last_lap = False
+        self.is_doing_laps = False
+        self.current_point_objectif = Point()
+        
+        # Publisher
+        self.publisher_raw = self.create_publisher(PositionTarget, '/mavros/setpoint_raw/local', 10)
+        
+        # Subscribers
+        # Lap specific subscriber
+        self.start_lap_sub = self.create_subscription(Bool, '/mission/lap/start', self.start_laps, 10)
+        self.finish_lap_sub = self.create_subscription(Bool, '/mission/lap/finish_lap', self.finish_current_lap_and_stop, 10)
+        
+        # Object delivery specific subscriber
+        self.move_to_ladder_sub = self.create_subscription(Bool, '/mission/control_nav/move_to_ladder', self.move_to_ladder_procedure, 10)
+        self.move_to_tank_sub = self.create_subscription(Bool, '/mission/control_nav/move_to_tank', self.move_to_tank_procedure, 10)
+        
+        # Genretal controle subscriber
+        self.stop_drone_sub = self.create_subscription(Bool, '/mission/control_nav/stop', self.stop_drone, 10)
 
-        self.declare_parameter('json_filename', 'waypoints.json')
+        self.drone_position_sub = self.create_subscription(
+            PoseStamped, "/mavros/local_position/pose", self.drone_pose_callback, qos_profile_BE
+        )
+        
+        self.read_json_waypoints()
+                
+        self.convert_client = self.create_client(ConvertGpsToLocal, '/convert/gps_to_local')
+        while not self.convert_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Convert service not available, waiting again...')
+                        
+        self.position_check_timer = self.create_timer(self.delais_for_position_check, self.position_check_timer_callback)
+    
+    def initialize_parameters(self):
+        ## Param decalration
+        self.declare_parameter('json_filename', 'lap_waypoints.json')
         self.declare_parameter('json_subfolder', 'data')
-
+        # We could remove the `number_of_laps` variable, but for now, 999 makes it basicly infinit
+        self.declare_parameter('number_of_laps', 999)
+        self.declare_parameter('delais_for_position_check', 0.5)
+        self.declare_parameter('distance_from_objectif_threashold', 2.0)
+        
+        self.declare_parameter('latitude_of_ladder', -35.361450)
+        self.declare_parameter('longitude_of_ladder', 149.161448)
+        self.declare_parameter('altitude_of_ladder', 10.0)
+        
+        self.declare_parameter('latitude_of_tank', -35.365722)
+        self.declare_parameter('longitude_of_tank', 149.163075)
+        self.declare_parameter('altitude_of_tank', 10.0)
+        
+        self.number_of_laps = self.get_parameter('number_of_laps').get_parameter_value().integer_value
+        self.delais_for_position_check = self.get_parameter('delais_for_position_check').get_parameter_value().double_value
+        self.distance_from_objectif_threashold = self.get_parameter('distance_from_objectif_threashold').get_parameter_value().double_value
+        
+        self.latitude_of_ladder = self.get_parameter('latitude_of_ladder').get_parameter_value().double_value
+        self.longitude_of_ladder = self.get_parameter('longitude_of_ladder').get_parameter_value().double_value
+        self.altitude_of_ladder = self.get_parameter('altitude_of_ladder').get_parameter_value().double_value
+        
+        self.latitude_of_tank = self.get_parameter('latitude_of_tank').get_parameter_value().double_value
+        self.longitude_of_tank = self.get_parameter('longitude_of_tank').get_parameter_value().double_value
+        self.altitude_of_tank = self.get_parameter('altitude_of_tank').get_parameter_value().double_value
+    
+    def read_json_waypoints(self):        
         json_filename = self.get_parameter('json_filename').get_parameter_value().string_value
-        json_subfolder = self.get_parameter('json_subfolder').get_parameter_value().string_value
+        json_subfolder = self.get_parameter('json_subfolder').get_parameter_value().string_value\
 
         try:
             package_share_dir = get_package_share_directory('control_nav')
@@ -51,67 +108,9 @@ class ControlNav(Node):
         except Exception as e:
             self.get_logger().error(f'Failed to load JSON file: {e}')
             raise
-                
-        self.moving_to_position = False
-        self.current_point_objectif = Point()
         
-        qos_profile = QoSProfile(
-            reliability=ReliabilityPolicy.BEST_EFFORT,
-            durability=DurabilityPolicy.TRANSIENT_LOCAL,
-            history=HistoryPolicy.KEEP_LAST,
-            depth=1
-        )
-
-        # self.position_pub = self.create_publisher(PoseStamped, '/mavros/setpoint_position/local', qos_profile)
-        self.publisher_raw = self.create_publisher(PositionTarget, '/mavros/setpoint_raw/local', 10)
-        
-        self.start_lap_sub = self.create_subscription(Bool, '/mission/lap', self.start_laps, 10)
-
-        self.drone_position_sub = self.create_subscription(
-            PoseStamped, "/mavros/local_position/pose", self.drone_pose_callback, qos_profile_BE
-        )
-        
-        self.convert_client = self.create_client(ConvertGpsToLocal, '/convert/gps_to_local')
-        while not self.convert_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('Service not available, waiting again...')
-        
-        self.waypoints_raw = []
-        
-        for i, waypoint in enumerate(self.waypoints_gps):
-            request = ConvertGpsToLocal.Request()
-            request.gps_point = NavSatFix()
-            request.gps_point.latitude = waypoint['latitude']
-            request.gps_point.longitude = waypoint['longitude']
-            request.gps_point.altitude = waypoint['altitude']
-
-            future = self.convert_client.call_async(request)
-            rclpy.spin_until_future_complete(self, future)
-            if future.result() is not None:
-                local_pose = future.result().local_point
-                self.get_logger().info(f"GPS position: latitude={waypoint['latitude']}, longitude={waypoint['longitude']}, altitude={waypoint['altitude']}")
-                self.get_logger().info(f"Local Pose: position x={local_pose.pose.position.x}, y={local_pose.pose.position.y}, z={local_pose.pose.position.z}")
-                self.waypoints_raw.append(local_pose)
-            else:
-                # TODO What should we do if the service fails
-                self.get_logger().error(f'Failed to convert the gps point ({i}) to local pos')
-
-        self.position_check_timer = self.create_timer(DELAIS_FOR_POSITION_CHECK, self.position_check_timer_callback)
-
     def move_to_pose(self, wp):
-        # self.current_point_objectif = Point()
-        # self.current_point_objectif = wp.pose.position
-        
-        # self.target_pose = PoseStamped()
-        # self.target_pose.header.frame_id = 'map'
-        # self.target_pose.pose.position = self.current_point_objectif
-        # self.target_pose.pose.orientation.w = 1.0
-
-        # self.get_logger().info(f"Currently moving to : x={wp.pose.position.x}, y={wp.pose.position.y}, z={wp.pose.position.z}")
-        
-        # self.target_pose.header.stamp = self.get_clock().now().to_msg()
-        # self.position_pub.publish(self.target_pose)
-        
-        self.current_point_objectif = wp.pose.position
+        self.current_point_objectif = wp
         
         target = PositionTarget()  
         target.header.stamp = self.get_clock().now().to_msg()  
@@ -119,91 +118,205 @@ class ControlNav(Node):
         target.coordinate_frame = PositionTarget.FRAME_LOCAL_NED
         
         target.type_mask = (
-            PositionTarget.IGNORE_AX |
-            PositionTarget.IGNORE_AY |
-            PositionTarget.IGNORE_AZ |
+            PositionTarget.IGNORE_AFX |
+            PositionTarget.IGNORE_AFY |
+            PositionTarget.IGNORE_AFZ |
             PositionTarget.IGNORE_VX |
             PositionTarget.IGNORE_VY |
             PositionTarget.IGNORE_VZ |
             PositionTarget.IGNORE_YAW |
-            PositionTarget.IGNIRE_YAW_RATE
+            PositionTarget.IGNORE_YAW_RATE
         )
 
-        target.postion = self.current_point_objectif
+        target.position = self.current_point_objectif
 
         self.publisher_raw.publish(target)
 
+    def waypoint_convert_gps_to_local(self):
+        self.waypoints_raw = []
+        self.pending_conversions = len(self.waypoints_gps)
+        for waypoint in self.waypoints_gps:
+            request = ConvertGpsToLocal.Request()
+            request.gps_point = NavSatFix()
+            request.gps_point.latitude = waypoint['latitude']
+            request.gps_point.longitude = waypoint['longitude']
+            request.gps_point.altitude = waypoint['altitude']
+            future = self.convert_client.call_async(request)
+            future.add_done_callback(self.conversion_callback)
 
+    def conversion_callback(self, future):
+        if future.result() is not None:
+            local_pose = future.result().local_point
+            self.waypoints_raw.append(local_pose)
+            self.get_logger().info(f"Converted waypoint: x={local_pose.pose.position.x}, y={local_pose.pose.position.y}, z={local_pose.pose.position.z}")
+        else:
+            self.get_logger().error('Conversion failed')
+            
+        self.pending_conversions -= 1
+            
+        if self.pending_conversions == 0:
+            self.get_logger().info("All conversions complete")
+            self.start_lap_logic()
+    
     def start_laps(self, _):
         self.get_logger().info("Starting the laps")
+        self.waypoint_convert_gps_to_local()
+        
+    def move_to_ladder_procedure(self, _):
+        ladder_conversion_request = ConvertGpsToLocal.Request()
+        ladder_conversion_request.gps_point = NavSatFix()
+        ladder_conversion_request.gps_point.latitude = self.latitude_of_ladder
+        ladder_conversion_request.gps_point.longitude = self.longitude_of_ladder
+        ladder_conversion_request.gps_point.altitude = self.altitude_of_ladder
+        future = self.convert_client.call_async(ladder_conversion_request)
+        self.get_logger().info(f"Move to Ladder procedure started")
+        future.add_done_callback(self.object_conversion_callback)
+
+    def move_to_tank_procedure(self, _):
+        tank_conversion_request = ConvertGpsToLocal.Request()
+        tank_conversion_request.gps_point = NavSatFix()
+        tank_conversion_request.gps_point.latitude = self.latitude_of_tank
+        tank_conversion_request.gps_point.longitude = self.longitude_of_tank
+        tank_conversion_request.gps_point.altitude = self.altitude_of_tank
+        future = self.convert_client.call_async(tank_conversion_request)
+        self.get_logger().info(f"Move to Tank procedure started")
+        future.add_done_callback(self.object_conversion_callback)
+        
+    def object_conversion_callback(self, future):
+        if future.result() is not None:
+            local_pose = future.result().local_point
+            self.object_objectif_waypoint = local_pose.pose.position
+            self.get_logger().info(f"Converted gps pose to local: x={local_pose.pose.position.x}, y={local_pose.pose.position.y}, z={local_pose.pose.position.z}")
+        else:
+            self.get_logger().error('Conversion failed')
+            return
+            
+        distance = self.calculate_distance_from_point(self.object_objectif_waypoint)
+        if (distance <= 30):
+            self.get_logger().info(f"Already at a distance of {distance}m, which is smaller thant 30m. Not moving")
+        else:
+            dx = self.drone_pose.x - self.object_objectif_waypoint.x
+            dy = self.drone_pose.y - self.object_objectif_waypoint.y
+            horiz_dist = math.sqrt(dx**2 + dy**2)
+            if horiz_dist > 0:
+                ux = dx / horiz_dist
+                uy = dy / horiz_dist
+                target_pos = Point()
+                target_pos.x = self.object_objectif_waypoint.x + 30 * ux
+                target_pos.y = self.object_objectif_waypoint.y + 30 * uy
+                target_pos.z = self.drone_pose.z  # Keep current altitude
+                self.is_moving_to_position = True
+                self.current_point_objectif = target_pos
+                self.get_logger().info(f"Moving to target position: x={target_pos.x}, y={target_pos.y}, z={target_pos.z}")
+                self.move_to_pose(self.current_point_objectif)
+            else:
+                self.get_logger().info("Drone is directly above/below the target; no horizontal movement needed.")
+
+    def start_lap_logic(self):
+        self.get_logger().info("Starting the laps")
         self.current_lap = 0
-        self.moving_to_position = True
+        self.is_doing_laps = True
+        self.is_moving_to_position = True
+        self.is_last_lap = False
         self.waypoint_index = 0
-        self.move_to_pose(self.waypoints_raw[self.waypoint_index])
+        
+        self.get_logger().info(f"Waypoint lengh: {len(self.waypoints_raw)}")
+
+        self.move_to_pose(self.waypoints_raw[self.waypoint_index].pose.position)
         
     def drone_pose_callback(self, msg):
         self.drone_pose = msg.pose.position
 
-    
     def handle_reach_waypoint(self):
         self.waypoint_index += 1
         if len(self.waypoints_raw) == self.waypoint_index:
             self.waypoint_index = 0
             self.current_lap += 1
-            if self.current_lap == NUMBER_OF_LAP:
-                self.moving_to_position = False
+            if self.current_lap == self.number_of_laps or self.stop_after_finishing_lap:
+                if not self.is_last_lap:
+                    self.is_last_lap = True
+                    self.move_to_pose(self.waypoints_raw[0].pose.position)
+                self.is_moving_to_position = False
+                self.is_doing_laps = False
                 self.current_lap = 0
-                self.get_logger().info("Finised all laps")
+                self.get_logger().info("Finised laps")
                 return
                 
-        self.move_to_pose(self.waypoints_raw[self.waypoint_index])
+        self.move_to_pose(self.waypoints_raw[self.waypoint_index].pose.position)
+        
+    def calculate_distance_from_point(self, point_1):
+        return math.sqrt(
+            (point_1.x - self.drone_pose.x) ** 2 +
+            (point_1.y - self.drone_pose.y) ** 2 +
+            (point_1.z - self.drone_pose.z) ** 2
+        )
 
     def position_check_timer_callback(self):
-        if not self.moving_to_position or not self.current_point_objectif:
+        if not self.is_moving_to_position or not self.current_point_objectif:
             return
         
-        # self.get_logger().info(f"Current Position : x={self.drone_pose.x}, y={self.drone_pose.y}, z={self.drone_pose.z}")
-
-        distance_form_objectif = math.sqrt(
-            (self.current_point_objectif.x - self.drone_pose.x) ** 2 +
-            (self.current_point_objectif.y - self.drone_pose.y) ** 2 +
-            (self.current_point_objectif.z - self.drone_pose.z) ** 2
-        )
+        distance_form_objectif = self.calculate_distance_from_point(self.current_point_objectif)
         
         self.get_logger().info(f"Current distance : {distance_form_objectif}")
-        
-        if self.current_lap == 1 and distance_form_objectif < 100:
-            self.stop_laps()
 
-        if distance_form_objectif < DISTANCE_FROM_OBJECTIF_THREASHOLD:
+        if distance_form_objectif < self.distance_from_objectif_threashold:
             self.get_logger().info("Objectif reached")
-            self.handle_reach_waypoint()
+            if self.is_doing_laps:
+                self.handle_reach_waypoint()
+            else:
+                self.is_moving_to_position = False
     
+    # Stop the drone in current place
     def stop_current_lap(self):
-        self.current_point_objectif = Point()
+        stop_target = PositionTarget()
+        stop_target.header.stamp = self.get_clock().now().to_msg()
+        stop_target.header.frame_id = "map"
         
-        self.target_pose = PoseStamped()
-        self.target_pose.header.frame_id = 'map'
-        self.target_pose.pose.position = self.drone_pose
-        self.target_pose.pose.orientation.w = 1.0
+        stop_target.coordinate_frame = PositionTarget.FRAME_LOCAL_NED
         
-        self.target_pose.header.stamp = self.get_clock().now().to_msg()
-        # self.position_pub.publish(self.target_pose)
+        stop_target.type_mask = (
+            PositionTarget.IGNORE_PX |
+            PositionTarget.IGNORE_PY |
+            PositionTarget.IGNORE_PZ |
+            PositionTarget.IGNORE_AFX |
+            PositionTarget.IGNORE_AFY |
+            PositionTarget.IGNORE_AFZ |
+            PositionTarget.IGNORE_YAW
+        )
+        
+        stop_target.velocity.x = 0.0
+        stop_target.velocity.y = 0.0
+        stop_target.velocity.z = 0.0
+                
+        self.publisher_raw.publish(stop_target)
+        self.get_logger().info(f"Drone Stopped")
     
-    def skip_current_lap(self):
+    # Pass the to the nex point
+    def skip_current_waypoint(self):
+        self.get_logger().info(f"Skipping current lap")
         self.stop_current_lap()
         self.handle_reach_waypoint()
     
+    def stop_drone(self, _):
+        self.stop_laps()
+    
+    # Stop the laps completely
     def stop_laps(self):
-        self.moving_to_position = False
+        self.get_logger().info(f"Stopping Drone Laps")
+        self.is_moving_to_position = False
+        self.is_doing_laps = False
         self.current_lap = 0
         self.waypoint_index = 0
         
         self.stop_current_lap()
+    
+    def finish_current_lap_and_stop(self, _):
+        self.stop_after_finishing_lap = True
 
 def main(args=None):
     rclpy.init(args=args)
     node = ControlNav()
+
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
