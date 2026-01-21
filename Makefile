@@ -118,8 +118,7 @@ mavros-sim: up
 
 mission-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	  bash -lc '\
-	    cd "$$WS"; \
+	  bash -lc 'cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \
 	    colcon build; \
 	    source install/setup.bash; \
@@ -129,6 +128,14 @@ mission-sim: up
 	    ros2 launch bringup payload_mission.launch.py \
 	  '
 
+gcs: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    ros2 run web_server_node web_server_node \
+	  '
 
 hexa: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
