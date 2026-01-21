@@ -26,6 +26,6 @@
   mode: "peer",
   connect: {    
     endpoints: ["tcp/192.168.0.21:7447","tcp/192.168.30.204:7447"]  
-    \\put the ip adress of the jetson you need. 1:maison colin, 2:polyfab  
+    \\put the ip address of the jetson you need. 1:maison colin, 2:polyfab  
   }    
 }
