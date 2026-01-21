@@ -51,6 +51,24 @@ relay: ## Start SIYI relay (UDP 14540 → MAVROS, Pymavlink, Mission Planner)
 relay-down:
 	@docker compose -f compose/relay.yml down
 
+zed-shell: ## Open bash in the ZED container (with ROS sourced)
+	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
+	  source /root/ros2_ws/install/setup.bash; \
+	  exec bash -i'
+
+zenoh-ground: ## Start zenoh ground bridge
+	docker compose -f compose/zenoh-ground.yml up --build
+
+zenoh-air: ## Start zenoh air bridge
+	docker compose -f compose/zenoh-air.yml up --build
+
+launch-zed:
+	docker compose -f compose/zed.yml up -d zed-ros2
+	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
+	  source /root/ros2_ws/install/setup.bash; \
+	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml \
+	'
+
 # ===== Docker lifecycle (selected compose) =====
 build: ## Build image for C
 	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) build
@@ -79,8 +97,6 @@ link:
 connect: up    
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'source /opt/ros/humble/setup.bash && colcon build && source install/setup.bash && \
-	  export RMW_IMPLEMENTATION=rmw_zenoh_cpp && \
-	  export ZENOH_CONFIG_OVERRIDE="mode=\"client\";connect/endpoints=[\"tcp/$(DRONE_IP):7447\"]" && \
 	  source /opt/ros/humble/setup.bash && ros2 daemon start && bash'
 
 
@@ -91,9 +107,9 @@ launch: up
 	    source /opt/ros/humble/setup.bash; \
 	    colcon build; \
 	    source install/setup.bash; \
-	    nohup ros2 run rmw_zenoh_cpp rmw_zenohd > /tmp/zenohd.log 2>&1 & \
 	    ros2 daemon start; \
 	    exec bash -i'
+
 
 
 mavros-sim: up
@@ -101,15 +117,21 @@ mavros-sim: up
 	  bash -lc 'export ROS_DOMAIN_ID=$(DOMAIN); \
 	  source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
-	  nohup ros2 run rmw_zenoh_cpp rmw_zenohd > /tmp/zenohd.log 2>&1 & \
 	  ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:$(TCP_PORT) fcu_protocol:=v2.0'
+
+hexa: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'export ROS_DOMAIN_ID=$(DOMAIN); \
+	  source /opt/ros/humble/setup.bash; \
+	  ros2 daemon start; \
+	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS0:115200 fcu_protocol:=v2.0'
+
 
 mavros-ofa: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'export ROS_DOMAIN_ID=$(DOMAIN); \
 	  source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
-	  nohup ros2 run rmw_zenoh_cpp rmw_zenohd > /tmp/zenohd.log 2>&1 & \
 	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200'
 
 clean: ## Remove build/install/log (host + container)

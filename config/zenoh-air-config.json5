@@ -1,0 +1,27 @@
+{  
+  plugins: {  
+    ros2dds: {  
+      domain: 2, 
+      allow: {  
+        publishers: [  
+          "/tf",  
+          "/tf_static",   
+          "/zed/zed_node/rgb/color/rect/image/compressed",  
+          "/zed/zed_node/rgb/color/rect/camera_info",
+          "/chatter" 
+        ],  
+        subscribers: [  
+          "/tf",  
+          "/tf_static",    
+          "/zed/zed_node/rgb/color/rect/image/compressed",  
+          "/zed/zed_node/rgb/color/rect/camera_info" ,
+          "/chatter"
+        ]  
+      } 
+    }  
+  },  
+  mode: "peer",  
+  listen: {  
+    endpoints: ["tcp/0.0.0.0:7447"]  
+  }  
+}

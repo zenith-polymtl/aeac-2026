@@ -1,0 +1,57 @@
+# syntax=docker/dockerfile:1.6
+ARG ROS_DISTRO=humble
+FROM --platform=$TARGETPLATFORM ros:${ROS_DISTRO}-ros-base
+
+ARG TARGETPLATFORM
+ENV DEBIAN_FRONTEND=noninteractive
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Update & install ROS/colcon build tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    python3-colcon-common-extensions \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y \
+    ros-${ROS_DISTRO}-mavros-extras \
+    ros-${ROS_DISTRO}-mavlink \
+    geographiclib-tools \
+    && rm -rf /var/lib/apt/lists/* 
+  
+# Use the correct GeographicLib script  
+RUN /opt/ros/humble/lib/mavros/install_geographiclib_datasets.sh  
+
+RUN apt-get update && apt-get install -y \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+    ros-${ROS_DISTRO}-rmw-zenoh-cpp \
+ && rm -rf /var/lib/apt/lists/*
+
+ 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    iputils-ping \
+    iproute2 \
+    ros-humble-demo-nodes-cpp \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install tf_transformations for ROS 2 
+#Require for polar system package 
+RUN apt-get update && apt-get install -y \  
+    ros-${ROS_DISTRO}-tf-transformations \  
+    && rm -rf /var/lib/apt/lists/*
+
+# Install python3, pip and numpy
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    python3-numpy \
+    python3-geopy \
+    && python3 -m pip install --upgrade pip \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+ARG UID=1000
+ARG GID=1000
+RUN groupadd -g $GID dev && useradd -m -u $UID -g $GID dev
+RUN usermod -a -G dialout dev
