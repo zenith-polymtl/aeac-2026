@@ -110,27 +110,42 @@ launch: up
 	    ros2 daemon start; \
 	    exec bash -i'
 
-
-
 mavros-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	  bash -lc 'export ROS_DOMAIN_ID=$(DOMAIN); \
-	  source /opt/ros/humble/setup.bash; \
+	  bash -lc 'source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
 	  ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:$(TCP_PORT) fcu_protocol:=v2.0'
 
+mission-sim: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    colcon build; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:$(TCP_PORT) fcu_protocol:=v2.0 & \
+	    sleep 2; \
+	    ros2 launch bringup payload_mission.launch.py \
+	  '
+
+gcs: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    ros2 run web_server_node web_server_node \
+	  '
+
 hexa: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	  bash -lc 'export ROS_DOMAIN_ID=$(DOMAIN); \
-	  source /opt/ros/humble/setup.bash; \
+	  bash -lc 'source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
 	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS0:115200 fcu_protocol:=v2.0'
 
-
 mavros-ofa: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	  bash -lc 'export ROS_DOMAIN_ID=$(DOMAIN); \
-	  source /opt/ros/humble/setup.bash; \
+	  bash -lc 'source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
 	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200'
 

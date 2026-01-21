@@ -1,31 +1,39 @@
-{    
-  plugins: {    
+{  
+  plugins: {  
     ros2dds: {  
       domain: 3,  
       allow: {  
-        //put topics here exactly as you need them
         publishers: [  
           "/tf",  
-          "/tf_static",   
+          "/tf_static",  
           "/zed/zed_node/rgb/color/rect/image",  
           "/zed/zed_node/rgb/color/rect/image/compressed",  
-          "/zed/zed_node/rgb/color/rect/camera_info",
-          "/chatter"  
+          "/zed/zed_node/rgb/color/rect/camera_info",  
+          "/chatter",  
+          "/mavros.*"  
         ],  
         subscribers: [  
           "/tf",  
           "/tf_static",  
-          "/zed/zed_node/rgb/color/rect/image",   
+          "/zed/zed_node/rgb/color/rect/image",  
           "/zed/zed_node/rgb/color/rect/image/compressed",  
-          "/zed/zed_node/rgb/color/rect/camera_info",
-          "/chatter"
+          "/zed/zed_node/rgb/color/rect/camera_info",  
+          "/chatter",  
+          "/mavros.*"  
         ]  
-      } 
-    }    
-  },    
-  mode: "peer",
-  connect: {    
-    endpoints: ["tcp/192.168.0.21:7447","tcp/192.168.30.204:7447"]  
-    \\put the ip address of the jetson you need. 1:maison colin, 2:polyfab  
-  }    
+      }  
+    }  
+  },  
+  mode: "peer",  
+  connect: {  
+    endpoints: [  
+      "tcp/192.168.0.21:7447",  
+      "tcp/192.168.30.204:7447"  
+    ]  
+  },  
+  listen: {  
+    endpoints: [  
+      "tcp/0.0.0.0:7447"  
+    ]  
+  }  
 }
