@@ -2,7 +2,7 @@ services:
   payload:
     build:
       context: ..
-      dockerfile: docker/dockerfile.dev
+      dockerfile: docker/dockerfile.payload
     container_name: aeac-${C}
     network_mode: host
     tty: true
@@ -19,6 +19,7 @@ services:
       - ROS_DOMAIN_ID=2
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       - ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST  # Add this 
+
   zed-ros2:    
     image: zed_ros2_l4t_35.4.1_sdk_5.1.0   
     runtime: nvidia    
@@ -42,7 +43,25 @@ services:
       - /usr/local/zed/settings/:/usr/local/zed/settings/    
       - ../config:/root/ros2_ws/config 
       - ../models:/root/ros2_ws/models 
+            - ../workspaces/payload_ws:/payload_ws
+      - ../packages/bringup:/payload_ws/src/bringup
+      - ../packages/nav_stack:/payload_ws/src/nav_stack
+      - ../packages/polar_system:/payload_ws/src/polar_system
+      - ../packages/tools:/payload_ws/src/tools
+      - ../packages/vision:/payload_ws/src/vision
+      - ../packages/custom_interfaces:/payload_ws/src/custom_interfaces
     command: ["bash", "-lc", "source /root/ros2_ws/install/setup.bash && sleep infinity"]
     #launch zed with :
     #ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml
     
+  services:
+    zenoh-bridge-air:  
+      image: eclipse/zenoh-bridge-ros2dds:latest  
+      network_mode: host  
+      volumes:  
+        - ../config/zenoh-air-config.json5:/config.json5:ro  
+      command: ["-c", "/config.json5"]  
+      environment:  
+        - ROS_DOMAIN_ID=2  
+        - RUST_LOG=debug
+        - ROS_DISTRO=humble
