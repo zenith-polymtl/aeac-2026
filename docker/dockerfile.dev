@@ -6,11 +6,12 @@ ARG TARGETPLATFORM
 ENV DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Update & install ROS/colcon build tools
+# Update & install ROS/colcon build tools + nlohmann-json3-dev
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
     python3-colcon-common-extensions \
+    nlohmann-json3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install -y \
