@@ -54,14 +54,13 @@ services:
     #launch zed with :
     #ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml
     
-  services:
-    zenoh-bridge-air:  
-      image: eclipse/zenoh-bridge-ros2dds:latest  
-      network_mode: host  
-      volumes:  
-        - ../config/zenoh-air-config.json5:/config.json5:ro  
-      command: ["-c", "/config.json5"]  
-      environment:  
-        - ROS_DOMAIN_ID=2  
-        - RUST_LOG=debug
-        - ROS_DISTRO=humble
+  zenoh-bridge-air:  
+    image: eclipse/zenoh-bridge-ros2dds:latest  
+    network_mode: host  
+    volumes:  
+      - ../config/zenoh-air-config.json5:/config.json5:ro  
+    command: ["-c", "/config.json5"]  
+    environment:  
+      - ROS_DOMAIN_ID=2  
+      - RUST_LOG=debug
+      - ROS_DISTRO=humble
