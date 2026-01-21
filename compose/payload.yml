@@ -43,7 +43,7 @@ services:
       - /usr/local/zed/settings/:/usr/local/zed/settings/    
       - ../config:/root/ros2_ws/config 
       - ../models:/root/ros2_ws/models 
-            - ../workspaces/payload_ws:/payload_ws
+      - ../workspaces/payload_ws:/payload_ws
       - ../packages/bringup:/payload_ws/src/bringup
       - ../packages/nav_stack:/payload_ws/src/nav_stack
       - ../packages/polar_system:/payload_ws/src/polar_system
