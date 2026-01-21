@@ -9,15 +9,15 @@
 #include <map>
 #include <functional>
 
-// This line make is possible to use water state and use it as simply WaterState
-using WaterState = custom_interfaces::msg::WaterState;
-
 class MissionStatsController : public rclcpp::Node
 {
 public:
 	MissionStatsController();
 
 private:
+	// This line make is possible to use water state and use it as simply WaterState
+	using WaterState = custom_interfaces::msg::WaterState;
+
 	// void handleAskStateChange(const custom_interfaces::msg::WaterState msg);
 
 	/// @brief This function handle the transition between state

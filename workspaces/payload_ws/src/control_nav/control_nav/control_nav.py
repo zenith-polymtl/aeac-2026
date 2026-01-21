@@ -10,6 +10,7 @@ from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 from geometry_msgs.msg import PoseStamped, Point
 from std_msgs.msg import Bool
 from rclpy.qos import QoSProfile
+import datetime
 
 from custom_interfaces.srv import ConvertGpsToLocal
 
@@ -33,6 +34,9 @@ class ControlNav(Node):
         self.is_last_lap = False
         self.is_doing_laps = False
         self.current_point_objectif = Point()
+        
+        self.start_of_lap_time = None
+
         
         # Publisher
         self.publisher_raw = self.create_publisher(PositionTarget, '/mavros/setpoint_raw/local', 10)
@@ -225,6 +229,7 @@ class ControlNav(Node):
         self.is_moving_to_position = True
         self.is_last_lap = False
         self.lap_waypoint_index = 0
+        self.start_of_lap_time = None
         
         self.get_logger().info(f"Waypoint lengh: {len(self.waypoints_raw)}")
 
@@ -233,18 +238,27 @@ class ControlNav(Node):
     def drone_pose_callback(self, msg):
         self.drone_pose = msg.pose.position
 
-    def handle_reach_waypoint(self):
+    def handle_reach_waypoint(self):  
+        if self.start_of_lap_time is None and self.is_doing_laps:
+            self.start_of_lap_time = datetime.datetime.now()
+        elif self.lap_waypoint_index == 0 and self.is_doing_laps:
+            self.get_logger().info(f"Lap time : {datetime.datetime.now() - self.start_of_lap_time}")
+            self.start_of_lap_time = datetime.datetime.now()
+        
         self.lap_waypoint_index += 1
+
         if len(self.waypoints_raw) == self.lap_waypoint_index:
             self.lap_waypoint_index = 0
             self.current_lap += 1
             if self.current_lap == self.number_of_laps or self.stop_after_finishing_lap:
                 if not self.is_last_lap:
                     self.is_last_lap = True
+                    self.lap_waypoint_index = len(self.waypoints_raw) - 1
                     self.move_to_pose(self.waypoints_raw[0].pose.position)
                 self.is_moving_to_position = False
                 self.is_doing_laps = False
                 self.current_lap = 0
+                self.start_of_lap_time = None   
                 self.get_logger().info("Finised laps")
                 return
                 
@@ -313,6 +327,7 @@ class ControlNav(Node):
         self.is_doing_laps = False
         self.current_lap = 0
         self.lap_waypoint_index = 0
+        self.start_of_lap_time = None
         
         self.stop_current_lap()
     
