@@ -43,8 +43,7 @@ class ControlNav(Node):
         self.finish_lap_sub = self.create_subscription(Bool, '/mission/control_nav/lap/finish', self.finish_current_lap_and_stop, 10)
         
         # Object delivery specific subscriber
-        self.move_to_ladder_sub = self.create_subscription(Bool, '/mission/control_nav/move_to_ladder', self.move_to_ladder_procedure, 10)
-        self.move_to_tank_sub = self.create_subscription(Bool, '/mission/control_nav/move_to_tank', self.move_to_tank_procedure, 10)
+        self.move_to_scene_sub = self.create_subscription(Bool, '/mission/control_nav/move_to_scene', self.move_to_scene_procedure, 10)
         
         # Genretal controle subscriber
         self.abort_all_sub = self.create_subscription(Bool, '/mission/abort_all', self.stop_drone, 10)
@@ -70,25 +69,18 @@ class ControlNav(Node):
         self.declare_parameter('delais_for_position_check', 0.5)
         self.declare_parameter('distance_from_objectif_threashold', 3.0)
         
-        self.declare_parameter('latitude_of_ladder', -35.361450)
-        self.declare_parameter('longitude_of_ladder', 149.161448)
-        self.declare_parameter('altitude_of_ladder', 10.0)
-        
-        self.declare_parameter('latitude_of_tank', -35.365722)
-        self.declare_parameter('longitude_of_tank', 149.163075)
-        self.declare_parameter('altitude_of_tank', 10.0)
+        self.declare_parameter('latitude_of_scene', -35.361450)
+        self.declare_parameter('longitude_of_scene', 149.161448)
+        self.declare_parameter('altitude_of_scene', 10.0)
         
         self.number_of_laps = self.get_parameter('number_of_laps').get_parameter_value().integer_value
         self.delais_for_position_check = self.get_parameter('delais_for_position_check').get_parameter_value().double_value
         self.distance_from_objectif_threashold = self.get_parameter('distance_from_objectif_threashold').get_parameter_value().double_value
         
-        self.latitude_of_ladder = self.get_parameter('latitude_of_ladder').get_parameter_value().double_value
-        self.longitude_of_ladder = self.get_parameter('longitude_of_ladder').get_parameter_value().double_value
-        self.altitude_of_ladder = self.get_parameter('altitude_of_ladder').get_parameter_value().double_value
+        self.latitude_of_scene = self.get_parameter('latitude_of_scene').get_parameter_value().double_value
+        self.longitude_of_scene = self.get_parameter('longitude_of_scene').get_parameter_value().double_value
+        self.altitude_of_scene = self.get_parameter('altitude_of_scene').get_parameter_value().double_value
         
-        self.latitude_of_tank = self.get_parameter('latitude_of_tank').get_parameter_value().double_value
-        self.longitude_of_tank = self.get_parameter('longitude_of_tank').get_parameter_value().double_value
-        self.altitude_of_tank = self.get_parameter('altitude_of_tank').get_parameter_value().double_value
     
     def read_json_waypoints(self):        
         json_filename = self.get_parameter('json_filename').get_parameter_value().string_value
@@ -163,31 +155,18 @@ class ControlNav(Node):
     def start_laps(self, _):
         self.get_logger().info("Starting the laps")
         self.waypoint_convert_gps_to_local()
-        
-    def move_to_ladder_procedure(self, _):
-        self.is_doing_laps = False
-        self.lap_waypoint_index = 0
-        self.current_lap = 0
-        ladder_conversion_request = ConvertGpsToLocal.Request()
-        ladder_conversion_request.gps_point = NavSatFix()
-        ladder_conversion_request.gps_point.latitude = self.latitude_of_ladder
-        ladder_conversion_request.gps_point.longitude = self.longitude_of_ladder
-        ladder_conversion_request.gps_point.altitude = self.altitude_of_ladder
-        future = self.convert_client.call_async(ladder_conversion_request)
-        self.get_logger().info(f"Move to Ladder procedure started")
-        future.add_done_callback(self.object_conversion_callback)
 
-    def move_to_tank_procedure(self, _):
+    def move_to_scene_procedure(self, _):
         self.is_doing_laps = False
         self.lap_waypoint_index = 0
         self.current_lap = 0
-        tank_conversion_request = ConvertGpsToLocal.Request()
-        tank_conversion_request.gps_point = NavSatFix()
-        tank_conversion_request.gps_point.latitude = self.latitude_of_tank
-        tank_conversion_request.gps_point.longitude = self.longitude_of_tank
-        tank_conversion_request.gps_point.altitude = self.altitude_of_tank
-        future = self.convert_client.call_async(tank_conversion_request)
-        self.get_logger().info(f"Move to Tank procedure started")
+        scene_conversion_request = ConvertGpsToLocal.Request()
+        scene_conversion_request.gps_point = NavSatFix()
+        scene_conversion_request.gps_point.latitude = self.latitude_of_scene
+        scene_conversion_request.gps_point.longitude = self.longitude_of_scene
+        scene_conversion_request.gps_point.altitude = self.altitude_of_scene
+        future = self.convert_client.call_async(scene_conversion_request)
+        self.get_logger().info(f"Move to Scene procedure started")
         future.add_done_callback(self.object_conversion_callback)
         
     def object_conversion_callback(self, future):
