@@ -63,12 +63,12 @@ class ControlNav(Node):
     
     def initialize_parameters(self):
         ## Param decalration
-        self.declare_parameter('json_filename', 'lap_waypoints.json')
+        self.declare_parameter('json_filename', 'lap_waypoints_colin.json')
         self.declare_parameter('json_subfolder', 'data')
         # We could remove the `number_of_laps` variable, but for now, 999 makes it basicly infinit
         self.declare_parameter('number_of_laps', 999)
         self.declare_parameter('delais_for_position_check', 0.5)
-        self.declare_parameter('distance_from_objectif_threashold', 2.0)
+        self.declare_parameter('distance_from_objectif_threashold', 3.0)
         
         self.declare_parameter('latitude_of_ladder', -35.361450)
         self.declare_parameter('longitude_of_ladder', 149.161448)
@@ -127,6 +127,8 @@ class ControlNav(Node):
             PositionTarget.IGNORE_YAW |
             PositionTarget.IGNORE_YAW_RATE
         )
+        target.position.x = wp.y      #NEU from ENU
+        target.position.y = wp.x 
 
         target.position = self.current_point_objectif
 
