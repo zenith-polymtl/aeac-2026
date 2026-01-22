@@ -69,8 +69,13 @@ class ControlNav(Node):
         self.declare_parameter('delais_for_position_check', 0.5)
         self.declare_parameter('distance_from_objectif_threashold', 3.0)
         
-        self.declare_parameter('latitude_of_scene', -35.361450)
-        self.declare_parameter('longitude_of_scene', 149.161448)
+        #Pour julien
+        #self.declare_parameter('latitude_of_scene', -35.361450)
+        #self.declare_parameter('longitude_of_scene', 149.161448)
+        #Pour Colin 
+        self.declare_parameter('latitude_of_scene', -34.357147)
+        self.declare_parameter('longitude_of_scene', 150.163406)
+
         self.declare_parameter('altitude_of_scene', 10.0)
         
         self.number_of_laps = self.get_parameter('number_of_laps').get_parameter_value().integer_value
@@ -119,14 +124,13 @@ class ControlNav(Node):
             PositionTarget.IGNORE_YAW |
             PositionTarget.IGNORE_YAW_RATE
         )
-        target.position.x = wp.y      #NEU from ENU
-        target.position.y = wp.x 
 
         target.position = self.current_point_objectif
 
         self.publisher_raw.publish(target)
 
     def waypoint_convert_gps_to_local(self):
+        self.conversion_failed = False
         self.waypoints_raw = []
         self.pending_conversions = len(self.waypoints_gps)
         for waypoint in self.waypoints_gps:
@@ -138,17 +142,30 @@ class ControlNav(Node):
             future = self.convert_client.call_async(request)
             future.add_done_callback(self.conversion_callback)
 
+        if self.conversion_failed:
+            self.get_logger().error('One or more waypoint conversions failed!')
+            # Take appropriate action if needed TODO
+
+
+
+
     def conversion_callback(self, future):
-        if future.result() is not None:
+        if future.result() is not None and future.result().success:
             local_pose = future.result().local_point
             self.waypoints_raw.append(local_pose)
             self.get_logger().info(f"Converted waypoint: x={local_pose.pose.position.x}, y={local_pose.pose.position.y}, z={local_pose.pose.position.z}")
         else:
-            self.get_logger().error('Conversion failed')
+            self.get_logger().error('Conversion failed - origin not set or invalid GPS')
+            self.conversion_failed = True
             
         self.pending_conversions -= 1
             
         if self.pending_conversions == 0:
+            if len(self.waypoints_raw) == 0:
+                self.get_logger().error('All waypoint conversions failed! Origin not set. Aborting.')
+                return
+            if len(self.waypoints_raw) < len(self.waypoints_gps):
+                self.get_logger().warn(f'Only {len(self.waypoints_raw)}/{len(self.waypoints_gps)} waypoints converted successfully')
             self.get_logger().info("All conversions complete")
             self.start_lap_logic()
     
