@@ -1,8 +1,7 @@
 const API_MISSION_GO = "/api/mission/go";
 const API_START_LAP = "/api/mission/lap/start";
 const API_FINISH_LAP = "/api/mission/lap/finish";
-const API_MOVE_TO_LADDER = "/api/mission/move_to_ladder";
-const API_MOVE_TO_TANK = "/api/mission/move_to_tank";
+const API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
 const API_ABORT_ALL = "/api/mission/abort_all";
 
 const statusElement = document.getElementById('status');
@@ -46,8 +45,7 @@ function initalise_buttons() {
     document.getElementById('mission-go').addEventListener('click', () => sendCommand(API_MISSION_GO));
     document.getElementById('start-lap').addEventListener('click', () => sendCommand(API_START_LAP));
     document.getElementById('finish-lap').addEventListener('click', () => sendCommand(API_FINISH_LAP));
-    document.getElementById('move-to-ladder').addEventListener('click', () => sendCommand(API_MOVE_TO_LADDER));
-    document.getElementById('move-to-tank').addEventListener('click', () => sendCommand(API_MOVE_TO_TANK));
+    document.getElementById('move-to-scene').addEventListener('click', () => sendCommand(API_MOVE_TO_SCENE));
     document.getElementById('abort-all').addEventListener('click', () => sendCommand(API_ABORT_ALL));
 
 }

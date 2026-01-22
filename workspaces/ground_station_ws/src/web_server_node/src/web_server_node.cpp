@@ -69,8 +69,7 @@ void WebServerNode::initialize_publisher()
     start_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/lap/start", 10);
     finish_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/lap/finish", 10);
 
-    move_to_ladder_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/move_to_ladder", 10);
-    move_to_tank_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/move_to_tank", 10);
+    move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/move_to_scene", 10);
     abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/abort_all", 10);
 }
 
@@ -251,8 +250,7 @@ WebServerNode::try_handle_api(
     // API_MISSION_GO = "/api/mission/go";
     // const std::string API_START_LAP = "/api/mission/lap/start";
     // const std::string API_FINISH_LAP = "/api/mission/lap/finish";
-    // const std::string API_MOVE_TO_LADDER = "/api/mission/move_to_ladder";
-    // const std::string API_MOVE_TO_TANK = "/api/mission/move_to_tank";
+    // const std::string API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
     // const std::string API_ABORT_ALL = "/api/mission/abort_all";
 
     if (target == API_FINISH_LAP)
@@ -270,32 +268,17 @@ WebServerNode::try_handle_api(
         res.keep_alive(req.keep_alive());
         return res;
     }
-    if (target == API_MOVE_TO_LADDER)
+    if (target == API_MOVE_TO_SCENE)
     {
-        RCLCPP_INFO(get_logger(), "Starting Ladder movement procedure!");
+        RCLCPP_INFO(get_logger(), "Starting Scene movement procedure!");
         std_msgs::msg::Bool msg;
         msg.data = true;
-        move_to_ladder_publisher_->publish(msg);
+        move_to_scene_publisher_->publish(msg);
 
         http::response<http::string_body> res{http::status::ok, req.version()};
         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
         res.set(http::field::content_type, "application/json");
-        res.body() = R"({"message": "Request Move to Lap received"})";
-        res.prepare_payload();
-        res.keep_alive(req.keep_alive());
-        return res;
-    }
-    if (target == API_MOVE_TO_TANK)
-    {
-        RCLCPP_INFO(get_logger(), "Starting Tank movement procedure!");
-        std_msgs::msg::Bool msg;
-        msg.data = true;
-        move_to_tank_publisher_->publish(msg);
-
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "application/json");
-        res.body() = R"({"message": "Request Move to Tank received"})";
+        res.body() = R"({"message": "Request Move to Scene received"})";
         res.prepare_payload();
         res.keep_alive(req.keep_alive());
         return res;

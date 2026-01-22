@@ -60,15 +60,9 @@ button:hover {
     color: black;
 }
 
-#move-to-ladder {
+#move-to-scene {
     background-color: #9C27B0;
     /* Purple */
-    color: white;
-}
-
-#move-to-tank {
-    background-color: #FF5722;
-    /* Orange */
     color: white;
 }
 

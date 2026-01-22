@@ -25,8 +25,7 @@ const int SERVER_PORT = 8080;
 const std::string API_MISSION_GO = "/api/mission/go";
 const std::string API_START_LAP = "/api/mission/lap/start";
 const std::string API_FINISH_LAP = "/api/mission/lap/finish";
-const std::string API_MOVE_TO_LADDER = "/api/mission/move_to_ladder";
-const std::string API_MOVE_TO_TANK = "/api/mission/move_to_tank";
+const std::string API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
 const std::string API_ABORT_ALL = "/api/mission/abort_all";
 
 namespace beast = boost::beast;
@@ -81,8 +80,7 @@ private:
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr start_lap_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr finish_lap_publisher_;
 
-    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr move_to_ladder_publisher_;
-    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr move_to_tank_publisher_;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr move_to_scene_publisher_;
 
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr abort_all_mission_publisher_;
 
