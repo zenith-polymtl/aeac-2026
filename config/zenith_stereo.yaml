@@ -117,7 +117,7 @@
             
             allow_reduced_precision_inference: true  
             max_range: 20.0  
-            confidence_threshold: 65.0  
+            confidence_threshold: 20.0  
             prediction_timeout: 0.2  
             enable_tracking: true  
           
@@ -130,4 +130,4 @@
           
         debug:  
             debug_object_detection: true  
-            debug_advanced: true
+            debug_advanced: tru
