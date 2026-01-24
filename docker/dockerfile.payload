@@ -49,6 +49,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && python3 -m pip install --upgrade pip \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get install -y \
+    ros-${ROS_DISTRO}-zed-msgs \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 ARG UID=1000
