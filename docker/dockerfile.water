@@ -13,26 +13,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-colcon-common-extensions \
     && rm -rf /var/lib/apt/lists/*
 
-# Critical mavros package for UAV communication
-RUN apt-get update && apt-get install -y \  
-    ros-${ROS_DISTRO}-mavros \  
-    && rm -rf /var/lib/apt/lists/*  
+RUN apt-get update && apt-get install -y \
+    ros-${ROS_DISTRO}-mavros-extras \
+    ros-${ROS_DISTRO}-mavlink \
+    geographiclib-tools \
+    && rm -rf /var/lib/apt/lists/* 
   
-# Install GeographicLib datasets (required for mavros)  
-RUN apt-get update && apt-get install -y wget \  
-    && wget https://raw.githubusercontent.com/mavlink/mavros/ros2/mavros/scripts/install_geographiclib_datasets.sh \  
-    && chmod +x install_geographiclib_datasets.sh \  
-    && ./install_geographiclib_datasets.sh \  
-    && rm install_geographiclib_datasets.sh \  
-    && rm -rf /var/lib/apt/lists/*
+# Use the correct GeographicLib script  
+RUN /opt/ros/humble/lib/mavros/install_geographiclib_datasets.sh  
 
-#Zenoh rmw implementation for ros2
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ros-humble-rmw-zenoh-cpp \
+RUN apt-get update && apt-get install -y \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+    ros-${ROS_DISTRO}-rmw-zenoh-cpp \
  && rm -rf /var/lib/apt/lists/*
 
-
-#ping utils and demo nodes for testing could remove if sure all is working
+ 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     iputils-ping \
     iproute2 \
@@ -50,19 +45,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     python3-numpy \
+    python3-geopy \
     && python3 -m pip install --upgrade pip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y \
+    ros-${ROS_DISTRO}-zed-msgs \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Only copy the gremsy package to use rosdep on it
-COPY packages/ros2_gremsy /app/packages/ros2_gremsy
-
-# rosdep to install dependencies of the gremsy package
-RUN rosdep install -y -r -q --from-paths /app/packages/ros2_gremsy --ignore-src --rosdistro ${ROS_DISTRO}
-
-
 ARG UID=1000
 ARG GID=1000
 RUN groupadd -g $GID dev && useradd -m -u $UID -g $GID dev
-USER dev
+RUN usermod -a -G dialout dev
