@@ -1,6 +1,6 @@
 services:
   zed-ros2:    
-    image: zed_ros2_l4t_35.4.1_sdk_5.1.0   
+    image: zed_ros2_l4t_36.4.0_sdk_5.0.0:latest 
     runtime: nvidia    
     privileged: true    
     network_mode: host    
