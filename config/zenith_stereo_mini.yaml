@@ -3,7 +3,7 @@
     ros__parameters:  
         # General settings  
         general:  
-            camera_name: 'zed2i'
+            camera_name: 'zedm'
             grab_resolution: 'VGA'  # Good balance for Jetson, or 'VGA' for maximum performance  
             pub_frame_rate: 10.0
             pub_resolution: 'CUSTOM'  

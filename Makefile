@@ -165,7 +165,7 @@ hexa: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
-	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS0:115200 fcu_protocol:=v2.0'
+	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS1:115200 fcu_protocol:=v2.0'
 
 mavros-ofa: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
