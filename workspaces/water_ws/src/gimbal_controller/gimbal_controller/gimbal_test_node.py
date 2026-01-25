@@ -8,7 +8,7 @@ import sys, select, termios, tty
 import time
 
 # Configuration
-FAKE_ERROR_MAGNITUDE = 1.0 
+FAKE_ERROR_MAGNITUDE = 5.0 
 DRONE_SPEED = 1.0 
 DRONE_ROT_SPEED = 0.5 
 CLIMB_SPEED = 0.5 

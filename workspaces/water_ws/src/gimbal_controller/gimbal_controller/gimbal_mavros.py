@@ -30,8 +30,7 @@ SPEED_FLAGS = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_LOCK + GIMBAL_MANAGE
 # MAX_ANGLE_YAW = 325.0
 
 # safe limits
-MAX_ANGLE_PITCH_DOWN = 70.0
-MAX_ANGLE_PITCH_UP = 30.0
+MAX_ANGLE_PITCH = 110.0
 MAX_ANGLE_YAW = 100
 
 class GimbalMode:
@@ -124,10 +123,10 @@ class GremsyMavros(Node):
 
     def check_angle_limit(self, target_vel_pitch, target_vel_yaw):
         # --- SECURITY PITCH ---
-        if self.current_pitch >= MAX_ANGLE_PITCH_UP and target_vel_pitch > 0:
+        if self.current_pitch >= MAX_ANGLE_PITCH and target_vel_pitch > 0:
             self.get_logger().warn("MAX PITCH reached!")
             target_vel_pitch = 0.0
-        elif self.current_pitch <= -MAX_ANGLE_PITCH_DOWN and target_vel_pitch < 0:
+        elif self.current_pitch <= -MAX_ANGLE_PITCH and target_vel_pitch < 0:
             self.get_logger().warn("MIN PITCH reached!")
             target_vel_pitch = 0.0
 
