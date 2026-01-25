@@ -9,9 +9,11 @@ services:
     stdin_open: true
     volumes:
       - ../workspaces/payload_ws:/payload_ws
+      - ../packages/bringup:/payload_ws/src/bringup
       - ../packages/nav_stack:/payload_ws/src/nav_stack
-      - ../packages/UI:/payload_ws/src/UI
+      - ../packages/polar_system:/payload_ws/src/polar_system
       - ../packages/tools:/payload_ws/src/tools
+      - ../packages/vision:/payload_ws/src/vision
       - ../packages/custom_interfaces:/payload_ws/src/custom_interfaces
     working_dir: /payload_ws     # set WS in .env, e.g. workspaces/payload_ws
     command: ["bash","-lc","while :; do sleep 86400; done"]
@@ -43,13 +45,6 @@ services:
       - /usr/local/zed/settings/:/usr/local/zed/settings/    
       - ../config:/root/ros2_ws/config 
       - ../models:/root/ros2_ws/models 
-      - ../workspaces/payload_ws:/payload_ws
-      - ../packages/bringup:/payload_ws/src/bringup
-      - ../packages/nav_stack:/payload_ws/src/nav_stack
-      - ../packages/polar_system:/payload_ws/src/polar_system
-      - ../packages/tools:/payload_ws/src/tools
-      - ../packages/vision:/payload_ws/src/vision
-      - ../packages/custom_interfaces:/payload_ws/src/custom_interfaces
     command: ["bash", "-lc", "source /root/ros2_ws/install/setup.bash && sleep infinity"]
     #launch zed with :
     #ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml
