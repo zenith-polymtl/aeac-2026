@@ -113,18 +113,19 @@ launch: up
 	    exec bash -i'
 
 payload-stack:
-	launch: up
+	docker compose -f compose/payload.yml up -d --build
 	# Launch ZED inside the already-running zed-ros2 service (detached)
-	docker compose -f $(COMPOSE_FILE) exec -T zed-ros2 bash -lc '\
-	  source /root/ros2_ws/install/setup.bash; \
-	  nohup ros2 launch zed_wrapper zed_camera.launch.py \
-	    camera_model:=zed2i \
-	    ros_params_override_path:=config/zenith_stereo.yaml \
-	    > /tmp/zed_launch.log 2>&1 & \
-	'
+	docker compose -f compose/payload.yml exec -T zed-ros2 bash -lc " \
+		source /root/ros2_ws/install/setup.bash && \
+		nohup ros2 launch zed_wrapper zed_camera.launch.py \
+			camera_model:=zed2i \
+			ros_params_override_path:=config/zenith_stereo.yaml \
+			> /tmp/zed_launch.log 2>&1 & \
+	"
+
 
 	# Enter payload dev shell (your original behavior)
-	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	WS=$(WS_IN) docker compose -f compose/payload.yml exec -it payload \
 	  bash -lc '\
 	    cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \

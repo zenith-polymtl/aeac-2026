@@ -51,6 +51,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN apt-get update && apt-get install -y \
     ros-${ROS_DISTRO}-zed-msgs \
+    ros-humble-cv-bridge \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
