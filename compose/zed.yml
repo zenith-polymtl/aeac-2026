@@ -1,27 +1,27 @@
 services:
-  zed-ros2:    
-    image: zed_ros2_l4t_36.4.0_sdk_5.0.0:latest 
-    runtime: nvidia    
-    privileged: true    
-    network_mode: host    
-    ipc: host    
-    pid: host 
-    tty: true
-    stdin_open: true   
-    environment:    
-      - NVIDIA_DRIVER_CAPABILITIES=all    
-      - DISPLAY=${DISPLAY}   
-      - ROS_DOMAIN_ID=2 
+  zed-ros2:
+    image: zed_ros2_l4t_36.4.0_sdk_5.0.0:latest
+    runtime: nvidia
+    network_mode: host
+    ipc: host
+    pid: host
+    privileged: true
+    shm_size: "2gb"
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - ROS_DOMAIN_ID=2
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-    volumes:    
-      - /tmp/.X11-unix/:/tmp/.X11-unix    
-      - /dev:/dev    
-      - /dev/shm:/dev/shm    
-      - /usr/local/zed/resources/:/usr/local/zed/resources/    
-      - /usr/local/zed/settings/:/usr/local/zed/settings/    
-      - ../config:/root/ros2_ws/config  
-      - ../models:/root/ros2_ws/models  
+    volumes:
+      - /dev:/dev
+      - /usr/local/zed/resources/:/usr/local/zed/resources/
+      - /usr/local/zed/settings/:/usr/local/zed/settings/
+      - ../config:/root/ros2_ws/config
+      - ../models:/root/ros2_ws/models
     command: ["bash", "-lc", "sleep infinity"]
-    #launch zed with :
-    #ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml
+      #launch zed with :
+      #ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml
     

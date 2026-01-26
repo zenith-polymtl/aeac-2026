@@ -56,18 +56,20 @@ zed-shell: ## Open bash in the ZED container (with ROS sourced)
 	  source /root/ros2_ws/install/setup.bash; \
 	  exec bash -i'
 
+zed-launch:
+	docker compose -f compose/zed.yml up -d zed-ros2
+	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
+	  source /root/ros2_ws/install/setup.bash; \
+	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml \
+	'
+
 zenoh-ground: ## Start zenoh ground bridge
 	docker compose -f compose/zenoh-ground.yml up --build
 
 zenoh-air: ## Start zenoh air bridge
 	docker compose -f compose/zenoh-air.yml up --build
 
-launch-zed:
-	docker compose -f compose/zed.yml up -d zed-ros2
-	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
-	  source /root/ros2_ws/install/setup.bash; \
-	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml \
-	'
+
 
 # ===== Docker lifecycle (selected compose) =====
 build: ## Build image for C
@@ -110,6 +112,29 @@ launch: up
 	    ros2 daemon start; \
 	    exec bash -i'
 
+payload-stack:
+	docker compose -f compose/payload.yml up -d --build
+	# Launch ZED inside the already-running zed-ros2 service (detached)
+	docker compose -f compose/payload.yml exec -T zed-ros2 bash -lc " \
+		source /root/ros2_ws/install/setup.bash && \
+		nohup ros2 launch zed_wrapper zed_camera.launch.py \
+			camera_model:=zed2i \
+			ros_params_override_path:=config/zenith_stereo.yaml \
+			> /tmp/zed_launch.log 2>&1 & \
+	"
+
+
+	# Enter payload dev shell (your original behavior)
+	WS=$(WS_IN) docker compose -f compose/payload.yml exec -it payload \
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    colcon build; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    exec bash -i'
+
+
 mavros-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'source /opt/ros/humble/setup.bash; \
@@ -141,7 +166,7 @@ hexa: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
-	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS0:115200 fcu_protocol:=v2.0'
+	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS1:115200 fcu_protocol:=v2.0'
 
 mavros-ofa: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
