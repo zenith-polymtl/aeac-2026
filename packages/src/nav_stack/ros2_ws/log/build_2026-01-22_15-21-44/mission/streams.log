@@ -1,0 +1,22 @@
+[2.738s] Invoking command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/mission': PYTHONPATH=/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/mission/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/mission/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/mission build --build-base /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/mission/build install --record /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/mission/install.log --single-version-externally-managed install_data
+[3.431s] running egg_info
+[3.434s] writing ../../build/mission/mission.egg-info/PKG-INFO
+[3.437s] writing dependency_links to ../../build/mission/mission.egg-info/dependency_links.txt
+[3.437s] writing entry points to ../../build/mission/mission.egg-info/entry_points.txt
+[3.437s] writing requirements to ../../build/mission/mission.egg-info/requires.txt
+[3.437s] writing top-level names to ../../build/mission/mission.egg-info/top_level.txt
+[3.441s] reading manifest file '../../build/mission/mission.egg-info/SOURCES.txt'
+[3.443s] writing manifest file '../../build/mission/mission.egg-info/SOURCES.txt'
+[3.444s] running build
+[3.444s] running build_py
+[3.445s] running install
+[3.447s] running install_lib
+[3.450s] running install_data
+[3.451s] running install_egg_info
+[3.456s] removing '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/mission/lib/python3.10/site-packages/mission-0.0.0-py3.10.egg-info' (and everything under it)
+[3.457s] Copying ../../build/mission/mission.egg-info to /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/mission/lib/python3.10/site-packages/mission-0.0.0-py3.10.egg-info
+[3.464s] running install_scripts
+[3.511s] Installing gps_to_local script to /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/mission/lib/mission
+[3.511s] Installing laps script to /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/mission/lib/mission
+[3.512s] writing list of installed files to '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/mission/install.log'
+[3.589s] Invoked command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/mission' returned '0': PYTHONPATH=/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/mission/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/mission/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/mission build --build-base /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/mission/build install --record /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/mission/install.log --single-version-externally-managed install_data

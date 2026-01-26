@@ -1,0 +1,6 @@
+{
+  "package_name": "custom_interfaces",
+  "non_idl_tuples": [
+    "/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/custom_interfaces:srv/GpsToLocal.srv"
+  ]
+}

@@ -54,7 +54,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # On copie seulement le paquet gremsy afin d'utiliser rosdep dessus
-COPY packages/ros2_gremsy /app/packages/ros2_gremsy
+COPY packages/src/ros2_gremsy /app/packages/ros2_gremsy
 
 # rosdep pour installer les dépendances du paquet gremsy
 RUN rosdep install -y -r -q --from-paths /app/packages/ros2_gremsy --ignore-src --rosdistro ${ROS_DISTRO}

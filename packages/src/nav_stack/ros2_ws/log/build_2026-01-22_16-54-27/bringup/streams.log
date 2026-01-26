@@ -1,0 +1,19 @@
+[4.504s] Invoking command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/bringup': PYTHONPATH=/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/bringup/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/bringup/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/bringup build --build-base /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/bringup/build install --record /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/bringup/install.log --single-version-externally-managed install_data
+[5.145s] running egg_info
+[5.147s] writing ../../build/bringup/bringup.egg-info/PKG-INFO
+[5.147s] writing dependency_links to ../../build/bringup/bringup.egg-info/dependency_links.txt
+[5.148s] writing requirements to ../../build/bringup/bringup.egg-info/requires.txt
+[5.149s] writing top-level names to ../../build/bringup/bringup.egg-info/top_level.txt
+[5.155s] reading manifest file '../../build/bringup/bringup.egg-info/SOURCES.txt'
+[5.157s] writing manifest file '../../build/bringup/bringup.egg-info/SOURCES.txt'
+[5.159s] running build
+[5.159s] running build_py
+[5.160s] running install
+[5.161s] running install_lib
+[5.165s] running install_data
+[5.166s] running install_egg_info
+[5.172s] removing '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/bringup/lib/python3.10/site-packages/bringup-0.0.0-py3.10.egg-info' (and everything under it)
+[5.174s] Copying ../../build/bringup/bringup.egg-info to /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/bringup/lib/python3.10/site-packages/bringup-0.0.0-py3.10.egg-info
+[5.183s] running install_scripts
+[5.252s] writing list of installed files to '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/bringup/install.log'
+[5.340s] Invoked command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/src/bringup' returned '0': PYTHONPATH=/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/bringup/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/bringup/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/bringup build --build-base /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/bringup/build install --record /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/bringup/install.log --single-version-externally-managed install_data

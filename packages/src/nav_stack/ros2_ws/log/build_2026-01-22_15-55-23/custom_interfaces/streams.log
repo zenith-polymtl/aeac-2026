@@ -1,0 +1,151 @@
+[2.323s] Invoking command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/custom_interfaces': /usr/bin/cmake --build /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/custom_interfaces -- -j8 -l8
+[2.723s] [  3%] Built target custom_interfaces__cpp
+[2.765s] [ 12%] Built target custom_interfaces__rosidl_generator_c
+[2.860s] [ 12%] Built target ament_cmake_python_copy_custom_interfaces
+[3.054s] [ 22%] Built target custom_interfaces__rosidl_typesupport_introspection_cpp
+[3.066s] [ 38%] Built target custom_interfaces__rosidl_typesupport_cpp
+[3.066s] [ 41%] Built target custom_interfaces__rosidl_typesupport_introspection_c
+[3.080s] [ 54%] Built target custom_interfaces__rosidl_typesupport_c
+[3.085s] [ 64%] Built target custom_interfaces__rosidl_typesupport_fastrtps_c
+[3.088s] [ 70%] Built target custom_interfaces__rosidl_typesupport_fastrtps_cpp
+[3.271s] [ 70%] Built target custom_interfaces
+[3.505s] [ 74%] Built target custom_interfaces__py
+[3.777s] [ 80%] Built target custom_interfaces__rosidl_generator_py
+[4.085s] [ 87%] Built target custom_interfaces__rosidl_typesupport_introspection_c__pyext
+[4.126s] [ 93%] Built target custom_interfaces__rosidl_typesupport_c__pyext
+[4.151s] [100%] Built target custom_interfaces__rosidl_typesupport_fastrtps_c__pyext
+[5.391s] running egg_info
+[5.395s] writing custom_interfaces.egg-info/PKG-INFO
+[5.397s] writing dependency_links to custom_interfaces.egg-info/dependency_links.txt
+[5.400s] writing top-level names to custom_interfaces.egg-info/top_level.txt
+[5.408s] reading manifest file 'custom_interfaces.egg-info/SOURCES.txt'
+[5.410s] writing manifest file 'custom_interfaces.egg-info/SOURCES.txt'
+[5.598s] [100%] Built target ament_cmake_python_build_custom_interfaces_egg
+[5.769s] Invoked command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/custom_interfaces' returned '0': /usr/bin/cmake --build /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/custom_interfaces -- -j8 -l8
+[5.892s] Invoking command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/custom_interfaces': /usr/bin/cmake --install /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/custom_interfaces
+[6.034s] -- Install configuration: ""
+[6.037s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/ament_index/resource_index/rosidl_interfaces/custom_interfaces
+[6.039s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces
+[6.040s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg
+[6.041s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg/rosidl_generator_c__visibility_control.h
+[6.042s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv
+[6.042s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail
+[6.042s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__functions.c
+[6.043s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__type_support.h
+[6.047s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__functions.h
+[6.048s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__struct.h
+[6.049s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/gps_to_local.h
+[6.050s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/environment/library_path.sh
+[6.050s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/environment/library_path.dsv
+[6.064s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/lib/libcustom_interfaces__rosidl_generator_c.so
+[6.065s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces
+[6.065s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg
+[6.067s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg/rosidl_typesupport_fastrtps_c__visibility_control.h
+[6.068s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv
+[6.071s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail
+[6.071s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__rosidl_typesupport_fastrtps_c.h
+[6.078s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_fastrtps_c.so
+[6.079s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces
+[6.080s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg
+[6.082s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg/rosidl_typesupport_introspection_c__visibility_control.h
+[6.082s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv
+[6.083s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail
+[6.083s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__rosidl_typesupport_introspection_c.h
+[6.084s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__type_support.c
+[6.092s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_introspection_c.so
+[6.096s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_c.so
+[6.109s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces
+[6.111s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg
+[6.111s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg/rosidl_generator_cpp__visibility_control.hpp
+[6.111s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv
+[6.112s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/gps_to_local.hpp
+[6.112s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail
+[6.113s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__struct.hpp
+[6.113s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__type_support.hpp
+[6.114s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__builder.hpp
+[6.114s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__traits.hpp
+[6.126s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces
+[6.126s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg
+[6.127s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h
+[6.128s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv
+[6.129s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail
+[6.129s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/dds_fastrtps
+[6.129s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__rosidl_typesupport_fastrtps_cpp.hpp
+[6.130s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_fastrtps_cpp.so
+[6.130s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces
+[6.130s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv
+[6.131s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail
+[6.131s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__type_support.cpp
+[6.131s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/include/custom_interfaces/custom_interfaces/srv/detail/gps_to_local__rosidl_typesupport_introspection_cpp.hpp
+[6.132s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_introspection_cpp.so
+[6.144s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/lib/libcustom_interfaces__rosidl_typesupport_cpp.so
+[6.144s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/environment/pythonpath.sh
+[6.145s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/environment/pythonpath.dsv
+[6.146s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces-0.0.0-py3.10.egg-info
+[6.149s] -- Installing: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces-0.0.0-py3.10.egg-info/PKG-INFO
+[6.158s] -- Installing: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces-0.0.0-py3.10.egg-info/SOURCES.txt
+[6.159s] -- Installing: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces-0.0.0-py3.10.egg-info/dependency_links.txt
+[6.187s] -- Installing: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces-0.0.0-py3.10.egg-info/top_level.txt
+[6.187s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces
+[6.188s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[6.189s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[6.189s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[6.190s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/libcustom_interfaces__rosidl_generator_py.so
+[6.191s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv
+[6.191s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv/_gps_to_local_s.c
+[6.192s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv/_gps_to_local.py
+[6.192s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv/__init__.py
+[6.193s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/_custom_interfaces_s.ep.rosidl_typesupport_c.c
+[6.193s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/_custom_interfaces_s.ep.rosidl_typesupport_fastrtps_c.c
+[6.194s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/__init__.py
+[6.200s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/_custom_interfaces_s.ep.rosidl_typesupport_introspection_c.c
+[6.407s] Listing '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces'...
+[6.408s] Listing '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/srv'...
+[6.428s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[6.428s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[6.429s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/local/lib/python3.10/dist-packages/custom_interfaces/custom_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[6.435s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/lib/libcustom_interfaces__rosidl_generator_py.so
+[6.436s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/srv/GpsToLocal.idl
+[6.437s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/srv/GpsToLocal.srv
+[6.437s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/srv/GpsToLocal_Request.msg
+[6.438s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/srv/GpsToLocal_Response.msg
+[6.438s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/ament_index/resource_index/package_run_dependencies/custom_interfaces
+[6.439s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/ament_index/resource_index/parent_prefix_path/custom_interfaces
+[6.439s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/environment/ament_prefix_path.sh
+[6.439s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/environment/ament_prefix_path.dsv
+[6.439s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/environment/path.sh
+[6.439s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/environment/path.dsv
+[6.440s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/local_setup.bash
+[6.441s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/local_setup.sh
+[6.441s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/local_setup.zsh
+[6.441s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/local_setup.dsv
+[6.442s] -- Installing: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/package.dsv
+[6.442s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/ament_index/resource_index/packages/custom_interfaces
+[6.442s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_generator_cExport.cmake
+[6.443s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_generator_cExport-noconfig.cmake
+[6.443s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_typesupport_fastrtps_cExport.cmake
+[6.443s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_typesupport_fastrtps_cExport-noconfig.cmake
+[6.443s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_introspection_cExport.cmake
+[6.443s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_introspection_cExport-noconfig.cmake
+[6.444s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_cExport.cmake
+[6.444s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_cExport-noconfig.cmake
+[6.444s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_generator_cppExport.cmake
+[6.444s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_typesupport_fastrtps_cppExport.cmake
+[6.444s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake
+[6.448s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_introspection_cppExport.cmake
+[6.453s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_introspection_cppExport-noconfig.cmake
+[6.456s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_cppExport.cmake
+[6.457s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfaces__rosidl_typesupport_cppExport-noconfig.cmake
+[6.458s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_generator_pyExport.cmake
+[6.459s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/export_custom_interfaces__rosidl_generator_pyExport-noconfig.cmake
+[6.459s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/rosidl_cmake-extras.cmake
+[6.460s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/ament_cmake_export_include_directories-extras.cmake
+[6.460s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/ament_cmake_export_libraries-extras.cmake
+[6.461s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/ament_cmake_export_targets-extras.cmake
+[6.461s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake
+[6.462s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/ament_cmake_export_dependencies-extras.cmake
+[6.463s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake
+[6.463s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfacesConfig.cmake
+[6.464s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/cmake/custom_interfacesConfig-version.cmake
+[6.464s] -- Up-to-date: /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/install/custom_interfaces/share/custom_interfaces/package.xml
+[6.471s] Invoked command in '/home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/custom_interfaces' returned '0': /usr/bin/cmake --install /home/tom/aeac-2026/packages/src/nav_stack/ros2_ws/build/custom_interfaces

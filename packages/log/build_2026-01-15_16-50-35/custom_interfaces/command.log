@@ -1,4 +1,0 @@
-Invoking command in '/home/tom/aeac-2026/packages/build/custom_interfaces': /usr/bin/cmake --build /home/tom/aeac-2026/packages/build/custom_interfaces -- -j8 -l8
-Invoked command in '/home/tom/aeac-2026/packages/build/custom_interfaces' returned '0': /usr/bin/cmake --build /home/tom/aeac-2026/packages/build/custom_interfaces -- -j8 -l8
-Invoking command in '/home/tom/aeac-2026/packages/build/custom_interfaces': /usr/bin/cmake --install /home/tom/aeac-2026/packages/build/custom_interfaces
-Invoked command in '/home/tom/aeac-2026/packages/build/custom_interfaces' returned '0': /usr/bin/cmake --install /home/tom/aeac-2026/packages/build/custom_interfaces
