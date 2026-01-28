@@ -40,47 +40,47 @@ class AutonomousApproach(Node):
         qos_reliable = self._create_qos_profile(QoSReliabilityPolicy.RELIABLE)
         self.auto_approach_sub = self.create_subscription(
             Bool,
-            '/auto_approach',
+            '/Mission-2/auto_approach',
             self.auto_approach_activation_callback,
             10
         )
 
         self.target_acquired_sub = self.create_subscription(
             Bool,
-            '/target_acquired',
+            '/Mission-2/target_acquired',
             self.target_acquired_callback,
             10
         )
 
         self.in_position_sub = self.create_subscription(
             Bool,
-            '/in_position',
+            '/Mission-2/in_position',
             self.in_position_callback,
             10
         )
 
         self.aim_pub = self.create_publisher(
             Bool,
-            '/aim_topic',
+            '/Mission-2/aim_topic',
             qos_reliable
         )
         #meow
         self.aimed_sub = self.create_subscription(
             Bool,
-            '/aimed_topic',
+            '/Mission-2/aimed_topic',
             self.aimed_callback,
             qos_reliable
         )
 
         self.shoot_pub = self.create_publisher(
             Bool,
-            '/shoot_topic',
+            '/Mission-2/shoot_topic',
             qos_reliable
         )
 
         self.target_pub = self.create_publisher(
             TargetPosePolar,
-            '/goal_pose_polar',
+            '/Mission-2/goal_pose_polar',
             qos_reliable
         )
 
