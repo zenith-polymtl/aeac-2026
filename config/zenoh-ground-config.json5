@@ -1,0 +1,39 @@
+{  
+  plugins: {  
+    ros2dds: {  
+      domain: 3,  
+      allow: {  
+        publishers: [  
+          "/tf",  
+          "/tf_static",  
+          "/zed/zed_node/rgb/image_rect_color/compressed",  
+          "/zed/zed_node/point_cloud/cloud_registered",
+          "/zed/zed_node/rgb/camera_info",  
+          "/chatter",  
+          "/mavros.*"  
+        ],  
+        subscribers: [  
+          "/tf",  
+          "/tf_static",  
+          "/zed/zed_node/rgb/image_rect_color/compressed",  
+          "/zed/zed_node/point_cloud/cloud_registered", 
+          "/zed/zed_node/rgb/camera_info",
+          "/chatter",  
+          "/mavros.*"  
+        ]  
+      }  
+    }  
+  },  
+  mode: "peer",  
+  connect: {  
+    endpoints: [  
+      "tcp/192.168.0.11:7447",  
+      "tcp/192.168.30.208:7447"  
+    ]  
+  },  
+  listen: {  
+    endpoints: [  
+      "tcp/0.0.0.0:7447"  
+    ]  
+  }  
+}

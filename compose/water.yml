@@ -9,15 +9,25 @@ services:
     stdin_open: true
     volumes:
       - ../workspaces/water_ws:/water_ws
-      - ../workspaces/bringup:/water_ws/src/bringup
+      - ../packages/bringup:/water_ws/src/bringup
       - ../packages/nav_stack:/water_ws/src/nav_stack
       - ../packages/polar_system:/water_ws/src/polar_system
       - ../packages/tools:/water_ws/src/tools
       - ../packages/vision:/water_ws/src/vision
-      - ../packages/ros2_gremsy:/water_ws/src/ros2_gremsy
       - ../packages/custom_interfaces:/water_ws/src/custom_interfaces
     working_dir: /water_ws     # set WS in .env, e.g. workspaces/water_ws
     command: ["bash","-lc","while :; do sleep 86400; done"]
     environment:  
       - ROS_DOMAIN_ID=2
       - RMW_IMPLEMENTATION=rmw_zenoh_cpp
+
+  zenoh-bridge-air:  
+    image: eclipse/zenoh-bridge-ros2dds:latest  
+    network_mode: host  
+    volumes:  
+      - ../config/zenoh-air-config.json5:/config.json5:ro  
+    command: ["-c", "/config.json5"]  
+    environment:  
+      - ROS_DOMAIN_ID=2  
+      - RUST_LOG=debug
+      - ROS_DISTRO=humble

@@ -1,4 +1,4 @@
-# ===== Select compose (dev|payload|recon|water|relay) =====
+# ===== Select compose (dev|payload|water|relay) =====
 C ?= dev
 DOMAIN ?= 2
 TCP_PORT ?= 5762
@@ -6,7 +6,7 @@ TCP_PORT ?= 5762
 COMPOSE_FILE := compose/$(C).yml
 CONTAINER    ?= aeac-$(C)
 
-DRONE_IP ?= 192.168.0.13
+DRONE_IP ?= 192.168.144.12
 
 # Workspace path RELATIVE to repo root (e.g., workspaces/dev_ws)
 WS_REL := workspaces/$(C)_ws
@@ -28,11 +28,11 @@ export UID GID
 ENV_INJECT := C=$(C) WS=$(WS_REL)
 
 # All compose files for the *-all targets
-COMPOSES := compose/dev.yml compose/payload.yml compose/recon.yml compose/water.yml compose/relay.yml
+COMPOSES := compose/dev.yml compose/payload.yml compose/water.yml compose/relay.yml
 
 # ===== Pretty help =====
 help: ## Show help
-	@awk 'BEGIN{FS":.*##"; printf "\nTargets (use C=<dev|payload|recon|water>):\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN{FS":.*##"; printf "\nTargets (use C=<dev|payload|water|relay>):\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 print-vars: ## Show resolved variables (debug)
 	@echo "C=$(C)"
@@ -51,6 +51,26 @@ relay: ## Start SIYI relay (UDP 14540 → MAVROS, Pymavlink, Mission Planner)
 relay-down:
 	@docker compose -f compose/relay.yml down
 
+zed-shell: ## Open bash in the ZED container (with ROS sourced)
+	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
+	  source /root/ros2_ws/install/setup.bash; \
+	  exec bash -i'
+
+zed-launch:
+	docker compose -f compose/zed.yml up -d zed-ros2
+	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
+	  source /root/ros2_ws/install/setup.bash; \
+	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml \
+	'
+
+zenoh-ground: ## Start zenoh ground bridge
+	docker compose -f compose/zenoh-ground.yml up --build
+
+zenoh-air: ## Start zenoh air bridge
+	docker compose -f compose/zenoh-air.yml up --build
+
+
+
 # ===== Docker lifecycle (selected compose) =====
 build: ## Build image for C
 	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) build
@@ -63,7 +83,13 @@ down: ## Down for C (remove orphans)
 	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) down --remove-orphans
 
 shell sh bash: ## Open bash in the running container (with ROS sourced)
-	docker exec -it $(CONTAINER) bash -lc "export ROS_DOMAIN_ID=$(DOMAIN) && source /opt/ros/humble/setup.bash && ros2 daemon start && exec bash -i"
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    exec bash -i'
 
 # ===== Workspace helpers =====
 link: 
@@ -73,31 +99,80 @@ link:
 connect: up    
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'source /opt/ros/humble/setup.bash && colcon build && source install/setup.bash && \
-	  export RMW_IMPLEMENTATION=rmw_zenoh_cpp && \
-	  export ZENOH_CONFIG_OVERRIDE="mode=\"client\";connect/endpoints=[\"tcp/$(DRONE_IP):7447\"]" && \
 	  source /opt/ros/humble/setup.bash && ros2 daemon start && bash'
 
 
 launch: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	bash -lc 'source /opt/ros/humble/setup.bash && colcon build && source install/setup.bash && nohup ros2 run rmw_zenoh_cpp rmw_zenohd > /tmp/zenohd.log 2>&1 & exec bash -lc "source /opt/ros/humble/setup.bash && ros2 daemon start && bash"'
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    colcon build; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    exec bash -i'
+
+payload-stack:
+	docker compose -f compose/payload.yml up -d --build
+	# Launch ZED inside the already-running zed-ros2 service (detached)
+	docker compose -f compose/payload.yml exec -T zed-ros2 bash -lc " \
+		source /root/ros2_ws/install/setup.bash && \
+		nohup ros2 launch zed_wrapper zed_camera.launch.py \
+			camera_model:=zed2i \
+			ros_params_override_path:=config/zenith_stereo.yaml \
+			> /tmp/zed_launch.log 2>&1 & \
+	"
+
+
+	# Enter payload dev shell (your original behavior)
+	WS=$(WS_IN) docker compose -f compose/payload.yml exec -it payload \
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    colcon build; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    exec bash -i'
 
 
 mavros-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	  bash -lc 'export ROS_DOMAIN_ID=$(DOMAIN); \
-	  source /opt/ros/humble/setup.bash; \
+	  bash -lc 'source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
-	  nohup ros2 run rmw_zenoh_cpp rmw_zenohd > /tmp/zenohd.log 2>&1 & \
 	  ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:$(TCP_PORT) fcu_protocol:=v2.0'
+
+mission-sim: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    colcon build; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:$(TCP_PORT) fcu_protocol:=v2.0 & \
+	    sleep 2; \
+	    ros2 launch bringup payload_mission.launch.py \
+	  '
+
+gcs: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    ros2 run web_server_node web_server_node \
+	  '
+
+hexa: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'source /opt/ros/humble/setup.bash; \
+	  ros2 daemon start; \
+	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS1:115200 fcu_protocol:=v2.0'
 
 mavros-ofa: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	  bash -lc 'export ROS_DOMAIN_ID=$(DOMAIN); \
-	  source /opt/ros/humble/setup.bash; \
+	  bash -lc 'source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
-	  nohup ros2 run rmw_zenoh_cpp rmw_zenohd > /tmp/zenohd.log 2>&1 & \
-	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200 fcu_protocol:=v2.0'
+	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200'
 
 clean: ## Remove build/install/log (host + container)
 	sudo rm -rf "$(WS_REL)/build" "$(WS_REL)/install" "$(WS_REL)/log" "workspaces/install" "workspaces/log" "workspaces/build"
