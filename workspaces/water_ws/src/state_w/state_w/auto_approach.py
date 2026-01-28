@@ -64,7 +64,7 @@ class AutonomousApproach(Node):
             '/aim_topic',
             qos_reliable
         )
-
+        #meow
         self.aimed_sub = self.create_subscription(
             Bool,
             '/aimed_topic',
