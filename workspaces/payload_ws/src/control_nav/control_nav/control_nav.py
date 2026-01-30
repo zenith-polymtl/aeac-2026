@@ -36,6 +36,8 @@ class ControlNav(Node):
         
         # Publisher
         self.publisher_raw = self.create_publisher(PositionTarget, '/mavros/setpoint_raw/local', 10)
+        self.lap_finished_pub = self.create_publisher(Bool, '/mission/control_nav/lap/finished', 10)
+        self.move_to_scene_pub = self.create_publisher(Bool, '/mission/control_nav/move_to_scene/finished', 10)
         
         # Subscribers
         # Lap specific subscriber
@@ -62,7 +64,7 @@ class ControlNav(Node):
     
     def initialize_parameters(self):
         ## Param decalration
-        self.declare_parameter('json_filename', 'lap_waypoints_colin.json')
+        self.declare_parameter('json_filename', 'lap_waypoints.json')
         self.declare_parameter('json_subfolder', 'data')
         # We could remove the `number_of_laps` variable, but for now, 999 makes it basicly infinit
         self.declare_parameter('number_of_laps', 999)
@@ -240,10 +242,14 @@ class ControlNav(Node):
                 if not self.is_last_lap:
                     self.is_last_lap = True
                     self.move_to_pose(self.waypoints_raw[0].pose.position)
+                    return
                 self.is_moving_to_position = False
                 self.is_doing_laps = False
                 self.current_lap = 0
                 self.get_logger().info("Finised laps")
+                lap_finished_msg = Bool()
+                lap_finished_msg.data = True
+                self.lap_finished_pub.publish(lap_finished_msg)
                 return
                 
         self.move_to_pose(self.waypoints_raw[self.lap_waypoint_index].pose.position)
@@ -269,6 +275,9 @@ class ControlNav(Node):
                 self.handle_reach_waypoint()
             else:
                 self.is_moving_to_position = False
+                reached_site_msg = Bool()
+                reached_site_msg.data = True
+                self.move_to_scene_pub.publish(reached_site_msg)
     
     # Stop the drone in current place
     def stop_current_lap(self):
