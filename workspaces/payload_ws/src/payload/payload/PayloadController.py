@@ -1,15 +1,19 @@
 import rclpy
 from rclpy.node import Node
 from mavros_msgs.srv import CommandLong
-from custom_interfaces.srv import ServoState 
+from custom_interfaces.srv import ServoState
+from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
 
 class PayloadController(Node):
     def __init__(self):
         super().__init__('PayloadController')
 
-        self.srv = self.create_service(ServoState, '/payload/set_state', self.handle_servo_request)
+        self.callback_group = ReentrantCallbackGroup()
 
-        self.mavros_client = self.create_client(CommandLong, '/mavros/cmd/command')
+        self.srv = self.create_service(ServoState, '/payload/set_state', self.handle_servo_request, callback_group=self.callback_group)
+
+        self.mavros_client = self.create_client(CommandLong, '/mavros/cmd/command', callback_group=self.callback_group)
         while not self.mavros_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('waiting for /mavros/cmd/command...')
 
@@ -48,8 +52,11 @@ class PayloadController(Node):
 def main():
     rclpy.init()
     node = PayloadController()
+
+    executor = MultiThreadedExecutor()
+    executor.add_node(node)
     try:
-        rclpy.spin(node)
+        executor.spin()
     except KeyboardInterrupt:
         pass
     finally:
