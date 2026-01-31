@@ -6,20 +6,22 @@
         publishers: [  
           "/tf",  
           "/tf_static",  
-          "/zed/zed_node/rgb/image_rect_color/compressed",  
+          "/zed/zed_node/rgb/color/rect/image/compressed",  
           "/zed/zed_node/point_cloud/cloud_registered",
-          "/zed/zed_node/rgb/camera_info",  
+          "/zed/zed_node/rgb/color/rect/image/camera_info",  
+          "/zed/zed_node/status/heartbeat",
           "/chatter",  
           "/mavros.*"  
         ],  
         subscribers: [  
           "/tf",  
           "/tf_static",  
-          "/zed/zed_node/rgb/image_rect_color/compressed",  
-          "/zed/zed_node/point_cloud/cloud_registered", 
-          "/zed/zed_node/rgb/camera_info",
+          "/zed/zed_node/rgb/color/rect/image/compressed",  
+          "/zed/zed_node/point_cloud/cloud_registered",
+          "/zed/zed_node/rgb/color/rect/image/camera_info",  
+          "/zed/zed_node/status/heartbeat",
           "/chatter",  
-          "/mavros.*"  
+          "/mavros.*"   
         ]  
       } 
     }  

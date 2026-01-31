@@ -4,7 +4,7 @@
         # General settings  
         general:  
             camera_name: 'zed2i'
-            grab_resolution: 'VGA'  # Good balance for Jetson, or 'VGA' for maximum performance  
+            grab_resolution: '720'  # Good balance for Jetson, or 'VGA' for maximum performance  
             pub_frame_rate: 10.0
             pub_resolution: 'CUSTOM'  
             pub_downscale_factor: 2.0  
@@ -57,7 +57,7 @@
           
         # Object Detection - CUSTOM ONNX MODEL  
         object_detection:  
-            od_enabled: true 
+            od_enabled: false 
             detection_model: 'MULTI_CLASS_BOX_FAST' 
             custom_onnx_file: '/root/ros2_ws/models/phase1_nano.onnx'  
             custom_onnx_input_size: 640  
