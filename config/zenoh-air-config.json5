@@ -8,7 +8,8 @@
           "/tf_static",  
           "/zed/zed_node/rgb/color/rect/image/compressed",  
           "/zed/zed_node/point_cloud/cloud_registered",
-          "/zed/zed_node/rgb/color/rect/image/camera_info",  
+          "/zed/zed_node/rgb/color/rect/image/camera_info", 
+          "/zed/zed_node/rgb/color/rect/camera_info", 
           "/zed/zed_node/status/heartbeat",
           "/chatter",  
           "/mavros.*"  
@@ -18,7 +19,8 @@
           "/tf_static",  
           "/zed/zed_node/rgb/color/rect/image/compressed",  
           "/zed/zed_node/point_cloud/cloud_registered",
-          "/zed/zed_node/rgb/color/rect/image/camera_info",  
+          "/zed/zed_node/rgb/color/rect/image/camera_info",
+          "/zed/zed_node/rgb/color/rect/camera_info",  
           "/zed/zed_node/status/heartbeat",
           "/chatter",  
           "/mavros.*"   
