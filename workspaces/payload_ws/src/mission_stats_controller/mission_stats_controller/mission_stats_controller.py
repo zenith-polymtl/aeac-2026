@@ -22,7 +22,7 @@ class MissionStatsController(Node):
         self.move_to_scene_publisher = self.create_publisher(Bool, "/mission/control_nav/move_to_scene", 10)
         self.state_changed_publisher = self.create_publisher(PayloadState, '/mission/state_changed', 10)
         
-        self.current_state = PayloadState.INITAL_STATE
+        self.current_state = PayloadState.INITIAL_STATE
 
         
     def change_state_callback(self, msg):
@@ -32,7 +32,7 @@ class MissionStatsController(Node):
     
     def handle_state_change(self, state):
         self.current_state = state
-        if state == PayloadState.INITAL_STATE:
+        if state == PayloadState.INITIAL_STATE:
             self.undefined_state_handler("inital")
         elif state == PayloadState.TAKEOFF:
             self.undefined_state_handler("takeoff")
@@ -82,7 +82,7 @@ class MissionStatsController(Node):
         if is_completed and self.current_state != PayloadState.TAKEOFF_COMPLETED:
             self.handle_state_change(PayloadState.TAKEOFF_COMPLETED)
         elif self.current_state == PayloadState.TAKEOFF:
-            self.handle_state_change(PayloadState.INITAL_STATE)
+            self.handle_state_change(PayloadState.INITIAL_STATE)
             
     
     def undefined_state_handler(self, state):
