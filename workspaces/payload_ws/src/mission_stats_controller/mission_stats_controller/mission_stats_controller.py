@@ -24,17 +24,11 @@ class MissionStatsController(Node):
         
         self.current_state = PayloadState.INITAL_STATE
 
-        self.status_printer_timer = self.create_timer(1, self.print_state)
-
-
         
     def change_state_callback(self, msg):
         state = msg.mode
         if state != self.current_state:
             self.handle_state_change(state)
-    
-    def print_state(self):
-        self.get_logger().warn(f'Current state: {self.current_state}')
     
     def handle_state_change(self, state):
         self.current_state = state
