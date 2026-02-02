@@ -145,7 +145,7 @@ gazebo-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
-	  ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:14550 fcu_protocol:=v2.0'
+	  ros2 launch mavros apm.launch fcu_url:=udp://:14551@ fcu_protocol:=v2.0 use_sim_time:=true'
 
 
 payload-mission-sim: up
@@ -166,7 +166,7 @@ gcs: up
 	  bash -lc 'cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \
 	    source install/setup.bash; \
-		colcon build; \
+		colcon build --packages-select web_server_node custom_interfaces; \
 	    ros2 daemon start; \
 	    ros2 run web_server_node web_server_node \
 	  '
