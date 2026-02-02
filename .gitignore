@@ -10,3 +10,6 @@ workspaces/log/
 workspaces/.colcon/
 
 .vscode/
+
+data*/
+*.zip
