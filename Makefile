@@ -166,6 +166,7 @@ gcs: up
 	  bash -lc 'cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \
 	    source install/setup.bash; \
+		colcon build; \
 	    ros2 daemon start; \
 	    ros2 run web_server_node web_server_node \
 	  '
