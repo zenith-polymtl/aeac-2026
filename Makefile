@@ -141,9 +141,17 @@ mavros-sim: up
 	  ros2 daemon start; \
 	  ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:$(TCP_PORT) fcu_protocol:=v2.0'
 
-mission-sim: up
+mavros-gazebo: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'source /opt/ros/humble/setup.bash; \
+	  ros2 daemon start; \
+	  ros2 launch mavros apm.launch fcu_url:=udp://:14551@ fcu_protocol:=v2.0 use_sim_time:=true'
+
+
+payload-mission-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'cd "$$WS"; \
+	  	cd payload_ws; \
 	    source /opt/ros/humble/setup.bash; \
 	    colcon build; \
 	    source install/setup.bash; \
@@ -158,11 +166,12 @@ gcs: up
 	  bash -lc 'cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \
 	    source install/setup.bash; \
+		colcon build --packages-select web_server_node custom_interfaces; \
 	    ros2 daemon start; \
 	    ros2 run web_server_node web_server_node \
 	  '
 
-hexa: up
+mavros-hexa: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
