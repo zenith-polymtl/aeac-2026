@@ -1,6 +1,6 @@
 services:
   zed-ros2:
-    image: zed_ros2_l4t_36.4.0_sdk_5.0.0:latest
+    image: zed_ros2_l4t_36.4.0_sdk_5.1.0:latest
     runtime: nvidia
     network_mode: host
     ipc: host
