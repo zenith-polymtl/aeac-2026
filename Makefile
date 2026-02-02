@@ -141,9 +141,10 @@ mavros-sim: up
 	  ros2 daemon start; \
 	  ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:$(TCP_PORT) fcu_protocol:=v2.0'
 
-mission-sim: up
+payload-mission-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'cd "$$WS"; \
+	  	cd payload_ws; \
 	    source /opt/ros/humble/setup.bash; \
 	    colcon build; \
 	    source install/setup.bash; \
