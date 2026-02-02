@@ -171,7 +171,7 @@ gcs: up
 	    ros2 run web_server_node web_server_node \
 	  '
 
-hexa: up
+mavros-hexa: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
