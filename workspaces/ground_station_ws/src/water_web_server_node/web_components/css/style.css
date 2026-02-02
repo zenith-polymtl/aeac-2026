@@ -1,0 +1,320 @@
+:root {
+    --log-width: 400px;
+    --left-container-margin: 30px;
+    --top-container-height: 150px;
+    --middle-bottom-container-height: 100px;
+    --bottom-container-height: 100px;
+
+    --top-container-child-margin: 20px;
+
+    --mission-status-width: 300px;
+    --mission-progresson-info-width: 300px;
+
+    --top-middle-container-child-margin: 10px;
+    --left-column-width: 300px
+
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+body {
+    background-color: #dfdfdf;
+    color: #111111;
+    height: 100vh;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+}
+
+.main-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    background-color: pink;
+}
+
+.left-container{
+    display: flex;
+    width: calc(100% - var(--log-width) - var(--left-container-margin));
+    height: 100%;
+    background-color: orange;
+    margin-right: var(--left-container-margin);
+    flex-direction: column;
+    overflow-y: auto;
+    min-width: 720px;
+}
+
+.logs-container {
+    display: flex;
+    width: var(--log-width);
+    height: 100%;
+    background-color: greenyellow;
+    flex-direction: column;
+}
+
+.top-container {
+    display: flex;
+    width: 100%;
+    height: var(--top-container-height);
+    min-height: var(--top-container-height);
+    background-color: purple;
+}
+
+.middle-top-container {
+    display: flex;
+    width: 100%;
+    height: calc(100% - var(--top-container-height) - var(--middle-bottom-container-height) - var(--bottom-container-height));
+    min-height: 400px;
+    background-color: forestgreen;
+}
+
+.middle-bottom-container {
+    display: flex;
+    width: 100%;
+    height: var(--middle-bottom-container-height);
+    min-height: var(--middle-bottom-container-height);
+    background-color: royalblue;
+}
+
+.bottom-container {
+    display: flex;
+    width: 100%;
+    height: var(--bottom-container-height);
+    min-height: var(--bottom-container-height);
+    background-color: darkorange;
+}
+
+.mission-status-info-container {
+    display: flex;
+    width: var(--mission-status-width);
+    height: calc(100% - (2 * var(--top-container-child-margin)));
+    background-color: aquamarine;
+    margin: var(--top-container-child-margin);
+    flex-direction: column;
+}
+
+.mission-status-info-container > span {
+    margin: auto 10px auto;
+}
+
+.mission-progresson-info-container {
+    display: flex;
+    width: var(--mission-progresson-info-width);
+    height: calc(100% - (2 * var(--top-container-child-margin)));
+    background-color: rgb(140, 127, 255);
+    margin: var(--top-container-child-margin);
+    flex-direction: column;
+}
+
+.mission-progresson-info-container > span {
+    margin: auto 10px auto;
+}
+
+.zenith-logo-container {
+    display: flex;
+    width: calc(100% - var(--mission-progresson-info-width) - var(--mission-status-width) - 6 * var(--top-container-child-margin));
+    height: calc(100% - (2 * var(--top-container-child-margin)));
+    background-color: rgb(170, 185, 28);
+    margin: var(--top-container-child-margin)
+}
+
+.button-container {
+    display: flex;
+    margin: var(--top-middle-container-child-margin);
+    height: calc(100% - 2 * var(--top-middle-container-child-margin));
+    width: calc(var(--left-column-width) - 2 * var(--top-middle-container-child-margin));
+    background-color: darkkhaki;
+    padding: 0 10px;
+    flex-direction: column;
+}
+
+.image-display-container {
+    display: flex;
+    margin: var(--top-middle-container-child-margin);
+    height: calc(100% - 2 * var(--top-middle-container-child-margin));
+    width: calc(100% - var(--left-column-width) - 2 * var(--top-middle-container-child-margin));
+    background-color: rosybrown;
+}
+
+.toggle-gimbal-controle-container {
+    display: flex;
+    margin: var(--top-middle-container-child-margin);
+    height: calc(100% - 2 * var(--top-middle-container-child-margin));
+    width: calc(var(--left-column-width) - 2 * var(--top-middle-container-child-margin));
+    background-color: fuchsia;
+}
+
+.confirm-deny-container {
+    display: flex;
+    margin: var(--top-middle-container-child-margin);
+    height: calc(100% - 2 * var(--top-middle-container-child-margin));
+    width: calc(100% - var(--left-column-width) - 2 * var(--top-middle-container-child-margin));
+    background-color: rgb(62, 206, 19);
+
+}
+
+.buttons-grid > button {
+    border: 2px solid #252525;
+    color: #fbfdfd;
+    height: 60px;
+    font-size: 1rem;
+    padding: 8px 5px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: #111111;
+}
+
+.buttons-grid > button:hover {
+    background-color: #e0e0e0;
+    color: #0d0d0d;
+}
+
+.buttons-grid > button:active {
+    background-color: #868686;
+    color: #0d0d0d;
+}
+
+.buttons-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+    height: auto;
+    padding: 0 5px;
+    overflow-y: auto;
+}
+
+.button-container > h3 {
+    margin: 10px auto;
+    height: auto;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+  margin: auto;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.toggle-gimbal-controle-container > span {
+    margin: auto;
+    font-weight: bold;
+}
+
+.confirm-deny-container > button {
+    border: 2px solid #252525;
+    color: #000000;
+    height: 60px;
+    font-size: 1rem;
+    padding: 8px 5px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100px;
+}
+
+.accept-image-button {
+    background-color: rgb(43, 187, 43);
+    margin: auto 20px auto
+}
+
+.deny-image-button {
+    background-color: rgb(189, 30, 30);
+    margin : auto 20px auto auto
+}
+
+.accept-image-button:hover {
+    background-color: rgb(90, 218, 90);
+    color: #0d0d0d;
+}
+
+.accept-image-button:active {
+    background-color: rgb(35, 131, 35);
+    color: #c7c7c7;
+}
+
+.deny-image-button:hover {
+    background-color: rgb(218, 67, 67);
+    color: #0d0d0d;
+}
+
+.deny-image-button:active {
+    background-color: rgb(134, 13, 13);
+    color: #0d0d0d;
+}
+
+.zenith-logo-container > h2 {
+    margin: auto;
+}
+
+.target-image {
+    margin: auto;
+}
+
+.logs-container > span {
+    margin: 5px 10px;
+}
