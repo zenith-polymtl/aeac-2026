@@ -1,0 +1,144 @@
+# config/zed2i_image_od_only.yaml  
+/**:  
+    ros__parameters:  
+        # General settings  
+        general:  
+            camera_name: 'zed2i'
+            grab_resolution: '720'  # Good balance for Jetson, or 'VGA' for maximum performance  
+            pub_frame_rate: 10.0
+            pub_resolution: 'CUSTOM'  
+            pub_downscale_factor: 2.0  
+            gpu_id: -1  
+            enable_image_validity_check: 1  
+            async_image_retrieval: false  
+            camera_timeout_sec: 5  
+            camera_max_reconnect: 5  
+            camera_flip: false  
+            self_calib: true
+          
+        # Video settings - outdoor optimized  
+        video:  
+            saturation: 4  # Add this  
+            sharpness: 4   # Add this    
+            gamma: 8       # Add this  
+            brightness: 4  
+            contrast: 4  
+            auto_exposure_gain: true  
+            auto_whitebalance: true
+          
+        # Sensor settings  
+        sensors:  
+            sensors_pub_rate: 10.0  
+            publish_imu_tf: false  
+            sensors_image_sync: true  
+          
+        # Depth settings - minimal for object detection  
+        depth:  
+            depth_mode: 'NEURAL_LIGHT'  # Required for object detection  
+            point_cloud_freq: 5.0   
+            depth_confidence: 80  
+            depth_texture_conf: 80  
+            remove_saturated_areas: true  
+            openni_depth_mode: true
+          
+        # POSITIONAL TRACKING DISABLED  
+        pos_tracking:  
+            pos_tracking_enabled: false  # DISABLED - no SLAM  
+            publish_tf: false  
+            publish_map_tf: false  
+          
+        # MAPPING DISABLED  
+        mapping:  
+            mapping_enabled: false  # DISABLED - no SLAM  
+          
+        # GNSS FUSION DISABLED  
+        gnss_fusion:  
+            gnss_fusion_enabled: false  # DISABLED - no SLAM  
+
+        object_detection:
+            od_enabled: true # True to enable Object Detection
+            enable_tracking: false # Whether the object detection system includes object tracking capabilities across a sequence of images.
+            detection_model: 'MULTI_CLASS_BOX_FAST' # 'MULTI_CLASS_BOX_FAST', 'MULTI_CLASS_BOX_MEDIUM', 'MULTI_CLASS_BOX_ACCURATE', 'PERSON_HEAD_BOX_FAST', 'PERSON_HEAD_BOX_ACCURATE', 'CUSTOM_YOLOLIKE_BOX_OBJECTS'
+            max_range: 10.0 # [m] Upper depth range for detections.The value cannot be greater than 'depth.max_depth'
+            filtering_mode: 'NMS3D' # Filtering mode that should be applied to raw detections: 'NONE', 'NMS3D', 'NMS3D_PER_CLASS'
+            prediction_timeout: 2.0 # During this time [sec], the object will have OK state even if it is not detected. Set this parameter to 0 to disable SDK predictions
+            allow_reduced_precision_inference: true # Allow inference to run at a lower precision to improve runtime and memory usage
+            # Other parameters are defined in the 'object_detection.yaml' and 'custom_object_detection.yaml' files
+          
+        # Object Detection - CUSTOM ONNX MODEL  
+        #object_detection:  
+        #    od_enabled: false 
+        #    detection_model: 'MULTI_CLASS_BOX_FAST' 
+        #    custom_onnx_file: '/root/ros2_ws/models/phase1_nano.onnx'  
+        #    custom_onnx_input_size: 640  
+        #    custom_class_count: 8
+            
+            # Class definitions based on phase1_nano.yaml
+            #class_000:
+            #    label: 'window'
+            #    model_class_id: 0
+            #    enabled: true
+            #
+            #class_001:
+            #    label: 'door'
+            #    model_class_id: 1
+            #    enabled: true
+            #
+            #class_002:
+            #    label: 'red circle'
+            #    model_class_id: 2
+            #    enabled: true
+            #    is_grounded: false
+            #    is_static: true
+            #
+            #class_003:
+            #    label: 'green circle'
+            #    model_class_id: 3
+            #    enabled: true
+            #    is_grounded: false
+            #    is_static: true
+            #
+            #class_004:
+            #    label: 'blue circle'
+            #    model_class_id: 4
+            #    enabled: true
+            #    is_grounded: false
+            #    is_static: true
+            #
+            #class_005:
+            #    label: 'yellow circle'
+            #    model_class_id: 5
+            #    enabled: true
+            #    is_grounded: false
+            #    is_static: true
+            #
+            #class_006:
+            #    label: 'white circle'
+            #    model_class_id: 6
+            #    enabled: true
+            #    is_grounded: false
+            #    is_static: true
+            #
+            #class_007:
+            #    label: 'black circle'
+            #    model_class_id: 7
+            #    enabled: true
+            #    is_grounded: false
+            #    is_static: true
+            
+            allow_reduced_precision_inference: true  
+            max_range: 12.0  
+            confidence_threshold: 50.0  
+            prediction_timeout: 0.2  
+            enable_tracking: false  
+          
+        # Jetson optimization  
+        advanced:  
+            thread_sched_policy: 'SCHED_FIFO'  
+            thread_grab_priority: 60  
+            thread_sensor_priority: 80  
+            thread_pointcloud_priority: 40  
+          
+        debug:  
+            debug_object_detection: true  
+            debug_advanced: false
