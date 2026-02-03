@@ -222,7 +222,7 @@ WaterWebServerNode::try_handle_api(
         msg.data = true;
         mission_go_publisher_->publish(msg);
 
-        return generate_responce(R"({"message": "Request Mission Go received"})", req);
+        return generate_responce("Request Mission Go received", req);
     }
     if (target == API_MOVE_TO_SCENE)
     {
@@ -231,7 +231,7 @@ WaterWebServerNode::try_handle_api(
         msg.data = true;
         move_to_scene_publisher_->publish(msg);
 
-        return generate_responce(R"({"message": "Request Scene movement received"})", req);
+        return generate_responce("Request Scene movement received", req);
     }
     if (target == API_AUTO_APPROACH)
     {
@@ -239,7 +239,7 @@ WaterWebServerNode::try_handle_api(
 
         // TODO: Add Auto Approach Logic
 
-        return generate_responce(R"({"message": "Request Auto Approach received"})", req);
+        return generate_responce("Request Auto Approach received", req);
     }
     if (target == API_AUTO_SHOOT)
     {
@@ -247,7 +247,7 @@ WaterWebServerNode::try_handle_api(
 
         // TODO: Add Auto Shoot Logic
 
-        return generate_responce(R"({"message": "Request Auto Shoot received"})", req);
+        return generate_responce("Request Auto Shoot received", req);
     }
     if (target == API_SHOOT)
     {
@@ -255,7 +255,16 @@ WaterWebServerNode::try_handle_api(
 
         // TODO: Add Shoot Logic
 
-        return generate_responce(R"({"message": "Request Shoot received"})", req);
+        return generate_responce("Request Shoot received", req);
+    }
+    if (target == TAKE_PICTURE)
+    {
+        RCLCPP_INFO(get_logger(), "Received Take Picture!");
+        
+        // TODO: Add Toggle Gimbal Logic
+
+        return generate_responce("Request Taje Picture received", req);
+
     }
     if (target == API_GIMBAL_TOGGLE)
     {
@@ -263,7 +272,7 @@ WaterWebServerNode::try_handle_api(
         
         // TODO: Add Toggle Gimbal Logic
 
-        return generate_responce(R"({"message": "Request Toggle Gimbal received"})", req);
+        return generate_responce("Request Toggle Gimbal received", req);
     }
     if (target == API_ABORT_ALL)
     {
@@ -272,7 +281,7 @@ WaterWebServerNode::try_handle_api(
         msg.data = true;
         abort_all_mission_publisher_->publish(msg);
 
-        return generate_responce(R"({"message": "Request Abort received"})", req);
+        return generate_responce("Request Abort received", req);
     }
     return std::nullopt;
 }
@@ -281,7 +290,7 @@ http::response<http::string_body> WaterWebServerNode::generate_responce(std::str
     http::response<http::string_body> res{http::status::ok, req.version()};
     res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
     res.set(http::field::content_type, "application/json");
-    res.body() = message;
+    res.body() = "{\"message\": \"" + message + "\"}";
     res.prepare_payload();
     res.keep_alive(req.keep_alive());
     return res;

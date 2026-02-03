@@ -1,11 +1,21 @@
 const API_MISSION_GO = "/api/mission/go";
 const API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
-const API_AUTO_APPROACH = "/api/mission/move_to_scene";
-const API_AUTO_SHOOT = "/api/mission/move_to_scene";
-const API_SHOOT = "/api/mission/move_to_scene";
+const API_AUTO_APPROACH = "/api/mission/auto_approach";
+const API_AUTO_SHOOT = "/api/mission/auto_shoot";
+const API_SHOOT = "/api/mission/shoot";
+const TAKE_PICTURE = "/api/mission/take_picture";
 const API_ABORT_ALL = "/api/mission/abort_all";
 const API_GIMBAL_TOGGLE = "/api/toogle_gimbal"
 
+function appendToLog(msg) {
+    const logsContainer = document.querySelector('.logs-container');
+    const newLog = document.createElement('span');
+    const timestamp = new Date().toLocaleTimeString();
+    
+    newLog.textContent = `[${timestamp}] ${msg}`;
+    logsContainer.appendChild(newLog);
+    logsContainer.scrollTop = logsContainer.scrollHeight;
+}
 
 async function sendCommand(endpoint) {
     try {
@@ -17,7 +27,8 @@ async function sendCommand(endpoint) {
         });
         if (response.ok) {
             const data = await response.json();
-            const successMessage = `Success: ${JSON.stringify(data)}`;
+            const successMessage = `Success: ${JSON.stringify(data.message)}`;
+            appendToLog(successMessage)
         } else {
             const errorMessage = `Error: ${response.statusText}`;
         }
@@ -31,6 +42,7 @@ function initaliseButtons() {
     document.getElementById('go-to-site-button').addEventListener('click', () => sendCommand(API_MOVE_TO_SCENE));
     document.getElementById('auto-approach-button').addEventListener('click', () => sendCommand(API_AUTO_APPROACH));
     document.getElementById('auto-shoot-button').addEventListener('click', () => sendCommand(API_AUTO_SHOOT));
+    document.getElementById('take-picture-button').addEventListener('click', () => sendCommand(TAKE_PICTURE));
     document.getElementById('shoot-button').addEventListener('click', () => sendCommand(API_SHOOT));
     document.getElementById('abort-button').addEventListener('click', () => sendCommand(API_ABORT_ALL));
 }
@@ -67,11 +79,7 @@ function initaliseGimbalLogic() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    initaliseButtons();
-    initaliseGimbalLogic();
-    loadTheme();
-
+function initaliseSocket() {
     const ws = new WebSocket("ws://" + window.location.host + "/ws/status");
 
     ws.onopen = function() {
@@ -96,4 +104,11 @@ document.addEventListener('DOMContentLoaded', () => {
     ws.onerror = function(error) {
         console.error("WebSocket error:", error);
     };
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initaliseButtons();
+    initaliseGimbalLogic();
+    loadTheme();
+    initaliseSocket();
 })

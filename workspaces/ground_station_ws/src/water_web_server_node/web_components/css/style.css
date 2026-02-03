@@ -115,14 +115,6 @@ body {
     border: 1px solid var(--border-color);
 }
 
-.logs-container {
-    /* display: flex; */
-    width: var(--log-width);
-    height: 100%;
-    /* background-color: greenyellow; */
-    flex-direction: column;
-}
-
 /* --- Top Section --- */
 
 .top-container {
@@ -368,6 +360,7 @@ body {
     font-size: 0.85rem;
     border-bottom: 1px solid #334155;
     padding-bottom: 4px;
+    flex-shrink: 0;
     font-family: inherit; /* Ensure monospace inherits */
 }
 

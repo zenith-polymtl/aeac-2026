@@ -24,9 +24,10 @@ const int SERVER_PORT = 8080;
 // API routes
 const std::string API_MISSION_GO = "/api/mission/go";
 const std::string API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
-const std::string API_AUTO_APPROACH = "/api/mission/move_to_scene";
-const std::string API_AUTO_SHOOT = "/api/mission/move_to_scene";
-const std::string API_SHOOT = "/api/mission/move_to_scene";
+const std::string API_AUTO_APPROACH = "/api/mission/auto_approach";
+const std::string API_AUTO_SHOOT = "/api/mission/auto_shoot";
+const std::string API_SHOOT = "/api/mission/shoot";
+const std::string TAKE_PICTURE = "/api/mission/take_picture";
 const std::string API_ABORT_ALL = "/api/mission/abort_all";
 const std::string API_GIMBAL_TOGGLE = "/api/toogle_gimbal";
 
