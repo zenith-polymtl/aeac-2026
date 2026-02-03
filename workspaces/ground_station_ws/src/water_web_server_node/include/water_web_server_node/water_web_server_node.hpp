@@ -23,10 +23,13 @@ const int SERVER_PORT = 8080;
 
 // API routes
 const std::string API_MISSION_GO = "/api/mission/go";
-const std::string API_START_LAP = "/api/mission/lap/start";
-const std::string API_FINISH_LAP = "/api/mission/lap/finish";
 const std::string API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
+const std::string API_AUTO_APPROACH = "/api/mission/move_to_scene";
+const std::string API_AUTO_SHOOT = "/api/mission/move_to_scene";
+const std::string API_SHOOT = "/api/mission/move_to_scene";
 const std::string API_ABORT_ALL = "/api/mission/abort_all";
+const std::string API_GIMBAL_TOGGLE = "/api/toogle_gimbal";
+
 
 namespace beast = boost::beast;
 namespace http = beast::http;
@@ -60,6 +63,9 @@ private:
     std::optional<http::response<http::string_body>> try_handle_api(beast::string_view target, const http::request<http::string_body> &req);
 
     std::optional<http::response<http::string_body>> try_serve_static_file(std::string const &doc_root, beast::string_view target, const http::request<http::string_body> &req);
+
+    http::response<http::string_body> generate_responce(std::string message, const http::request<http::string_body> &req);
+
 
     // Socket functions
     void broadcast_status();

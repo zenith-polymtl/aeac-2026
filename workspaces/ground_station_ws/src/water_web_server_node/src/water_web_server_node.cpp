@@ -68,7 +68,6 @@ void WaterWebServerNode::initialize_publisher()
     mission_go_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/go", 10);
     start_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/lap/start", 10);
     finish_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/lap/finish", 10);
-
     move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/move_to_scene", 10);
     abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/abort_all", 10);
 }
@@ -223,65 +222,48 @@ WaterWebServerNode::try_handle_api(
         msg.data = true;
         mission_go_publisher_->publish(msg);
 
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "application/json");
-        res.body() = R"({"message": "Request Mission Go received"})";
-        res.prepare_payload();
-        res.keep_alive(req.keep_alive());
-        return res;
-    }
-    if (target == API_START_LAP)
-    {
-        RCLCPP_INFO(get_logger(), "Starting Laps!");
-        std_msgs::msg::Bool msg;
-        msg.data = true;
-        start_lap_publisher_->publish(msg);
-
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "application/json");
-        res.body() = R"({"message": "Request Start Lap received"})";
-        res.prepare_payload();
-        res.keep_alive(req.keep_alive());
-        return res;
-    }
-
-    // API_MISSION_GO = "/api/mission/go";
-    // const std::string API_START_LAP = "/api/mission/lap/start";
-    // const std::string API_FINISH_LAP = "/api/mission/lap/finish";
-    // const std::string API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
-    // const std::string API_ABORT_ALL = "/api/mission/abort_all";
-
-    if (target == API_FINISH_LAP)
-    {
-        RCLCPP_INFO(get_logger(), "Finishing the current lap and stopping");
-        std_msgs::msg::Bool msg;
-        msg.data = true;
-        finish_lap_publisher_->publish(msg);
-
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "application/json");
-        res.body() = R"({"message": "Request Finish Lap received"})";
-        res.prepare_payload();
-        res.keep_alive(req.keep_alive());
-        return res;
+        return generate_responce(R"({"message": "Request Mission Go received"})", req);
     }
     if (target == API_MOVE_TO_SCENE)
     {
-        RCLCPP_INFO(get_logger(), "Starting Scene movement procedure!");
+        RCLCPP_INFO(get_logger(), "Received Scene movement command!");
         std_msgs::msg::Bool msg;
         msg.data = true;
         move_to_scene_publisher_->publish(msg);
 
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "application/json");
-        res.body() = R"({"message": "Request Move to Scene received"})";
-        res.prepare_payload();
-        res.keep_alive(req.keep_alive());
-        return res;
+        return generate_responce(R"({"message": "Request Scene movement received"})", req);
+    }
+    if (target == API_AUTO_APPROACH)
+    {
+        RCLCPP_INFO(get_logger(), "Received Auto Approach!");
+
+        // TODO: Add Auto Approach Logic
+
+        return generate_responce(R"({"message": "Request Auto Approach received"})", req);
+    }
+    if (target == API_AUTO_SHOOT)
+    {
+        RCLCPP_INFO(get_logger(), "Received Auto Shoot!");
+
+        // TODO: Add Auto Shoot Logic
+
+        return generate_responce(R"({"message": "Request Auto Shoot received"})", req);
+    }
+    if (target == API_SHOOT)
+    {
+        RCLCPP_INFO(get_logger(), "Received shoot!");
+
+        // TODO: Add Shoot Logic
+
+        return generate_responce(R"({"message": "Request Shoot received"})", req);
+    }
+    if (target == API_GIMBAL_TOGGLE)
+    {
+        RCLCPP_INFO(get_logger(), "Received Toggle Gimbal!");
+        
+        // TODO: Add Toggle Gimbal Logic
+
+        return generate_responce(R"({"message": "Request Toggle Gimbal received"})", req);
     }
     if (target == API_ABORT_ALL)
     {
@@ -290,15 +272,19 @@ WaterWebServerNode::try_handle_api(
         msg.data = true;
         abort_all_mission_publisher_->publish(msg);
 
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "application/json");
-        res.body() = R"({"message": "Abort received"})";
-        res.prepare_payload();
-        res.keep_alive(req.keep_alive());
-        return res;
+        return generate_responce(R"({"message": "Request Abort received"})", req);
     }
     return std::nullopt;
+}
+
+http::response<http::string_body> WaterWebServerNode::generate_responce(std::string message, const http::request<http::string_body> &req) {
+    http::response<http::string_body> res{http::status::ok, req.version()};
+    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+    res.set(http::field::content_type, "application/json");
+    res.body() = message;
+    res.prepare_payload();
+    res.keep_alive(req.keep_alive());
+    return res;
 }
 
 std::optional<http::response<http::string_body>> WaterWebServerNode::try_serve_static_file(
@@ -362,18 +348,16 @@ void WaterWebServerNode::do_session(tcp::socket socket, std::string const &doc_r
             std::lock_guard<std::mutex> lock(ws_mutex_);
             ws_sessions_.insert(ws_ptr);
         }
-        RCLCPP_INFO(get_logger(), "New WebSocket client connected. Total: %zu", ws_sessions_.size());
-
         auto cleanup = [&]() {
             std::lock_guard<std::mutex> lock(ws_mutex_);
             ws_sessions_.erase(ws_ptr);
-            RCLCPP_INFO(get_logger(), "WebSocket client disconnected. Total: %zu", ws_sessions_.size());
+            // RCLCPP_INFO(get_logger(), "WebSocket client disconnected. Total: %zu", ws_sessions_.size());
         };
         struct Guard {
             std::function<void()> fn;
             ~Guard() { if (fn) fn(); }
         } guard{cleanup};
-        RCLCPP_INFO(get_logger(), "New WebSocket client connected. Total: %zu", ws_sessions_.size());
+        // RCLCPP_INFO(get_logger(), "New WebSocket client connected. Total: %zu", ws_sessions_.size());
         for (;;)
         {
             beast::flat_buffer ws_buffer;
@@ -394,7 +378,7 @@ void WaterWebServerNode::do_session(tcp::socket socket, std::string const &doc_r
         ws.close(websocket::close_code::normal, ec);
         if (ec && ec != websocket::error::closed)
         {
-            RCLCPP_WARN(get_logger(), "WebSocket close failed: %s", ec.message().c_str());
+            // RCLCPP_WARN(get_logger(), "WebSocket close failed: %s", ec.message().c_str());
         }
     }
     else
