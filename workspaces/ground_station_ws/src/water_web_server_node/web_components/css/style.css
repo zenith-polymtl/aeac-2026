@@ -104,7 +104,7 @@ body {
 .zenith-logo-container,
 .button-container,
 .image-display-container,
-.toggle-gimbal-controle-container,
+.toggle-gimbal-control-container,
 .confirm-deny-container,
 .logs-container,
 .bottom-container {
@@ -290,7 +290,7 @@ body {
     min-height: var(--middle-bottom-container-height);
 }
 
-.toggle-gimbal-controle-container {
+.toggle-gimbal-control-container {
     display: flex;
     margin: var(--top-middle-container-child-margin);
     height: calc(100% - 2 * var(--top-middle-container-child-margin));
@@ -401,7 +401,7 @@ body {
 input:checked + .slider { background-color: var(--accent-blue); }
 input:checked + .slider:before { transform: translateX(22px); }
 
-.toggle-gimbal-controle-container > span {
+.toggle-gimbal-control-container > span {
     margin: auto;
     font-weight: bold;
 }

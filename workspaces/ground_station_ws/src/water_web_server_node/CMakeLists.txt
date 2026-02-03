@@ -1,44 +1,44 @@
 cmake_minimum_required(VERSION 3.8)
 project(water_web_server_node)
+set(EXECUTABLE_NAME water_web_server_node)
+set(PACKAGE_NAME water_web_server_node)
+set(DEPENDENCIES
+  rclcpp
+  std_msgs
+  ament_index_cpp
+  Boost
+  nlohmann_json
+  custom_interfaces
+)
+
+set(LIB_NAME ${PACKAGE_NAME}_lib)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(ament_index_cpp REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(Boost REQUIRED)
-find_package(nlohmann_json REQUIRED)
-find_package(custom_interfaces REQUIRED)
 
+foreach(pkg IN LISTS DEPENDENCIES)
+  find_package(${pkg} REQUIRED)
+endforeach()
 
-set(DEPENDENCIES
-  "rclcpp"
-  "std_msgs"
-  "ament_index_cpp"
-  "Boost"
-  "nlohmann_json"
-  "custom_interfaces"
-)
 
 add_library(${PROJECT_NAME}_lib
   src/water_web_server_node.cpp
 )
 
-ament_target_dependencies(${PROJECT_NAME}_lib std_msgs nlohmann_json rclcpp custom_interfaces)
+ament_target_dependencies(${LIB_NAME} std_msgs nlohmann_json rclcpp custom_interfaces)
 
-add_executable(water_web_server_node src/water_web_server_node.cpp)
-install(TARGETS water_web_server_node DESTINATION lib/${PROJECT_NAME})
+add_executable(${PACKAGE_NAME} src/${EXECUTABLE_NAME}.cpp)
+install(TARGETS ${PACKAGE_NAME} DESTINATION lib/${PROJECT_NAME})
 
-target_link_libraries(water_web_server_node
+target_link_libraries(${PACKAGE_NAME}
   ${PROJECT_NAME}_lib
   ament_index_cpp::ament_index_cpp
 )
 
-target_include_directories(water_web_server_node_lib PUBLIC
+target_include_directories(${LIB_NAME} PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${Boost_INCLUDE_DIRS}
 )
