@@ -28,30 +28,19 @@ function initaliseButtons() {
     // document.getElementById('mission-go').addEventListener('click', () => sendCommand(API_MISSION_GO));
 }
 
-function setupDarkMode() {
-    const logoBtn = document.getElementById("logo-image")
-    const body = document.body;
+const logoBtn = document.getElementById("logo-image")
+const body = document.body;
 
-    if (localStorage.getItem('theme') === 'dark') {
+if (localStorage.getItem('theme') === 'dark') {
+    body.setAttribute('data-theme', 'dark');
+}
+
+logoBtn.addEventListener('click', () => {
+    if (body.getAttribute('data-theme') === 'dark') {
+        body.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+    } else {
         body.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
     }
-
-    logoBtn.addEventListener('click', () => {
-        if (body.getAttribute('data-theme') === 'dark') {
-            body.removeAttribute('data-theme');
-            localStorage.setItem('theme', 'light');
-        } else {
-            body.setAttribute('data-theme', 'dark');
-            localStorage.setItem('theme', 'dark');
-        }
-    });
-}
-
-function init() {
-    initalise_buttons()
-    setupDarkMode()
-}
-
-document.addEventListener("load", () => {
-  init();
-})
+});
