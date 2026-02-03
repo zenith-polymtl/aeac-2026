@@ -261,9 +261,9 @@ WaterWebServerNode::try_handle_api(
     {
         RCLCPP_INFO(get_logger(), "Received Take Picture!");
         
-        // TODO: Add Toggle Gimbal Logic
+        // TODO: Add Take Picture Logic
 
-        return generate_responce("Request Taje Picture received", req);
+        return generate_responce("Request Take Picture received", req);
 
     }
     if (target == API_GIMBAL_TOGGLE)
