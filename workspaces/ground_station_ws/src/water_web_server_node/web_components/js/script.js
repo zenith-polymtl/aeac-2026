@@ -1,20 +1,3 @@
-// const API_MISSION_GO = "/api/mission/go";
-// const API_START_LAP = "/api/mission/lap/start";
-// const API_FINISH_LAP = "/api/mission/lap/finish";
-// const API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
-// const API_ABORT_ALL = "/api/mission/abort_all";
-
-// const statusElement = document.getElementById('status');
-// const logElement = document.getElementById('log');
-
-// function appendToLog(message, type = 'info') {
-//     const p = document.createElement('p');
-//     p.textContent = `${new Date().toLocaleString()} - ${message}`;
-//     p.classList.add(type);
-//     logElement.appendChild(p);
-//     logElement.scrollTop = logElement.scrollHeight;
-// }
-
 async function sendCommand(endpoint) {
     statusElement.textContent = 'Status: Sending command...';
     try {
@@ -41,40 +24,34 @@ async function sendCommand(endpoint) {
     }
 }
 
-function initalise_buttons() {
+function initaliseButtons() {
     // document.getElementById('mission-go').addEventListener('click', () => sendCommand(API_MISSION_GO));
-    // document.getElementById('start-lap').addEventListener('click', () => sendCommand(API_START_LAP));
-    // document.getElementById('finish-lap').addEventListener('click', () => sendCommand(API_FINISH_LAP));
-    // document.getElementById('move-to-scene').addEventListener('click', () => sendCommand(API_MOVE_TO_SCENE));
-    // document.getElementById('abort-all').addEventListener('click', () => sendCommand(API_ABORT_ALL));
-
 }
 
-// document.addEventListener('DOMContentLoaded', () => {
-//     initalise_buttons();
+function setupDarkMode() {
+    const logoBtn = document.getElementById("logo-image")
+    const body = document.body;
 
-//     const ws = new WebSocket("ws://" + window.location.host + "/ws/status");
+    if (localStorage.getItem('theme') === 'dark') {
+        body.setAttribute('data-theme', 'dark');
+    }
 
-//     ws.onopen = function() {
-//         console.log("WebSocket connected!");
-//     };
+    logoBtn.addEventListener('click', () => {
+        if (body.getAttribute('data-theme') === 'dark') {
+            body.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
+        } else {
+            body.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+}
 
-//     ws.onmessage = function(event) {
-//         try {
-//             const data = JSON.parse(event.data);
-//             console.log("Status update:", data);
-//             appendToLog(`Received Message: ${data.message}`, data.is_success ? 'info':'error')
-            
-//         } catch (e) {
-//             console.error("Invalid JSON:", event.data);
-//         }
-//     };
+function init() {
+    initalise_buttons()
+    setupDarkMode()
+}
 
-//     ws.onclose = function() {
-//         console.log("WebSocket disconnected");
-//     };
-
-//     ws.onerror = function(error) {
-//         console.error("WebSocket error:", error);
-//     };
-// })
+document.addEventListener("load", () => {
+  init();
+})
