@@ -183,6 +183,18 @@ mavros-ofa: up
 	  ros2 daemon start; \
 	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200'
 
+rviz: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'source /opt/ros/humble/setup.bash; \
+	  ros2 daemon start; \
+	  rviz2'
+
+foxglove: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'source /opt/ros/humble/setup.bash; \
+	  ros2 daemon start; \
+	  ros2 launch foxglove_bridge foxglove_bridge_launch.xml port:=8765'
+
 clean: ## Remove build/install/log (host + container)
 	sudo rm -rf "$(WS_REL)/build" "$(WS_REL)/install" "$(WS_REL)/log" "workspaces/install" "workspaces/log" "workspaces/build"
 	-docker exec -it $(CONTAINER) bash -lc 'rm -rf "$(WS_IN)/build" "$(WS_IN)/install" "$(WS_IN)/log"'
