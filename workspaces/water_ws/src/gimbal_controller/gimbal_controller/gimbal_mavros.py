@@ -53,8 +53,16 @@ class GremsyMavros(Node):
         self.yaw_integral = 0.0
         self.yaw_prev_error = 0.0
         self.last_update_time = self.get_clock().now()
+        
+        # Current PID ?
+        self.current_pitch = 0.0
+        self.current_yaw = 0.0
+        self.current_roll = 0.0
 
-        self.gimbal_mode = 2 # 1=LOCK, 2=FOLLOW
+        self.last_sent_pitch_vel = 0.0
+        self.last_sent_yaw_vel = 0.0
+
+        self.gimbal_mode = GimbalMode.FOLLOW
         
         # --- Publishers ---
         self.mavros_pub = self.create_publisher(GimbalManagerSetPitchyaw, '/mavros/gimbal_control/manager/set_pitchyaw', 10)
@@ -67,13 +75,6 @@ class GremsyMavros(Node):
             '/mavros/gimbal_control/device/attitude_status',
             self.gimbal_attitude_callback,
             10)
-
-        self.current_pitch = 0.0
-        self.current_yaw = 0.0
-        self.current_roll = 0.0
-
-        self.last_sent_pitch_vel = 0.0
-        self.last_sent_yaw_vel = 0.0
         
         # --- Services ---
         self.create_service(SetBool, '/gimbal/lock_mode', self.enable_lock_mode_callback)
@@ -89,7 +90,7 @@ class GremsyMavros(Node):
         self.current_pitch = math.degrees(angles[1])
         self.current_yaw = math.degrees(angles[2])
 
-        print(f"{self.current_pitch}, {self.current_yaw}")
+        # self.get_logger().info(f"Current pitch: {self.current_pitch}, Current yaw: {self.current_yaw}")
         target_pitch, target_yaw = self.check_angle_limit(self.last_sent_pitch_vel, self.last_sent_yaw_vel)
         
         if target_pitch != self.last_sent_pitch_vel or target_yaw != self.last_sent_yaw_vel:
@@ -112,12 +113,15 @@ class GremsyMavros(Node):
             self.send_speed_cmd(0.0, 0.0)
             response.success = True
             response.message = "Changed mode to LOCK"
+            self.get_logger().info("Changed mode to LOCK.")
+
 
         elif new_mode == GimbalMode.FOLLOW:
             self.gimbal_mode = new_mode
             self.send_position_cmd(0.0, 0.0)
             response.success = True
             response.message = "Changed mode to FOLLOW"
+            self.get_logger().info("Changed mode to FOLLOW.")
 
         return response
 
@@ -150,22 +154,22 @@ class GremsyMavros(Node):
         target_vel_pitch, target_vel_yaw = self.check_angle_limit(target_vel_pitch, target_vel_yaw)
 
         self.send_speed_cmd(target_vel_pitch, target_vel_yaw)
-        return
+        # return
     
-        current_time = self.get_clock().now()
-        dt = (current_time - self.last_update_time).nanoseconds / 1e9
-        self.last_update_time = current_time
+        # current_time = self.get_clock().now()
+        # dt = (current_time - self.last_update_time).nanoseconds / 1e9
+        # self.last_update_time = current_time
 
-        if dt <= 0.0 or dt > 0.1:
-            dt = 0.01
+        # if dt <= 0.0 or dt > 0.1:
+        #     dt = 0.01
 
-        cmd_pitch = self.compute_pid(msg.pitch_error, "pitch", dt)
-        cmd_yaw = self.compute_pid(msg.yaw_error, "yaw", dt)
+        # cmd_pitch = self.compute_pid(msg.pitch_error, "pitch", dt)
+        # cmd_yaw = self.compute_pid(msg.yaw_error, "yaw", dt)
 
-        cmd_pitch = max(min(cmd_pitch, self.max_speed), -self.max_speed)
-        cmd_yaw = max(min(cmd_yaw, self.max_speed), -self.max_speed)
+        # cmd_pitch = max(min(cmd_pitch, self.max_speed), -self.max_speed)
+        # cmd_yaw = max(min(cmd_yaw, self.max_speed), -self.max_speed)
 
-        self.send_speed_cmd(cmd_pitch, cmd_yaw)
+        # self.send_speed_cmd(cmd_pitch, cmd_yaw)
 
     def compute_pid(self, error, axis, dt):
         if axis == "pitch":
@@ -199,14 +203,12 @@ class GremsyMavros(Node):
         self.mavros_pub.publish(msg)
 
     def send_speed_cmd(self, pitch_rate, yaw_rate):
-
         self.last_sent_pitch_vel = pitch_rate
         self.last_sent_yaw_vel = yaw_rate
 
         msg = GimbalManagerSetPitchyaw()
         
         msg.flags = SPEED_FLAGS
-
         msg.pitch = float('nan')
         msg.yaw = float('nan')
 
