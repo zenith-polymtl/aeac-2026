@@ -13,3 +13,4 @@ workspaces/.colcon/
 
 data*/
 *.zip
+rosbag*
