@@ -1,0 +1,86 @@
+# config/zed2i_image_od_mapping.yaml  
+/**:  
+    ros__parameters:  
+        # General settings  
+        general:  
+            camera_name: 'zed2i'  
+            grab_resolution: '720'  
+            pub_frame_rate: 10.0  
+            pub_resolution: 'CUSTOM'  
+            pub_downscale_factor: 2.0  
+            gpu_id: -1  
+            enable_image_validity_check: 1  
+            async_image_retrieval: false  
+            camera_timeout_sec: 5  
+            camera_max_reconnect: 5  
+            camera_flip: false  
+            self_calib: true  
+  
+        # Video settings - outdoor optimized  
+        video:  
+            saturation: 4  
+            sharpness: 4  
+            gamma: 8  
+            brightness: 4  
+            contrast: 4  
+            auto_exposure_gain: true  
+            auto_whitebalance: true  
+  
+        # Sensor settings  
+        sensors:  
+            sensors_pub_rate: 50.0  
+            publish_imu_tf: false  
+            sensors_image_sync: true  
+  
+        # Depth settings - minimal for object detection  
+        depth:  
+            depth_mode: 'NEURAL_LIGHT'  
+            point_cloud_freq: 5.0  
+            depth_confidence: 80  
+            depth_texture_conf: 80  
+            remove_saturated_areas: true  
+            openni_depth_mode: true  
+  
+        # POSITIONAL TRACKING ENABLED (required for mapping)  
+        pos_tracking:  
+            pos_tracking_enabled: true  
+            publish_tf: false  
+            publish_map_tf: false  
+  
+        # MAPPING ENABLED with plane detection  
+        mapping:  
+            mapping_enabled: true  
+            resolution: 0.05  
+            max_mapping_range: 5.0  
+            fused_pointcloud_freq: 1.0  
+            clicked_point_topic: '/clicked_point'  
+            pd_max_distance_threshold: 0.15  
+            pd_normal_similarity_threshold: 15.0  
+  
+        # GNSS FUSION DISABLED  
+        gnss_fusion:  
+            gnss_fusion_enabled: false  
+  
+        # Object Detection - CUSTOM ONNX MODEL  
+        object_detection:  
+            od_enabled: true  
+            model: 'CUSTOM_YOLOLIKE_BOX_OBJECTS'  
+            custom_onnx_file: '/root/ros2_ws/models/phase1_nano.onnx'  
+            custom_onnx_input_size: 640  
+            custom_label_yaml: ''  # Add path to your label YAML if available  
+            allow_reduced_precision_inference: true  
+            max_range: 12.0  
+            confidence_threshold: 50.0  
+            prediction_timeout: 0.2  
+            enable_tracking: false  
+  
+        # Jetson optimization  
+        advanced:  
+            thread_sched_policy: 'SCHED_FIFO'  
+            thread_grab_priority: 60  
+            thread_sensor_priority: 80  
+            thread_pointcloud_priority: 40  
+  
+        debug:  
+            debug_object_detection: true  
+            debug_advanced: false

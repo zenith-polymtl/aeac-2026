@@ -56,6 +56,13 @@ zed-shell: ## Open bash in the ZED container (with ROS sourced)
 	  source /root/ros2_ws/install/setup.bash; \
 	  exec bash -i'
 
+zed-slam:
+	docker compose -f compose/zed.yml up -d zed-ros2
+	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
+	  source /root/ros2_ws/install/setup.bash; \
+	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo_slam.yaml \
+	'
+
 zed-launch:
 	docker compose -f compose/zed.yml up -d zed-ros2
 	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
@@ -63,11 +70,11 @@ zed-launch:
 	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml \
 	'
 
-zed-launch-copy:
+zed-od:
 	docker compose -f compose/zed.yml up -d zed-ros2
 	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
 	  source /root/ros2_ws/install/setup.bash; \
-	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo_copy.yaml \
+	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo_od.yaml \
 	'
 
 zenoh-ground: ## Start zenoh ground bridge
@@ -76,13 +83,6 @@ zenoh-ground: ## Start zenoh ground bridge
 zenoh-air: ## Start zenoh air bridge
 	docker compose -f compose/zenoh-air.yml up --build
 
-
-
-mavros-jetson: ## Open bash in the MAVROS container (with ROS sourced)
-	docker compose -f compose/mavros.yml up -d --build
-	docker compose -f compose/mavros.yml exec -T mavros bash -lc '\
-	source /opt/ros/humble/setup.bash; \
-	ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS1:921600 fcu_protocol:=v2.0'
 
 # ===== Docker lifecycle (selected compose) =====
 build: ## Build image for C
@@ -125,7 +125,7 @@ launch: up
 	    ros2 daemon start; \
 	    exec bash -i'
 
-payload-stack:
+payload:
 	docker compose -f compose/payload.yml up -d --build
 	# Launch ZED inside the already-running zed-ros2 service (detached)
 	docker compose -f compose/payload.yml exec -T zed-ros2 bash -lc " \
@@ -160,6 +160,18 @@ mavros-gazebo: up
 	  ros2 daemon start; \
 	  ros2 launch mavros apm.launch fcu_url:=udp://:14551@ fcu_protocol:=v2.0 use_sim_time:=true'
 
+mavros-jetson: ## Open bash in the MAVROS container (with ROS sourced)
+	docker compose -f compose/mavros.yml up -d --build
+	docker compose -f compose/mavros.yml exec -T mavros bash -lc '\
+	source /opt/ros/humble/setup.bash; \
+	ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS1:921600 fcu_protocol:=v2.0'
+
+mavros-ofa: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'source /opt/ros/humble/setup.bash; \
+	  ros2 daemon start; \
+	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200'
+
 
 payload-mission-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
@@ -183,18 +195,6 @@ gcs: up
 	    ros2 daemon start; \
 	    ros2 run web_server_node web_server_node \
 	  '
-
-mavros-hexa: up
-	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	  bash -lc 'source /opt/ros/humble/setup.bash; \
-	  ros2 daemon start; \
-	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS1:921600 fcu_protocol:=v2.0'
-
-mavros-ofa: up
-	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	  bash -lc 'source /opt/ros/humble/setup.bash; \
-	  ros2 daemon start; \
-	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200'
 
 rviz: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
