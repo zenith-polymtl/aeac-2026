@@ -1,0 +1,400 @@
+:root {
+    --log-width: 400px;
+    --log-padding: 15px;
+
+    --left-container-margin: 20px;
+    --top-container-height: 120px;
+    --middle-bottom-container-height: 100px;
+    --bottom-container-height: 100px;
+
+    --top-container-child-margin: 10px;
+    --top-container-child-padding: 10px;
+
+    --mission-status-width: 300px;
+    --mission-progresson-info-width: 300px;
+
+    --top-middle-container-child-margin: 10px;
+    --left-column-width: 300px;
+
+    --distance-between-accept-deny-buttons: 100px;
+
+    /* Color Theme */
+    --bg-app: #f1f5f9;          /* Very light blue-grey background */
+    --bg-panel: #ffffff;        /* Pure white for containers */
+    --text-primary: #1e293b;    /* Dark slate for main text */
+    --text-secondary: #64748b;  /* Lighter grey for labels */
+    --button-color: #ffffff;
+    --accent-blue: #0284c7;     /* Zenith Blue */
+    --accent-blue-hover: #0369a1;
+    --accent-green: #10b981;    /* Success/Accept */
+    --accent-red: #ef4444;      /* Danger/Abort/Deny */
+    --border-color: #e2e8f0;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+
+    
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('/fonts/Inter.woff2') format('woff2');
+}
+
+/* Dark Theme Overrides */
+[data-theme="dark"] {
+    --bg-app: #0f172a;          /* Dark Slate 900 */
+    --bg-panel: #1e293b;        /* Dark Slate 800 */
+    --text-primary: #f1f5f9;    /* Very Light Grey */
+    --text-secondary: #94a3b8;  /* Muted Blue-Grey */
+    --button-color: #0f172a;
+    --border-color: #334155;    /* Darker Border */
+    --shadow-sm: none;          /* Remove shadows in dark mode (flat look) */
+}
+
+/* Optional: In dark mode, make the logs slightly darker than the panel */
+[data-theme="dark"] .logs-container {
+    background-color: #020617; 
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    height: 100vh;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+}
+
+/* --- Layout Structure --- */
+
+.main-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--bg-app);
+}
+
+.left-container{
+    display: flex;
+    width: calc(100% - var(--log-width) - var(--left-container-margin));
+    height: 100%;
+    /* background-color: orange; */
+    margin-right: var(--left-container-margin);
+    flex-direction: column;
+    overflow-y: auto;
+    min-width: 720px;
+}
+
+/* --- Panel Styling helper --- */
+/* We apply this look to all your containers to replace the bright colors */
+.mission-status-info-container,
+.mission-progresson-info-container,
+.zenith-logo-container,
+.button-container,
+.image-display-container,
+.toggle-gimbal-control-container,
+.confirm-deny-container,
+.logs-container,
+.bottom-container {
+    display: flex;
+    background-color: var(--bg-panel);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+/* --- Top Section --- */
+
+.top-container {
+    display: flex;
+    width: 100%;
+    height: var(--top-container-height);
+    min-height: var(--top-container-height);
+    /* background-color: purple; */
+}
+
+.mission-status-info-container {
+    display: flex;
+    width: var(--mission-status-width);
+    height: calc(100% - (2 * var(--top-container-child-margin)));
+    margin: var(--top-container-child-margin);
+    margin-left: var(--top-middle-container-child-margin);
+    padding: var(--top-container-child-padding);
+    flex-direction: column;
+}
+
+.mission-status-info-container > span,
+.mission-progresson-info-container > span {
+    margin: auto 10px auto;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.mission-status-info-container > span:first-child {
+    color: var(--accent-blue);
+}
+
+.mission-progresson-info-container {
+    width: var(--mission-progresson-info-width);
+    height: calc(100% - (2 * var(--top-container-child-margin)));
+    flex-direction: column;
+    margin: var(--top-container-child-margin);
+    padding: var(--top-container-child-padding);
+}
+
+.zenith-logo-container {
+    width: calc(100% - var(--mission-progresson-info-width) - var(--mission-status-width) - 6 * var(--top-container-child-margin) + var(--top-middle-container-child-margin));
+    height: calc(100% - (2 * var(--top-container-child-margin)));
+    margin: var(--top-container-child-margin);
+}
+
+.zenith-logo-container > img {
+    height: 80px;
+    margin-right: 20px;
+    margin: auto 0;
+    margin-left: 40px;
+    cursor: pointer;
+}
+
+.zenith-logo-container > h2 {
+    margin: auto;
+    color: var(--text-primary);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* --- Middle Top Section --- */
+
+.middle-top-container {
+    display: flex;
+    width: 100%;
+    height: calc(100% - var(--top-container-height) - var(--middle-bottom-container-height) - var(--bottom-container-height));
+    min-height: 400px;
+    /* background-color: forestgreen; */
+    flex-grow: 1
+}
+
+.button-container {
+    display: flex;
+    color: var(--text-primary);
+    margin: var(--top-middle-container-child-margin);
+    height: calc(100% - 2 * var(--top-middle-container-child-margin));
+    width: calc(var(--left-column-width) - 2 * var(--top-middle-container-child-margin));
+    padding: 0 10px;
+    flex-direction: column;
+    border-bottom: 2px solid var(--bg-app);
+}
+
+.button-container > h3 {
+    margin: 10px auto;
+    height: auto;
+}
+
+.buttons-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+    height: auto;
+    padding: 0 5px;
+    overflow-y: auto;
+}
+
+.buttons-grid > button {
+    border: 1px solid var(--border-color);
+    background-color: var(--button-color);
+    color: var(--text-primary);
+    height: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 0 var(--border-color);
+}
+
+.buttons-grid > button:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 0 var(--border-color);
+}
+
+.buttons-grid > button:active {
+    transform: translateY(1px);
+    box-shadow: none;
+    background-color: #f1f5f9;
+}
+
+/* Special styling for specific buttons */
+#start-button {
+    background-color: var(--accent-blue);
+    color: white;
+    border: none;
+    box-shadow: 0 2px 0 #026aa0;
+}
+#start-button:hover {
+    background-color: var(--accent-blue-hover);
+    color: white;
+}
+#abort-button {
+    color: var(--accent-red);
+    border-color: #fecaca;
+}
+#abort-button:hover {
+    background-color: var(--accent-red);
+    color: white;
+}
+
+.image-display-container {
+    display: flex;
+    margin: var(--top-middle-container-child-margin);
+    height: calc(100% - 2 * var(--top-middle-container-child-margin));
+    width: calc(100% - var(--left-column-width) - 2 * var(--top-middle-container-child-margin));
+}
+
+.target-image {
+    margin: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Ensures image aspect ratio is preserved */
+}
+
+/* --- Middle Bottom Section --- */
+
+.middle-bottom-container {
+    display: flex;
+    width: 100%;
+    height: var(--middle-bottom-container-height);
+    min-height: var(--middle-bottom-container-height);
+}
+
+.toggle-gimbal-control-container {
+    display: flex;
+    margin: var(--top-middle-container-child-margin);
+    height: calc(100% - 2 * var(--top-middle-container-child-margin));
+    width: calc(var(--left-column-width) - 2 * var(--top-middle-container-child-margin));
+}
+
+.confirm-deny-container {
+    display: flex;
+    flex-grow: 1;
+    margin: var(--top-middle-container-child-margin);
+    height: calc(100% - 2 * var(--top-middle-container-child-margin));
+    width: calc(100% - var(--left-column-width) - 2 * var(--top-middle-container-child-margin));
+}
+
+.confirm-deny-container > button {
+    border: none;
+    color: white;
+    height: 60px;
+    font-size: 1rem;
+    font-weight: bold;
+    /* padding: 8px 5px; */
+    padding: 0 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--shadow-sm);
+    width: 140px;
+}
+
+.accept-image-button {
+    background-color: var(--accent-green);
+    margin: auto;
+    margin-right: calc(var(--distance-between-accept-deny-buttons) / 2);
+}
+.accept-image-button:hover { background-color: #059669; }
+
+.accept-image-button:active { background-color: #08553d; }
+
+
+.deny-image-button {
+    background-color: var(--accent-red);
+    margin: auto;
+    margin-left: calc(var(--distance-between-accept-deny-buttons) / 2);
+}
+.deny-image-button:hover { background-color: #dc2626; }
+
+.deny-image-button:active { background-color: #7e0707; }
+
+
+/* --- Bottom Section (Slider) --- */
+
+.bottom-container {
+    display: flex;
+    width: 100%;
+    height: var(--bottom-container-height);
+    min-height: var(--bottom-container-height);
+}
+
+/* --- Sidebar Logs --- */
+
+.logs-container {
+    display: flex;
+    width: var(--log-width);
+    height: 100%;
+    flex-direction: column;
+    padding: var(--log-padding);
+    background-color: #1e293b; /* Terminal dark theme for logs */
+    color: #38bdf8; /* Light blue terminal text */
+    overflow-y: auto;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.logs-container > span {
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 4px;
+    flex-shrink: 0;
+    font-family: inherit; /* Ensure monospace inherits */
+}
+
+/* --- Switch Styling --- */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+  margin: auto;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #cbd5e1;
+  transition: .4s;
+  border-radius: 34px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px; width: 20px;
+  left: 4px; bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+input:checked + .slider { background-color: var(--accent-blue); }
+input:checked + .slider:before { transform: translateX(22px); }
+
+.toggle-gimbal-control-container > span {
+    margin: auto;
+    font-weight: bold;
+}

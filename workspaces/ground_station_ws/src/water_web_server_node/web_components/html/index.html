@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super page de Zenith</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+</head>
+<body>
+    <div class="main-container">
+        <div class="left-container">
+            <div class="top-container">
+                <div class="mission-status-info-container">
+                    <span id="mission-status-span">Mission Status: IDDLE</span>
+                    <span id="connection-span">Connection: Conneted</span>
+                </div>
+                <div class="mission-progresson-info-container">
+                    <span id="time-to-reach-site-span">Time to reach site: XX:XX</span>
+                    <span id="target-shot-span">Target Shot: X</span>
+                </div>
+                <div class="zenith-logo-container">
+                    <img src="/images/LOGO.png" alt="logo" id="logo-image">
+                    <h2>Zenith Mission 2 Control Page</h2>
+                </div>
+            </div>
+            <div class="middle-top-container">
+                <div class="button-container">
+                    <h3>Buttons</h3>
+                    <div class="buttons-grid">
+                        <button id="start-button">Start</button>
+                        <button id="go-to-site-button">Go To Site</button>
+                        <button id="auto-approach-button">Auto Approach</button>
+                        <button id="auto-shoot-button">Auto Shoot</button>
+                        <button id="shoot-button">Shoot</button>
+                        <button id="take-picture-button">Take Picture</button>
+                        <button id="abort-button">Abort</button>
+                    </div>
+                </div>
+                <div class="image-display-container">
+                    <img class="target-image" src="/images/targets/rgb_0012.png" alt="target">
+                </div>
+            </div>
+            <div class="middle-bottom-container">
+                <div class="toggle-gimbal-control-container">
+                    <span>Gimbal Control</span>
+                    <label class="switch">
+                        <input type="checkbox" id="gimbal-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="confirm-deny-container">
+                    <button id="accept-image-button" class="accept-image-button">Accept</button>
+                    <button id="deny-image-deny" class="deny-image-button">Deny</button>
+                </div>
+            </div>
+            <div class="bottom-container">
+                <div class="gimbal-slider"></div>                
+            </div>
+        </div>
+        <div class="logs-container">
+            <span>THIS IS A LOG EXAMPLE</span>
+            <span>THIS IS A LOG EXAMPLE</span>
+            <span>THIS IS A LOG EXAMPLE</span>
+            <span>THIS IS A LOG EXAMPLE</span>
+            <span>THIS IS A LOG EXAMPLE</span>
+            <span>THIS IS A LOG EXAMPLE</span>
+            <span>THIS IS A LOG EXAMPLE</span>
+            <span>THIS IS A LOG EXAMPLE</span>
+        </div>
+    </div>
+    <script src="/js/script.js"></script>
+</body>
+</html>
