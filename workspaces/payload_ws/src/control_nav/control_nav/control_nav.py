@@ -36,6 +36,8 @@ class ControlNav(Node):
         
         # Publisher
         self.publisher_raw = self.create_publisher(PositionTarget, '/mavros/setpoint_raw/local', 10)
+        self.lap_finished_pub = self.create_publisher(Bool, '/mission/control_nav/lap/finished', 10)
+        self.move_to_scene_pub = self.create_publisher(Bool, '/mission/control_nav/move_to_scene/finished', 10)
         
         # Subscribers
         # Lap specific subscriber
@@ -62,23 +64,20 @@ class ControlNav(Node):
     
     def initialize_parameters(self):
         ## Param decalration
-        self.declare_parameter('json_filename', 'lap_waypoints_colin.json')
+        self.declare_parameter('json_filename', 'lap_waypoints.json')
         self.declare_parameter('json_subfolder', 'data')
-        # We could remove the `number_of_laps` variable, but for now, 999 makes it basicly infinit
-        self.declare_parameter('number_of_laps', 999)
         self.declare_parameter('delais_for_position_check', 0.5)
         self.declare_parameter('distance_from_objectif_threashold', 3.0)
         
         #Pour julien
-        #self.declare_parameter('latitude_of_scene', -35.361450)
-        #self.declare_parameter('longitude_of_scene', 149.161448)
+        self.declare_parameter('latitude_of_scene', -35.361450)
+        self.declare_parameter('longitude_of_scene', 149.161448)
         #Pour Colin 
-        self.declare_parameter('latitude_of_scene', -34.357147)
-        self.declare_parameter('longitude_of_scene', 150.163406)
+        # self.declare_parameter('latitude_of_scene', -34.357147)
+        # self.declare_parameter('longitude_of_scene', 150.163406)
 
         self.declare_parameter('altitude_of_scene', 10.0)
         
-        self.number_of_laps = self.get_parameter('number_of_laps').get_parameter_value().integer_value
         self.delais_for_position_check = self.get_parameter('delais_for_position_check').get_parameter_value().double_value
         self.distance_from_objectif_threashold = self.get_parameter('distance_from_objectif_threashold').get_parameter_value().double_value
         
@@ -221,6 +220,7 @@ class ControlNav(Node):
         self.current_lap = 0
         self.is_doing_laps = True
         self.is_moving_to_position = True
+        self.stop_after_finishing_lap = False
         self.is_last_lap = False
         self.lap_waypoint_index = 0
         
@@ -236,16 +236,18 @@ class ControlNav(Node):
         if len(self.waypoints_raw) == self.lap_waypoint_index:
             self.lap_waypoint_index = 0
             self.current_lap += 1
-            if self.current_lap == self.number_of_laps or self.stop_after_finishing_lap:
-                if not self.is_last_lap:
-                    self.is_last_lap = True
-                    self.move_to_pose(self.waypoints_raw[0].pose.position)
-                self.is_moving_to_position = False
-                self.is_doing_laps = False
-                self.current_lap = 0
-                self.get_logger().info("Finised laps")
-                return
-                
+            if self.stop_after_finishing_lap and not self.is_last_lap:
+                self.get_logger().info(f"Moving to inital")
+                self.is_last_lap = True
+        elif self.stop_after_finishing_lap and (self.is_last_lap or self.lap_waypoint_index == 1):
+            self.is_moving_to_position = False
+            self.is_doing_laps = False
+            self.current_lap = 0
+            self.get_logger().info("Finised laps")
+            lap_finished_msg = Bool()
+            lap_finished_msg.data = True
+            self.lap_finished_pub.publish(lap_finished_msg)
+            return
         self.move_to_pose(self.waypoints_raw[self.lap_waypoint_index].pose.position)
         
     def calculate_distance_from_point(self, point_1):
@@ -269,6 +271,9 @@ class ControlNav(Node):
                 self.handle_reach_waypoint()
             else:
                 self.is_moving_to_position = False
+                reached_site_msg = Bool()
+                reached_site_msg.data = True
+                self.move_to_scene_pub.publish(reached_site_msg)
     
     # Stop the drone in current place
     def stop_current_lap(self):

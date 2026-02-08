@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y \
     geographiclib-tools \
     && rm -rf /var/lib/apt/lists/* 
   
-# Use the correct GeographicLib script  
+
 RUN /opt/ros/humble/lib/mavros/install_geographiclib_datasets.sh  
 
 RUN apt-get update && apt-get install -y \
@@ -59,6 +59,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN apt-get update && apt-get install -y \
     ros-${ROS_DISTRO}-zed-msgs \
+    ros-${ROS_DISTRO}-foxglove-bridge \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
