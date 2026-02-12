@@ -1,15 +1,6 @@
 # config/zed2i_image_od_only.yaml  
 /**:  
-    ros__parameters:
-        stream_server:  
-            stream_enabled: true          # Start streaming at launch  
-            codec: 'H264'                # H264 for broad compatibility; H265 may not be supported  
-            port: 30000                  # Even port; ensure firewall/router allows this  
-            bitrate: 4000                # Lower bitrate for wireless links (1000–60000 Kbit/s)  
-            gop_size: 15                 # Smaller GOP for quicker recovery from packet loss (max 256; -1=default)  
-            adaptative_bitrate: true     # Enable to adapt to varying link quality  
-            chunk_size: 8192             # Smaller chunks reduce corruption impact (1024–65000)  
-            target_framerate: 10  
+    ros__parameters: 
               
         # General settings  
         general:  
