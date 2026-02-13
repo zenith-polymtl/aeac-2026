@@ -43,12 +43,30 @@
             </div>
             <div class="middle-bottom-container">
                 <div class="toggle-gimbal-control-container">
-                    <span>Gimbal Control</span>
-                    <label class="switch">
-                        <input type="checkbox" id="gimbal-toggle">
-                        <span class="slider"></span>
-                    </label>
+                    <div style="display: flex; align-items: center; gap: 2px;">
+                        <span>Gimbal Mode</span>
+                        <div style="display: flex; justify-content: center;">
+                            <button type="button" id="btn-follow" class="mode-btn"
+                                style="padding: 8px 20px; font-weight: bold; transition: 0.2s;
+                                    background-color: #007bff; color: white;">
+                                Follow
+                            </button>
+
+                            <button type="button" id="btn-lock" class="mode-btn"
+                                style="padding: 8px 20px; font-weight: bold; transition: 0.2s;
+                                    background-color: #007bff; color: white; ">
+                                Lock
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="orientation-display">
+                        <div><strong>Mode:</strong> <span id="gimbal-mode-val"></span></div>
+                        <div><strong>Pitch:</strong> <span id="pitch-val"></span>°</div>
+                        <div><strong>Yaw:</strong> <span id="yaw-val"></span>°</div>
+                    </div>
                 </div>
+
                 <div class="confirm-deny-container">
                     <button id="accept-image-button" class="accept-image-button">Accept</button>
                     <button id="deny-image-deny" class="deny-image-button">Deny</button>

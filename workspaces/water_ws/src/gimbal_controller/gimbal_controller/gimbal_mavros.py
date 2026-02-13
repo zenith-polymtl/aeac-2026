@@ -1,12 +1,8 @@
 import rclpy
 from rclpy.node import Node
 import math
-
-from mavros_msgs.msg import MountControl
-from mavros_msgs.srv import MountConfigure
-from custom_interfaces.msg import AimError
-from geometry_msgs.msg import Quaternion
-from std_srvs.srv import SetBool
+from std_msgs.msg import Bool
+from custom_interfaces.msg import AimError, GimbalState
 from tf_transformations import euler_from_quaternion
 from mavros_msgs.msg import GimbalManagerSetPitchyaw, GimbalDeviceAttitudeStatus
 
@@ -54,13 +50,21 @@ class GremsyMavros(Node):
         self.yaw_prev_error = 0.0
         self.last_update_time = self.get_clock().now()
 
-        self.gimbal_mode = 2 # 1=LOCK, 2=FOLLOW
+        self.gimbal_mode = GimbalMode.FOLLOW
         
         # --- Publishers ---
         self.mavros_pub = self.create_publisher(GimbalManagerSetPitchyaw, '/mavros/gimbal_control/manager/set_pitchyaw', 10)
 
+        self.state_timer = self.create_timer(0.5, self.publish_state)
+        self.state_pub = self.create_publisher(GimbalState, '/aeac/external/gimbal/state', 10)
+
         # --- Subscribers ---
-        self.create_subscription(AimError, '/gimbal/target_error', self.aiming_callback, 10)
+
+        self.create_subscription(Bool, '/aeac/external/gimbal/lock_mode', self.enable_lock_mode_callback, 10)
+
+        self.create_subscription(AimError, '/aeac/external/gimbal/move', self.gimbal_move_callback, 10)
+
+        self.create_subscription(AimError, '/aeac/internal/gimbal/target_error', self.aiming_callback, 10)
         
         self.sub_orientation = self.create_subscription(
             GimbalDeviceAttitudeStatus,
@@ -74,11 +78,16 @@ class GremsyMavros(Node):
 
         self.last_sent_pitch_vel = 0.0
         self.last_sent_yaw_vel = 0.0
-        
-        # --- Services ---
-        self.create_service(SetBool, '/gimbal/lock_mode', self.enable_lock_mode_callback)
 
         self.get_logger().info("Gimbal MAVROS ready.")
+
+    def publish_state(self):
+        state_msg = GimbalState()
+        mode_str = "LOCK" if self.gimbal_mode == GimbalMode.LOCK else "FOLLOW"
+        state_msg.mode = mode_str
+        state_msg.pitch = self.current_pitch
+        state_msg.yaw = self.current_yaw
+        self.state_pub.publish(state_msg)
 
     def gimbal_attitude_callback(self, msg):
         q = msg.q
@@ -102,24 +111,18 @@ class GremsyMavros(Node):
         self.yaw_prev_error = 0.0
         self.last_update_time = self.get_clock().now()
 
-    def enable_lock_mode_callback(self, request, response):
+    def enable_lock_mode_callback(self, msg):
         self.reset_pid_memory()
 
-        new_mode = GimbalMode.LOCK if request.data else GimbalMode.FOLLOW
+        new_mode = GimbalMode.LOCK if msg.data else GimbalMode.FOLLOW
 
         if new_mode == GimbalMode.LOCK:
-            self.gimbal_mode = new_mode
             self.send_speed_cmd(0.0, 0.0)
-            response.success = True
-            response.message = "Changed mode to LOCK"
-
         elif new_mode == GimbalMode.FOLLOW:
-            self.gimbal_mode = new_mode
             self.send_position_cmd(0.0, 0.0)
-            response.success = True
-            response.message = "Changed mode to FOLLOW"
 
-        return response
+        self.gimbal_mode = new_mode
+        self.publish_state()
 
     def check_angle_limit(self, target_vel_pitch, target_vel_yaw):
         # --- SECURITY PITCH ---
@@ -140,6 +143,12 @@ class GremsyMavros(Node):
         
         return target_vel_pitch, target_vel_yaw
     
+    def gimbal_move_callback(self, msg):
+        if self.gimbal_mode != GimbalMode.LOCK:
+            return
+
+        self.send_speed_cmd(msg.pitch_error, msg.yaw_error)
+
     def aiming_callback(self, msg):
         if self.gimbal_mode != GimbalMode.LOCK:
             return

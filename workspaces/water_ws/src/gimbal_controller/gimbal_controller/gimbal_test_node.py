@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 from custom_interfaces.msg import AimError
 from std_srvs.srv import SetBool
+from std_msgs.msg import Bool
 from geometry_msgs.msg import TwistStamped 
 from mavros_msgs.srv import CommandBool, SetMode, CommandTOL
 import sys, select, termios, tty
@@ -38,10 +39,10 @@ class PIDTester(Node):
     def __init__(self):
         super().__init__('pid_tester_keys')
         
-        self.aim_pub = self.create_publisher(AimError, '/gimbal/target_error', 10)
+        self.aim_pub = self.create_publisher(AimError, '/aeac/internal/gimbal/target_error', 10)
         self.vel_pub = self.create_publisher(TwistStamped, '/mavros/setpoint_velocity/cmd_vel', 10)
+        self.mode_pub = self.create_publisher(Bool, '/aeac/external/gimbal/lock_mode', 10)
         
-        self.mode_client = self.create_client(SetBool, 'gimbal/lock_mode')
         self.arming_client = self.create_client(CommandBool, '/mavros/cmd/arming')
         self.takeoff_client = self.create_client(CommandTOL, '/mavros/cmd/takeoff')
         self.set_mode_client = self.create_client(SetMode, '/mavros/set_mode')
@@ -163,9 +164,7 @@ class PIDTester(Node):
             self.get_logger().error(f"Erreur loop: {e}")
 
     def call_mode_service(self, val):
-        req = SetBool.Request()
-        req.data = val
-        self.mode_client.call_async(req)
+        self.mode_pub.publish(Bool(data=val))
 
 def main(args=None):
     rclpy.init(args=args)
