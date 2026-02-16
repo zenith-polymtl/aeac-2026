@@ -40,23 +40,43 @@ class AutonomousApproach(Node):
         qos_reliable = self._create_qos_profile(QoSReliabilityPolicy.RELIABLE)
         self.auto_approach_sub = self.create_subscription(
             Bool,
-            '/auto_approach',
+            '/aeac/external/auto_approach/start',
             self.auto_approach_activation_callback,
             10
         )
-
-        self.target_acquired_sub = self.create_subscription(
+        
+        self.in_position_to_shoot_sub = self.create_subscription(
             Bool,
-            '/target_acquired',
-            self.target_acquired_callback,
+            '/aeac/internal/auto_approach/in_position',
+            self.in_position_callback,
+            10
+        )
+        
+        self.auto_approach_sub = self.create_subscription(
+            Bool,
+            '/aeac/external/auto_shot/start',
+            self.auto_shoot_activation_callback,
             10
         )
 
-        self.in_position_sub = self.create_subscription(
+        self.target_aimed_sub = self.create_subscription(
             Bool,
-            '/in_position',
+            '/aeac/internal/auto_shot/target_aimed',
             self.in_position_callback,
             10
+        )
+        
+        self.shoot_sub = self.create_subscription(
+            Bool,
+            '/aeac/external/shoot',
+            self.in_position_callback,
+            10
+        )
+        
+        self.start_HR_aiming_pub = self.create_publisher(
+            Bool,
+            '/aeac/internal/start_hr_aiming',
+            qos_reliable
         )
 
         self.aim_pub = self.create_publisher(
@@ -69,12 +89,6 @@ class AutonomousApproach(Node):
             Bool,
             '/aimed_topic',
             self.aimed_callback,
-            qos_reliable
-        )
-
-        self.shoot_pub = self.create_publisher(
-            Bool,
-            '/shoot_topic',
             qos_reliable
         )
 
@@ -106,7 +120,11 @@ class AutonomousApproach(Node):
             self.get_logger().info("Autonomous approach deactivated.")
             self.define_initial_state()
 
-    def target_acquired_callback(self, msg):
+    def auto_shoot_activation_callback(self, msg):
+        pass
+    
+    
+    def in_position_callback(self, msg):
         self.target_acquired = msg.data
         if self.target_acquired:
             self.get_logger().info("Target acquired.")
