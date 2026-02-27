@@ -1,6 +1,7 @@
 # config/zed2i_image_od_only.yaml  
 /**:  
-    ros__parameters:  
+    ros__parameters: 
+              
         # General settings  
         general:  
             camera_name: 'zed2i'

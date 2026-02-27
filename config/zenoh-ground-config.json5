@@ -6,26 +6,20 @@
         publishers: [  
           "/tf",  
           "/tf_static",  
-          "/zed/zed_node/rgb/color/rect/image/compressed",  
-          "/zed/zed_node/mapping/fused_cloud",  
+          "/zed/zed_node/rgb/color/rect/image/compressed",   
           "/zed/zed_node/rgb/color/rect/image/camera_info",  
           "/zed/zed_node/rgb/color/rect/camera_info",  
           "/zed/zed_node/status/heartbeat",  
-          "/zed/zed_node/odom",
-          "/chatter",  
-          "/mavros.*"  
+          "/chatter",   
         ],  
         subscribers: [  
           "/tf",  
           "/tf_static",  
-          "/zed/zed_node/rgb/color/rect/image/compressed",  
-          "/zed/zed_node/mapping/fused_cloud",  
+          "/zed/zed_node/rgb/color/rect/image/compressed",   
           "/zed/zed_node/rgb/color/rect/image/camera_info",  
           "/zed/zed_node/rgb/color/rect/camera_info",  
           "/zed/zed_node/status/heartbeat",  
-          "/zed/zed_node/odom",
           "/chatter",  
-          "/mavros.*"  
         ]  
       }  
     }  
