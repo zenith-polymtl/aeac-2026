@@ -83,6 +83,9 @@ zenoh-ground: ## Start zenoh ground bridge
 zenoh-air: ## Start zenoh air bridge
 	docker compose -f compose/zenoh-air.yml up --build
 
+zenoh-build:
+	
+	docker build -f docker/dockerfile.zenoh-mdns -t zenoh-bridge-ros2dds:mdns .
 
 # ===== Docker lifecycle (selected compose) =====
 build: ## Build image for C

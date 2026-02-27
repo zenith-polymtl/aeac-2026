@@ -9,3 +9,5 @@ services:
       - ROS_DOMAIN_ID=3
       - RUST_LOG=debug
       - ROS_DISTRO=humble
+    extra_hosts:  
+      - "host.docker.internal:host-gateway"  

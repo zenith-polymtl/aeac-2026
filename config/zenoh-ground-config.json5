@@ -7,10 +7,11 @@
           "/tf",  
           "/tf_static",  
           "/zed/zed_node/rgb/color/rect/image/compressed",  
-          "/zed/zed_node/point_cloud/cloud_registered",
-          "/zed/zed_node/rgb/color/rect/image/camera_info", 
-          "/zed/zed_node/rgb/color/rect/camera_info", 
-          "/zed/zed_node/status/heartbeat",
+          "/zed/zed_node/mapping/fused_cloud",  
+          "/zed/zed_node/rgb/color/rect/image/camera_info",  
+          "/zed/zed_node/rgb/color/rect/camera_info",  
+          "/zed/zed_node/status/heartbeat",  
+          "/zed/zed_node/odom",
           "/chatter",  
           "/mavros.*"  
         ],  
@@ -18,10 +19,11 @@
           "/tf",  
           "/tf_static",  
           "/zed/zed_node/rgb/color/rect/image/compressed",  
-          "/zed/zed_node/point_cloud/cloud_registered",
+          "/zed/zed_node/mapping/fused_cloud",  
           "/zed/zed_node/rgb/color/rect/image/camera_info",  
-          "/zed/zed_node/rgb/color/rect/camera_info",
-          "/zed/zed_node/status/heartbeat",
+          "/zed/zed_node/rgb/color/rect/camera_info",  
+          "/zed/zed_node/status/heartbeat",  
+          "/zed/zed_node/odom",
           "/chatter",  
           "/mavros.*"  
         ]  
@@ -31,15 +33,27 @@
   mode: "peer",  
   connect: {  
     endpoints: [  
-      "tcp/192.168.0.11:7447",  
-      "tcp/192.168.30.208:7447",
-      "tcp/192.168.0.194:7447",
-      "tcp/192.168.30.202:7447"
+      "tcp/jetson-os.local:7447",  
+      "tcp/192.168.0.12:7447"  
     ]  
   },  
   listen: {  
     endpoints: [  
       "tcp/0.0.0.0:7447"  
     ]  
-  }  
+  },  
+scouting: {  
+    multicast: {  
+      enabled: true,  
+      address: "224.0.0.224:7446",  
+      interface: "auto",  
+      autoconnect: { router: ["router"] },  // Changed from "router" to ["router"]  
+      listen: true  
+    },  
+    gossip: {  
+      enabled: true,  
+      multihop: false,  
+      autoconnect: { router: ["router"] }   // Changed from "router" to ["router"]  
+    }  
+  }
 }
