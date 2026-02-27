@@ -181,6 +181,7 @@ gcs: up
 	    source install/setup.bash; \
 		colcon build --packages-select web_server_node custom_interfaces; \
 	    ros2 daemon start; \
+		source install/setup.bash; \
 	    ros2 run web_server_node web_server_node \
 	  '
 
