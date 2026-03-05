@@ -147,6 +147,18 @@ payload-stack:
 	    ros2 daemon start; \
 	    exec bash -i'
 
+water-stack:
+	docker compose -f compose/water.yml up -d --build
+
+	# Enter water dev shell (your original behavior)
+	WS=$(WS_IN) docker compose -f compose/water.yml exec -it water \
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    colcon build; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    exec bash -i'
 
 mavros-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \

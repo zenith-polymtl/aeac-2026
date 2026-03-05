@@ -3,7 +3,7 @@ services:
     build:
       context: ..
       dockerfile: docker/dockerfile.water
-    container_name: aeac-${C}
+    container_name: aeac-water
     network_mode: host
     tty: true
     stdin_open: true
@@ -19,7 +19,8 @@ services:
     command: ["bash","-lc","while :; do sleep 86400; done"]
     environment:  
       - ROS_DOMAIN_ID=2
-      - RMW_IMPLEMENTATION=rmw_zenoh_cpp
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
 
   zenoh-bridge-air:  
     image: eclipse/zenoh-bridge-ros2dds:latest  
