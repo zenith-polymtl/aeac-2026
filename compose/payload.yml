@@ -3,7 +3,7 @@ services:
     build:
       context: ..
       dockerfile: docker/dockerfile.payload
-    container_name: aeac-${C}
+    container_name: aeac-payload
     network_mode: host
     tty: true
     stdin_open: true
