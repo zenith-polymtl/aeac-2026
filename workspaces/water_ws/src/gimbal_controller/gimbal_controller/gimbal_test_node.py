@@ -128,16 +128,16 @@ class PIDTester(Node):
                 
                 # --- DRONE ---
                 elif k == 'w': 
-                    vy = DRONE_SPEED
+                    vx = DRONE_SPEED
                     user_input_active = True
                 elif k == 's': 
-                    vy = -DRONE_SPEED
-                    user_input_active = True
-                elif k == 'a': 
                     vx = -DRONE_SPEED
                     user_input_active = True
+                elif k == 'a': 
+                    vy = DRONE_SPEED
+                    user_input_active = True
                 elif k == 'd': 
-                    vx = DRONE_SPEED
+                    vy = -DRONE_SPEED
                     user_input_active = True
                 elif k == 'q': 
                     vyaw = DRONE_ROT_SPEED

@@ -73,15 +73,15 @@ class GremsyMavros(Node):
         self.create_subscription(AimError, '/aeac/external/gimbal/move', self.gimbal_move_callback, 10)
 
         self.create_subscription(AimError, '/aeac/internal/gimbal/target_error', self.aiming_callback, 10)
+
+        self.mode_sub = self.create_subscription(Bool, '/aeac/external/gimbal/lock_mode', self.enable_lock_mode_callback, 10)
+
         
         self.sub_orientation = self.create_subscription(
             GimbalDeviceAttitudeStatus,
             '/mavros/gimbal_control/device/attitude_status',
             self.gimbal_attitude_callback,
             10)
-        
-        # --- Services ---
-        self.create_service(SetBool, '/gimbal/lock_mode', self.enable_lock_mode_callback)
 
         self.get_logger().info("Gimbal MAVROS ready.")
 
@@ -122,15 +122,11 @@ class GremsyMavros(Node):
 
         if new_mode == GimbalMode.LOCK:
             self.send_speed_cmd(0.0, 0.0)
-            response.success = True
-            response.message = "Changed mode to LOCK"
             self.get_logger().info("Changed mode to LOCK.")
 
 
         elif new_mode == GimbalMode.FOLLOW:
             self.send_position_cmd(0.0, 0.0)
-            response.success = True
-            response.message = "Changed mode to FOLLOW"
             self.get_logger().info("Changed mode to FOLLOW.")
 
         self.gimbal_mode = new_mode
