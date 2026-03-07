@@ -62,6 +62,12 @@ zed-launch:
 	  source /root/ros2_ws/install/setup.bash; \
 	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml \
 	'
+zed-launch-mini:
+	docker compose -f compose/zed.yml up -d zed-ros2
+	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
+	  source /root/ros2_ws/install/setup.bash; \
+	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zedm ros_params_override_path:=config/zenith_stereo_mini.yaml \
+	'
 
 zed-launch-copy:
 	docker compose -f compose/zed.yml up -d zed-ros2
@@ -149,6 +155,14 @@ payload-stack:
 
 water-stack:
 	docker compose -f compose/water.yml up -d --build
+	
+	docker compose -f compose/water.yml exec -T zed-ros2 bash -lc " \
+		source /root/ros2_ws/install/setup.bash && \
+		nohup ros2 launch zed_wrapper zed_camera.launch.py \
+			camera_model:=zed2i \
+			ros_params_override_path:=config/zenith_stereo.yaml \
+			> /tmp/zed_launch.log 2>&1 & \
+	"
 
 	# Enter water dev shell (your original behavior)
 	WS=$(WS_IN) docker compose -f compose/water.yml exec -it water \

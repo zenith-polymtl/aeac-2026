@@ -57,71 +57,76 @@
           
         # Object Detection - CUSTOM ONNX MODEL  
         object_detection:  
-            od_enabled: false 
-            detection_model: 'MULTI_CLASS_BOX_FAST' 
+            od_enabled: true 
+            enable_tracking: true
+            
+            detection_model: 'CUSTOM_YOLOLIKE_BOX_OBJECTS'
             custom_onnx_file: '/root/ros2_ws/models/phase1_nano.onnx'  
+            custom_onnx_file: '/root/ros2_ws/models/phase1_nano.yaml'  
             custom_onnx_input_size: 640  
             custom_class_count: 8
+
+            max_range: 10.0  
+            confidence_threshold: 50.0
+
+            filtering_mode: 'NMS3D'
+            allow_reduced_precision_inference: true    
+            prediction_timeout: 2.0 
+          
             
             # Class definitions based on phase1_nano.yaml
-            #class_000:
+            # class_000:
             #    label: 'window'
             #    model_class_id: 0
             #    enabled: true
-            #
-            #class_001:
+            
+            # class_001:
             #    label: 'door'
             #    model_class_id: 1
             #    enabled: true
-            #
-            #class_002:
+            
+            # class_002:
             #    label: 'red circle'
             #    model_class_id: 2
             #    enabled: true
             #    is_grounded: false
             #    is_static: true
-            #
-            #class_003:
+            
+            # class_003:
             #    label: 'green circle'
             #    model_class_id: 3
             #    enabled: true
             #    is_grounded: false
             #    is_static: true
-            #
-            #class_004:
+            
+            # class_004:
             #    label: 'blue circle'
             #    model_class_id: 4
             #    enabled: true
             #    is_grounded: false
             #    is_static: true
-            #
-            #class_005:
+            
+            # class_005:
             #    label: 'yellow circle'
             #    model_class_id: 5
             #    enabled: true
             #    is_grounded: false
             #    is_static: true
-            #
-            #class_006:
+            
+            # class_006:
             #    label: 'white circle'
             #    model_class_id: 6
             #    enabled: true
             #    is_grounded: false
             #    is_static: true
-            #
-            #class_007:
+            
+            # class_007:
             #    label: 'black circle'
             #    model_class_id: 7
             #    enabled: true
             #    is_grounded: false
             #    is_static: true
-            
-            allow_reduced_precision_inference: true  
-            max_range: 12.0  
-            confidence_threshold: 50.0  
-            prediction_timeout: 0.2  
-            enable_tracking: false  
-          
+
         # Jetson optimization  
         advanced:  
             thread_sched_policy: 'SCHED_FIFO'  
