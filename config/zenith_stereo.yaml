@@ -43,10 +43,9 @@
           
         # POSITIONAL TRACKING DISABLED  
         pos_tracking:  
-            pos_tracking_enabled: false  # DISABLED - no SLAM  
-            publish_tf: false  
-            publish_map_tf: false  
-          
+            pos_tracking_enabled: true   # Set to true if using Object Detection
+            publish_tf: false            # Keep this false to avoid messy TF trees
+            publish_map_tf: false          
         # MAPPING DISABLED  
         mapping:  
             mapping_enabled: false  # DISABLED - no SLAM  
@@ -57,12 +56,12 @@
           
         # Object Detection - CUSTOM ONNX MODEL  
         object_detection:  
-            od_enabled: true 
+            od_enabled: false 
             enable_tracking: true
             
             detection_model: 'CUSTOM_YOLOLIKE_BOX_OBJECTS'
-            custom_onnx_file: '/root/ros2_ws/models/phase1_nano.onnx'  
-            custom_onnx_file: '/root/ros2_ws/models/phase1_nano.yaml'  
+            custom_onnx_file: '/root/ros2_ws/models/phase1_rect.onnx'  
+            custom_label_file: '/root/ros2_ws/models/phase1_rect.yaml'  
             custom_onnx_input_size: 640  
             custom_class_count: 8
 
