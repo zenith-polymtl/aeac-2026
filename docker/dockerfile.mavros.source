@@ -1,0 +1,58 @@
+# syntax=docker/dockerfile:1.6  
+FROM --platform=$TARGETPLATFORM ros:humble-ros-base  
+ARG TARGETPLATFORM  
+ENV DEBIAN_FRONTEND=noninteractive  
+  
+RUN mkdir -p /ros2_ws/src    
+WORKDIR /ros2_ws    
+    
+RUN apt-get update && apt-get install -y \
+    python3-vcstool \
+    python3-rosinstall-generator \
+    python3-osrf-pycommon \
+    python3-click \
+    python3-rosdep \
+    geographiclib-tools \
+    libgeographic-dev \
+    libasio-dev \
+    python3-future \
+    ros-humble-geographic-msgs \
+    ros-humble-ament-cmake \
+    ros-humble-ament-cmake-core \
+    ros-humble-ament-cmake-python \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN bash -c "source /opt/ros/humble/setup.bash"  
+  
+# Get MAVLink source    
+RUN rosinstall_generator --format repos mavlink | tee /tmp/mavlink.repos    
+    
+# Get MAVROS source (upstream - released)    
+RUN rosinstall_generator --format repos --upstream mavros | tee -a /tmp/mavros.repos    
+  
+# Import sources    
+RUN vcs import src < /tmp/mavlink.repos \    
+    && vcs import src < /tmp/mavros.repos    
+    
+# Install GeographicLib datasets (MANDATORY)    
+RUN ./src/mavros/mavros/scripts/install_geographiclib_datasets.sh    
+
+RUN rosdep init || true
+RUN rosdep update
+RUN apt-get update && rosdep install --from-paths src --ignore-src -r -y
+
+RUN apt-get update && apt-get install -y \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+    ros-humble-angles \
+ && rm -rf /var/lib/apt/lists/*
+    
+# Build the workspace (with sourced environment)  
+RUN bash -c "source /opt/ros/humble/setup.bash && colcon build"  
+    
+WORKDIR /ros2_ws
+  
+ARG UID=1000  
+ARG GID=1000  
+RUN groupadd -g $GID dev && useradd -m -u $UID -g $GID dev  
+RUN usermod -a -G dialout dev
