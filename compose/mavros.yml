@@ -2,7 +2,7 @@ services:
   mavros:
     build:
       context: ..
-      dockerfile: docker/dockerfile.mavros.source
+      dockerfile: docker/dockerfile.mavros
     network_mode: host
     privileged: true
     group_add:

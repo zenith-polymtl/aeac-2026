@@ -26,6 +26,8 @@ class GIMBAL_MANAGER_FLAGS:
 POSITION_FLAG = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_IN_VEHICLE_FRAME + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_PITCH_LOCK + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_ROLL_LOCK
 SPEED_FLAGS = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_LOCK + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_PITCH_LOCK + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_ROLL_LOCK
 
+#Keep YAW_IN_VEHICLE_FRAME to ensure proper dynamic transform rotation 
+
 # real limits
 # MAX_ANGLE_PITCH = 120.0
 # MAX_ANGLE_YAW = 325.0
@@ -77,12 +79,11 @@ class GremsyMavros(Node):
         self.child_frame  = 'gimbal_link'
 
         # Gimbal mount position relative to base_link (meters)
-        # Example: 10 cm forward, 0 right, 10 cm down (FLU base_link: x fwd, y left, z up)
+        # Exemple: 10 cm forward, 0 left, -10 cm up (FLU base_link: x fwd, y left, z up)
         self.gimbal_x = 0.10
         self.gimbal_y = 0.0
         self.gimbal_z = -0.10
         
-
 
         self.current_pitch = 0.0
         self.current_yaw = 0.0
