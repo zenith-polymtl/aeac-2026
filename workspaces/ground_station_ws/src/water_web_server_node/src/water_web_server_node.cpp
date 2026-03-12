@@ -70,17 +70,49 @@ void WaterWebServerNode::initialize_publisher()
     finish_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/lap/finish", 10);
     move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/move_to_scene", 10);
     abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/abort_all", 10);
+    gimbal_mode_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/gimbal/lock_mode", 10);
 }
 
 void WaterWebServerNode::initialize_subscriber() 
 {
     message_to_ui_subsciber_ = create_subscription<UiMessage>(
 		"/send_to_ui", 10, std::bind(&WaterWebServerNode::broadcast_message, this, std::placeholders::_1));
+
+    gimbal_state_subscriber_ = create_subscription<GimbalState>(
+        "/aeac/external/gimbal/state", 10, [this](const GimbalState::SharedPtr msg)
+        {
+            nlohmann::json gimbal_json = {
+                {"type", "gimbal_state"},
+                {"mode", msg->mode},
+                {"pitch", msg->pitch},
+                {"yaw", msg->yaw}
+            };
+            std::string message = gimbal_json.dump();
+
+            std::lock_guard<std::mutex> lock(ws_mutex_);
+
+            for (auto *ws_ptr : ws_sessions_)
+            {
+                try {
+                    beast::error_code ec;
+                    ws_ptr->text(true);
+                    ws_ptr->write(net::buffer(message), ec);
+                    if (ec)
+                    {
+                        RCLCPP_WARN(get_logger(), "Failed to send gimbal state to one client: %s", ec.message().c_str());
+                    }
+                }
+                catch(...){
+                    RCLCPP_WARN(get_logger(), "Error Broadcasting Gimbal State");
+                }
+            }
+        });
 }
 
 void WaterWebServerNode::broadcast_message(const UiMessage msg)
 {
     nlohmann::json status_json = {
+        {"type", "message"},
         {"is_success", msg.is_success},
         {"message", msg.message},
     };
@@ -266,13 +298,22 @@ WaterWebServerNode::try_handle_api(
         return generate_responce("Request Take Picture received", req);
 
     }
-    if (target == API_GIMBAL_TOGGLE)
+    if (target == API_GIMBAL_FOLLOW)
     {
-        RCLCPP_INFO(get_logger(), "Received Toggle Gimbal!");
+        RCLCPP_INFO(get_logger(), "Received  Gimbal Follow!");
         
-        // TODO: Add Toggle Gimbal Logic
-
-        return generate_responce("Request Toggle Gimbal received", req);
+        auto message = std_msgs::msg::Bool();
+        message.data = false;
+        gimbal_mode_publisher_->publish(message);
+        return generate_responce("Request Gimbal Follow received", req);
+    }
+    if (target == API_GIMBAL_LOCK)
+    {
+        RCLCPP_INFO(get_logger(), "Received Gimbal Lock!");
+        auto message = std_msgs::msg::Bool();
+        message.data = true;
+        gimbal_mode_publisher_->publish(message);
+        return generate_responce("Request  Gimbal Lock received", req);
     }
     if (target == API_ABORT_ALL)
     {

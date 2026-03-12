@@ -16,6 +16,7 @@
 #include <boost/beast/websocket.hpp>
 #include <nlohmann/json.hpp>
 #include "custom_interfaces/msg/ui_message.hpp"
+#include "custom_interfaces/msg/gimbal_state.hpp"
 #include <memory>
 
 const std::string WEB_COMPONENT_FOLDER = "/web_components/";
@@ -29,7 +30,8 @@ const std::string API_AUTO_SHOOT = "/api/mission/auto_shoot";
 const std::string API_SHOOT = "/api/mission/shoot";
 const std::string TAKE_PICTURE = "/api/mission/take_picture";
 const std::string API_ABORT_ALL = "/api/mission/abort_all";
-const std::string API_GIMBAL_TOGGLE = "/api/toogle_gimbal";
+const std::string API_GIMBAL_FOLLOW = "/api/gimbal_follow";
+const std::string API_GIMBAL_LOCK = "/api/gimbal_lock";
 
 
 namespace beast = boost::beast;
@@ -38,6 +40,7 @@ namespace websocket = beast::websocket;
 namespace net = boost::asio;
 using tcp = boost::asio::ip::tcp;
 using UiMessage = custom_interfaces::msg::UiMessage;
+using GimbalState = custom_interfaces::msg::GimbalState;
 
 class WaterWebServerNode : public rclcpp::Node
 {
@@ -80,8 +83,9 @@ private:
 
     std::string package_share_dir_;
     std::thread server_thread_;
-
+    
 	rclcpp::Subscription<UiMessage>::SharedPtr message_to_ui_subsciber_;
+    rclcpp::Subscription<GimbalState>::SharedPtr gimbal_state_subscriber_;
 
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr mission_go_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr start_lap_publisher_;
@@ -90,6 +94,8 @@ private:
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr move_to_scene_publisher_;
 
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr abort_all_mission_publisher_;
+
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr gimbal_mode_publisher_;
 
     boost::asio::io_context ioc_;
     boost::asio::ip::tcp::acceptor acceptor_;
