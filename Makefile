@@ -184,7 +184,7 @@ mavros-gazebo: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
-	  ros2 launch mavros apm.launch fcu_url:=udp://:14551@ fcu_protocol:=v2.0 use_sim_time:=true'
+	  ros2 launch mavros apm.launch fcu_url:=udp://:14550@ fcu_protocol:=v2.0 use_sim_time:=true'
 
 mavros-jetson: ## Open bash in the MAVROS container (with ROS sourced)
 	docker compose -f compose/mavros.yml up -d --build
@@ -219,6 +219,7 @@ gcs: up
 	    source install/setup.bash; \
 		colcon build --packages-select web_server_node custom_interfaces; \
 	    ros2 daemon start; \
+		source install/setup.bash; \
 	    ros2 run web_server_node web_server_node \
 	  '
 

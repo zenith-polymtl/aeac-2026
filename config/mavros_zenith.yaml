@@ -1,0 +1,14 @@
+# Common configuration for APM2 autopilot
+#
+# local_position
+/mavros/local_position:
+  ros__parameters:
+    tf.send: true
+
+
+
+# ros2 run tf2_tools view_frames  
+# service call /mavros/set_message_interval mavros_msgs/srv/MessageInterval "{message_id: 32, message_rate: 10.0}"
+# ros2 topic hz /mavros/local_position/pose
+# ros2 param get /mavros/local_position tf.send  
+# ros2 param set /mavros/local_position tf.send true
