@@ -5,10 +5,11 @@ import math
 from mavros_msgs.msg import MountControl
 from mavros_msgs.srv import MountConfigure
 from custom_interfaces.msg import AimError
-from geometry_msgs.msg import Quaternion
+from geometry_msgs.msg import Quaternion, TransformStamped
 from std_srvs.srv import SetBool
 from tf_transformations import euler_from_quaternion
 from mavros_msgs.msg import GimbalManagerSetPitchyaw, GimbalDeviceAttitudeStatus
+from tf2_ros import TransformBroadcaster
 
 class GIMBAL_MANAGER_FLAGS:
     GIMBAL_MANAGER_FLAGS_RETRACT = 1
@@ -24,6 +25,8 @@ class GIMBAL_MANAGER_FLAGS:
 
 POSITION_FLAG = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_IN_VEHICLE_FRAME + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_PITCH_LOCK + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_ROLL_LOCK
 SPEED_FLAGS = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_LOCK + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_PITCH_LOCK + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_ROLL_LOCK
+
+#Keep YAW_IN_VEHICLE_FRAME to ensure proper dynamic transform rotation 
 
 # real limits
 # MAX_ANGLE_PITCH = 120.0
@@ -76,6 +79,27 @@ class GremsyMavros(Node):
             self.gimbal_attitude_callback,
             10)
         
+                # TF broadcaster
+        self.tf_br = TransformBroadcaster(self)
+
+        # Frame names
+        self.parent_frame = 'base_link'
+        self.child_frame  = 'gimbal_link'
+
+        # Gimbal mount position relative to base_link (meters)
+        # Exemple: 10 cm forward, 0 left, -10 cm up (FLU base_link: x fwd, y left, z up)
+        self.gimbal_x = 0.10
+        self.gimbal_y = 0.0
+        self.gimbal_z = -0.10
+        
+
+        self.current_pitch = 0.0
+        self.current_yaw = 0.0
+        self.current_roll = 0.0
+
+        self.last_sent_pitch_vel = 0.0
+        self.last_sent_yaw_vel = 0.0
+        
         # --- Services ---
         self.create_service(SetBool, '/gimbal/lock_mode', self.enable_lock_mode_callback)
 
@@ -83,6 +107,27 @@ class GremsyMavros(Node):
 
     def gimbal_attitude_callback(self, msg):
         q = msg.q
+
+        # --- Publish TF: base_link -> gimbal_link (dynamic rotation) ---
+        t = TransformStamped()
+        t.header.stamp = msg.header.stamp  # use MAVROS stamp
+        t.header.frame_id = self.parent_frame
+        t.child_frame_id = self.child_frame
+
+        # Fixed mount translation (gimbal center wrt base_link)
+        t.transform.translation.x = float(self.gimbal_x)
+        t.transform.translation.y = float(self.gimbal_y)
+        t.transform.translation.z = float(self.gimbal_z)
+
+        # Dynamic rotation (gimbal attitude)
+        # IMPORTANT: this assumes q is already expressed as rotation of gimbal_link in base_link frame
+        # and in the same axis convention as your TF tree.
+        t.transform.rotation.x = float(q.x)
+        t.transform.rotation.y = float(q.y)
+        t.transform.rotation.z = float(q.z)
+        t.transform.rotation.w = float(q.w)
+
+        self.tf_br.sendTransform(t)
 
         angles = euler_from_quaternion([q.x, q.y, q.z, q.w])
         
