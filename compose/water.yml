@@ -36,7 +36,7 @@ services:
       - DISPLAY=${DISPLAY}   
       - ROS_DOMAIN_ID=2 
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-      - ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST  # Add this 
+      - ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST 
     volumes:    
       - /tmp/.X11-unix/:/tmp/.X11-unix    
       - /dev:/dev    

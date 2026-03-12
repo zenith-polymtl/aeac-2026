@@ -43,8 +43,8 @@
           
         # POSITIONAL TRACKING DISABLED  
         pos_tracking:  
-            pos_tracking_enabled: true   # Set to true if using Object Detection
-            publish_tf: false            # Keep this false to avoid messy TF trees
+            pos_tracking_enabled: false
+            publish_tf: false
             publish_map_tf: false          
         # MAPPING DISABLED  
         mapping:  
@@ -71,60 +71,6 @@
             filtering_mode: 'NMS3D'
             allow_reduced_precision_inference: true    
             prediction_timeout: 2.0 
-          
-            
-            # Class definitions based on phase1_nano.yaml
-            # class_000:
-            #    label: 'window'
-            #    model_class_id: 0
-            #    enabled: true
-            
-            # class_001:
-            #    label: 'door'
-            #    model_class_id: 1
-            #    enabled: true
-            
-            # class_002:
-            #    label: 'red circle'
-            #    model_class_id: 2
-            #    enabled: true
-            #    is_grounded: false
-            #    is_static: true
-            
-            # class_003:
-            #    label: 'green circle'
-            #    model_class_id: 3
-            #    enabled: true
-            #    is_grounded: false
-            #    is_static: true
-            
-            # class_004:
-            #    label: 'blue circle'
-            #    model_class_id: 4
-            #    enabled: true
-            #    is_grounded: false
-            #    is_static: true
-            
-            # class_005:
-            #    label: 'yellow circle'
-            #    model_class_id: 5
-            #    enabled: true
-            #    is_grounded: false
-            #    is_static: true
-            
-            # class_006:
-            #    label: 'white circle'
-            #    model_class_id: 6
-            #    enabled: true
-            #    is_grounded: false
-            #    is_static: true
-            
-            # class_007:
-            #    label: 'black circle'
-            #    model_class_id: 7
-            #    enabled: true
-            #    is_grounded: false
-            #    is_static: true
 
         # Jetson optimization  
         advanced:  
