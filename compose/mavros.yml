@@ -9,12 +9,15 @@ services:
       - dialout
     volumes:
       - /dev:/dev
+      - ./../config/mavros_zenith.yaml:/ros2_ws/config/zenith.yaml:ro
+
     environment:
       - ROS_DOMAIN_ID=2
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       - ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
-    command: >
-      bash -lc "
-        source /opt/ros/humble/setup.bash &&
-        ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS1:921600 fcu_protocol:=v2.0
-      "
+    command: ["bash", "-lc", "sleep infinity"]
+
+# ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS1:921600 fcu_protocol:=v2.0
+
+
+# ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:5762 fcu_protocol:=v2.0 config_yaml:=config/zenith.yaml

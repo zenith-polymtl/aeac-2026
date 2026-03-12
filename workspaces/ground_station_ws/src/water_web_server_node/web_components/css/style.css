@@ -4,7 +4,7 @@
 
     --left-container-margin: 20px;
     --top-container-height: 120px;
-    --middle-bottom-container-height: 100px;
+    --middle-bottom-container-height: 130px;
     --bottom-container-height: 100px;
 
     --top-container-child-margin: 10px;
@@ -397,4 +397,20 @@ input:checked + .slider:before { transform: translateX(22px); }
 .toggle-gimbal-control-container > span {
     margin: auto;
     font-weight: bold;
+
+}
+
+.toggle-gimbal-control-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.orientation-display {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 5px;
+    margin-top: 10px;
 }

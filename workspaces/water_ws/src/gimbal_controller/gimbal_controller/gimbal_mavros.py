@@ -4,11 +4,13 @@ import math
 
 from mavros_msgs.msg import MountControl
 from mavros_msgs.srv import MountConfigure
-from custom_interfaces.msg import AimError
-from geometry_msgs.msg import Quaternion
+from custom_interfaces.msg import AimError, GimbalState
+from geometry_msgs.msg import Quaternion, TransformStamped
 from std_srvs.srv import SetBool
+from std_msgs.msg import Bool
 from tf_transformations import euler_from_quaternion
 from mavros_msgs.msg import GimbalManagerSetPitchyaw, GimbalDeviceAttitudeStatus
+from tf2_ros import TransformBroadcaster
 
 class GIMBAL_MANAGER_FLAGS:
     GIMBAL_MANAGER_FLAGS_RETRACT = 1
@@ -24,6 +26,8 @@ class GIMBAL_MANAGER_FLAGS:
 
 POSITION_FLAG = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_IN_VEHICLE_FRAME + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_PITCH_LOCK + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_ROLL_LOCK
 SPEED_FLAGS = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_LOCK + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_PITCH_LOCK + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_ROLL_LOCK
+
+#Keep YAW_IN_VEHICLE_FRAME to ensure proper dynamic transform rotation 
 
 # real limits
 # MAX_ANGLE_PITCH = 120.0
@@ -53,20 +57,53 @@ class GremsyMavros(Node):
         self.yaw_integral = 0.0
         self.yaw_prev_error = 0.0
         self.last_update_time = self.get_clock().now()
+        
+        # Current PID ?
+        self.current_pitch = 0.0
+        self.current_yaw = 0.0
+        self.current_roll = 0.0
 
-        self.gimbal_mode = 2 # 1=LOCK, 2=FOLLOW
+        self.last_sent_pitch_vel = 0.0
+        self.last_sent_yaw_vel = 0.0
+
+        self.gimbal_mode = GimbalMode.FOLLOW
         
         # --- Publishers ---
         self.mavros_pub = self.create_publisher(GimbalManagerSetPitchyaw, '/mavros/gimbal_control/manager/set_pitchyaw', 10)
 
+        self.state_timer = self.create_timer(0.5, self.publish_state)
+        self.state_pub = self.create_publisher(GimbalState, '/aeac/external/gimbal/state', 10)
+
         # --- Subscribers ---
-        self.create_subscription(AimError, '/gimbal/target_error', self.aiming_callback, 10)
+
+        self.create_subscription(Bool, '/aeac/external/gimbal/lock_mode', self.enable_lock_mode_callback, 10)
+
+        self.create_subscription(AimError, '/aeac/external/gimbal/move', self.gimbal_move_callback, 10)
+
+        self.create_subscription(AimError, '/aeac/internal/gimbal/target_error', self.aiming_callback, 10)
+
+        self.mode_sub = self.create_subscription(Bool, '/aeac/external/gimbal/lock_mode', self.enable_lock_mode_callback, 10)
+
         
         self.sub_orientation = self.create_subscription(
             GimbalDeviceAttitudeStatus,
             '/mavros/gimbal_control/device/attitude_status',
             self.gimbal_attitude_callback,
             10)
+        
+                # TF broadcaster
+        self.tf_br = TransformBroadcaster(self)
+
+        # Frame names
+        self.parent_frame = 'base_link'
+        self.child_frame  = 'gimbal_link'
+
+        # Gimbal mount position relative to base_link (meters)
+        # Exemple: 10 cm forward, 0 left, -10 cm up (FLU base_link: x fwd, y left, z up)
+        self.gimbal_x = 0.10
+        self.gimbal_y = 0.0
+        self.gimbal_z = -0.10
+        
 
         self.current_pitch = 0.0
         self.current_yaw = 0.0
@@ -80,8 +117,37 @@ class GremsyMavros(Node):
 
         self.get_logger().info("Gimbal MAVROS ready.")
 
+    def publish_state(self):
+        state_msg = GimbalState()
+        mode_str = "LOCK" if self.gimbal_mode == GimbalMode.LOCK else "FOLLOW"
+        state_msg.mode = mode_str
+        state_msg.pitch = self.current_pitch
+        state_msg.yaw = self.current_yaw
+        self.state_pub.publish(state_msg)
+
     def gimbal_attitude_callback(self, msg):
         q = msg.q
+
+        # --- Publish TF: base_link -> gimbal_link (dynamic rotation) ---
+        t = TransformStamped()
+        t.header.stamp = msg.header.stamp  # use MAVROS stamp
+        t.header.frame_id = self.parent_frame
+        t.child_frame_id = self.child_frame
+
+        # Fixed mount translation (gimbal center wrt base_link)
+        t.transform.translation.x = float(self.gimbal_x)
+        t.transform.translation.y = float(self.gimbal_y)
+        t.transform.translation.z = float(self.gimbal_z)
+
+        # Dynamic rotation (gimbal attitude)
+        # IMPORTANT: this assumes q is already expressed as rotation of gimbal_link in base_link frame
+        # and in the same axis convention as your TF tree.
+        t.transform.rotation.x = float(q.x)
+        t.transform.rotation.y = float(q.y)
+        t.transform.rotation.z = float(q.z)
+        t.transform.rotation.w = float(q.w)
+
+        self.tf_br.sendTransform(t)
 
         angles = euler_from_quaternion([q.x, q.y, q.z, q.w])
         
@@ -89,7 +155,7 @@ class GremsyMavros(Node):
         self.current_pitch = math.degrees(angles[1])
         self.current_yaw = math.degrees(angles[2])
 
-        print(f"{self.current_pitch}, {self.current_yaw}")
+        # self.get_logger().info(f"Current pitch: {self.current_pitch}, Current yaw: {self.current_yaw}")
         target_pitch, target_yaw = self.check_angle_limit(self.last_sent_pitch_vel, self.last_sent_yaw_vel)
         
         if target_pitch != self.last_sent_pitch_vel or target_yaw != self.last_sent_yaw_vel:
@@ -102,24 +168,22 @@ class GremsyMavros(Node):
         self.yaw_prev_error = 0.0
         self.last_update_time = self.get_clock().now()
 
-    def enable_lock_mode_callback(self, request, response):
+    def enable_lock_mode_callback(self, msg):
         self.reset_pid_memory()
 
-        new_mode = GimbalMode.LOCK if request.data else GimbalMode.FOLLOW
+        new_mode = GimbalMode.LOCK if msg.data else GimbalMode.FOLLOW
 
         if new_mode == GimbalMode.LOCK:
-            self.gimbal_mode = new_mode
             self.send_speed_cmd(0.0, 0.0)
-            response.success = True
-            response.message = "Changed mode to LOCK"
+            self.get_logger().info("Changed mode to LOCK.")
+
 
         elif new_mode == GimbalMode.FOLLOW:
-            self.gimbal_mode = new_mode
             self.send_position_cmd(0.0, 0.0)
-            response.success = True
-            response.message = "Changed mode to FOLLOW"
+            self.get_logger().info("Changed mode to FOLLOW.")
 
-        return response
+        self.gimbal_mode = new_mode
+        self.publish_state()
 
     def check_angle_limit(self, target_vel_pitch, target_vel_yaw):
         # --- SECURITY PITCH ---
@@ -140,6 +204,12 @@ class GremsyMavros(Node):
         
         return target_vel_pitch, target_vel_yaw
     
+    def gimbal_move_callback(self, msg):
+        if self.gimbal_mode != GimbalMode.LOCK:
+            return
+
+        self.send_speed_cmd(msg.pitch_error, msg.yaw_error)
+
     def aiming_callback(self, msg):
         if self.gimbal_mode != GimbalMode.LOCK:
             return
@@ -150,22 +220,22 @@ class GremsyMavros(Node):
         target_vel_pitch, target_vel_yaw = self.check_angle_limit(target_vel_pitch, target_vel_yaw)
 
         self.send_speed_cmd(target_vel_pitch, target_vel_yaw)
-        return
+        # return
     
-        current_time = self.get_clock().now()
-        dt = (current_time - self.last_update_time).nanoseconds / 1e9
-        self.last_update_time = current_time
+        # current_time = self.get_clock().now()
+        # dt = (current_time - self.last_update_time).nanoseconds / 1e9
+        # self.last_update_time = current_time
 
-        if dt <= 0.0 or dt > 0.1:
-            dt = 0.01
+        # if dt <= 0.0 or dt > 0.1:
+        #     dt = 0.01
 
-        cmd_pitch = self.compute_pid(msg.pitch_error, "pitch", dt)
-        cmd_yaw = self.compute_pid(msg.yaw_error, "yaw", dt)
+        # cmd_pitch = self.compute_pid(msg.pitch_error, "pitch", dt)
+        # cmd_yaw = self.compute_pid(msg.yaw_error, "yaw", dt)
 
-        cmd_pitch = max(min(cmd_pitch, self.max_speed), -self.max_speed)
-        cmd_yaw = max(min(cmd_yaw, self.max_speed), -self.max_speed)
+        # cmd_pitch = max(min(cmd_pitch, self.max_speed), -self.max_speed)
+        # cmd_yaw = max(min(cmd_yaw, self.max_speed), -self.max_speed)
 
-        self.send_speed_cmd(cmd_pitch, cmd_yaw)
+        # self.send_speed_cmd(cmd_pitch, cmd_yaw)
 
     def compute_pid(self, error, axis, dt):
         if axis == "pitch":
@@ -199,14 +269,12 @@ class GremsyMavros(Node):
         self.mavros_pub.publish(msg)
 
     def send_speed_cmd(self, pitch_rate, yaw_rate):
-
         self.last_sent_pitch_vel = pitch_rate
         self.last_sent_yaw_vel = yaw_rate
 
         msg = GimbalManagerSetPitchyaw()
         
         msg.flags = SPEED_FLAGS
-
         msg.pitch = float('nan')
         msg.yaw = float('nan')
 

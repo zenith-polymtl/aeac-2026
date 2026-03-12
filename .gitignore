@@ -8,6 +8,7 @@ workspaces/build/
 workspaces/install/
 workspaces/log/
 workspaces/.colcon/
+frames*
 
 .vscode/
 

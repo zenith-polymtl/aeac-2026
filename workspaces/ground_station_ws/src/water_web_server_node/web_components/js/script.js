@@ -5,7 +5,9 @@ const API_AUTO_SHOOT = "/api/mission/auto_shoot";
 const API_SHOOT = "/api/mission/shoot";
 const TAKE_PICTURE = "/api/mission/take_picture";
 const API_ABORT_ALL = "/api/mission/abort_all";
-const API_GIMBAL_TOGGLE = "/api/toogle_gimbal"
+const API_GIMBAL_FOLLOW = "/api/gimbal_follow";
+const API_GIMBAL_LOCK = "/api/gimbal_lock";
+
 
 function appendToLog(msg) {
     const logsContainer = document.querySelector('.logs-container');
@@ -45,6 +47,8 @@ function initaliseButtons() {
     document.getElementById('take-picture-button').addEventListener('click', () => sendCommand(TAKE_PICTURE));
     document.getElementById('shoot-button').addEventListener('click', () => sendCommand(API_SHOOT));
     document.getElementById('abort-button').addEventListener('click', () => sendCommand(API_ABORT_ALL));
+    document.getElementById('btn-follow').addEventListener('click', () => sendCommand(API_GIMBAL_FOLLOW));
+    document.getElementById('btn-lock').addEventListener('click', () => sendCommand(API_GIMBAL_LOCK));
 }
 
 function loadTheme() {
@@ -66,19 +70,6 @@ function loadTheme() {
     });
 }
 
-function initaliseGimbalLogic() {
-    const gimbalToggle = document.getElementById('gimbal-toggle');
-
-    gimbalToggle.addEventListener('change', (event) => {
-        sendCommand(API_GIMBAL_TOGGLE);
-        if (event.target.checked) {
-            console.log("Gimbal Control: ACTIVATED");
-        } else {
-            console.log("Gimbal Control: DEACTIVATED");
-        }
-    });
-}
-
 function initaliseSocket() {
     const ws = new WebSocket("ws://" + window.location.host + "/ws/status");
 
@@ -89,9 +80,25 @@ function initaliseSocket() {
     ws.onmessage = function(event) {
         try {
             const data = JSON.parse(event.data);
-            console.log("Status update:", data);
-            appendToLog(`Received Message: ${data.message}`, data.is_success ? 'info':'error')
-            
+
+            switch(data.type) {
+                case "message":
+                    console.log("Status update:", data);
+                    appendToLog(`Received Message: ${data.message}`, data.is_success ? 'info':'error')
+                    break;
+                    
+                case "gimbal_state":
+                    const gimbalMode = document.getElementById('gimbal-mode-val');
+                    const pitchElement = document.getElementById('pitch-val');
+                    const yawElement = document.getElementById('yaw-val');
+
+                    gimbalMode.textContent = data.mode;
+                    pitchElement.textContent = data.pitch.toFixed(2);
+                    yawElement.textContent = data.yaw.toFixed(2);
+                    break;
+                default:
+                    console.warn("Unknown message type:", data.type);
+            }
         } catch (e) {
             console.error("Invalid JSON:", event.data);
         }
@@ -108,7 +115,6 @@ function initaliseSocket() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initaliseButtons();
-    initaliseGimbalLogic();
     loadTheme();
     initaliseSocket();
 })
