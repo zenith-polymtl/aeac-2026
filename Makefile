@@ -223,6 +223,28 @@ gcs: up
 	    ros2 run web_server_node web_server_node \
 	  '
 
+water-gcs: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    source install/setup.bash; \
+		colcon build --packages-select water_web_server_node custom_interfaces; \
+	    ros2 daemon start; \
+	    ros2 run water_web_server_node water_web_server_node \
+	  '
+
+mavros-hexa: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'source /opt/ros/humble/setup.bash; \
+	  ros2 daemon start; \
+	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS1:921600 fcu_protocol:=v2.0'
+
+mavros-ofa: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'source /opt/ros/humble/setup.bash; \
+	  ros2 daemon start; \
+	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200'
+
 rviz: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'source /opt/ros/humble/setup.bash; \

@@ -70,7 +70,7 @@ void WaterWebServerNode::initialize_publisher()
     finish_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/lap/finish", 10);
     move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/move_to_scene", 10);
     abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/abort_all", 10);
-    gimbal_mode_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/gimbal/lock_mode", 10);
+    gimbal_mode_publisher_ = create_publisher<std_msgs::msg::UInt8>("/aeac/external/gimbal/set_mode", 10);
 }
 
 void WaterWebServerNode::initialize_subscriber() 
@@ -302,16 +302,16 @@ WaterWebServerNode::try_handle_api(
     {
         RCLCPP_INFO(get_logger(), "Received  Gimbal Follow!");
         
-        auto message = std_msgs::msg::Bool();
-        message.data = false;
+        auto message = std_msgs::msg::UInt8();
+        message.data = 1;
         gimbal_mode_publisher_->publish(message);
         return generate_responce("Request Gimbal Follow received", req);
     }
     if (target == API_GIMBAL_LOCK)
     {
         RCLCPP_INFO(get_logger(), "Received Gimbal Lock!");
-        auto message = std_msgs::msg::Bool();
-        message.data = true;
+        auto message = std_msgs::msg::UInt8();
+        message.data = 0;
         gimbal_mode_publisher_->publish(message);
         return generate_responce("Request  Gimbal Lock received", req);
     }
