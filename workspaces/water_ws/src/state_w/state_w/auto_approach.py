@@ -5,6 +5,7 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 
 from custom_interfaces.msg import TargetPosePolar
+from custom_interfaces.srv import LocateTarget, ConvertCamDistToLocalDist
 from std_msgs.msg import Bool, String
 
 class AutonomousApproach(Node):
@@ -24,10 +25,11 @@ class AutonomousApproach(Node):
         )
 
     def define_initial_state(self):
-        self.active = False
+        self.auto_approach_active = False
         self.target_acquired = False
-        self.waiting_for_approach = False
-        self.waiting_for_aim = False
+        self.in_movement = False
+        self.in_position = False
+        self.target_aimed = False
 
     def set_up_parameters(self):
         self.declare_parameter('approach_radius', 2.0)
@@ -38,139 +40,92 @@ class AutonomousApproach(Node):
 
     def set_up_topics(self):
         qos_reliable = self._create_qos_profile(QoSReliabilityPolicy.RELIABLE)
+        # Autonomous Approach topics
+        # Activate auto_approach
         self.auto_approach_sub = self.create_subscription(
             Bool,
             '/aeac/external/auto_approach/start',
             self.auto_approach_activation_callback,
             10
         )
-        
+        # Triggered when polar finished
         self.in_position_to_shoot_sub = self.create_subscription(
             Bool,
             '/aeac/internal/auto_approach/in_position',
             self.in_position_callback,
             10
         )
-        
-        self.auto_approach_sub = self.create_subscription(
+        # Activate polar for auto approach
+        self.activate_polar_pub = self.create_publisher(
             Bool,
-            '/aeac/external/auto_shot/start',
-            self.auto_shoot_activation_callback,
+            '/aeac/internal/auto_approach/activate_polar',
+            qos_reliable
+        )
+        # Send polar position for auto approach
+        self.polar_target_pub = self.create_publisher(
+            TargetPosePolar,
+            '/aeac/internal/auto_approach/target_position',
+            qos_reliable
+        )
+        # Autonomous Shoot topcis
+        # Start the vision module for auto aim
+        self.start_HR_aiming_pub = self.create_publisher(
+            Bool,
+            '/aeac/internal/auto_shoot/start_hr_aiming',
+            qos_reliable
+        )
+        self.target_in_aim_sub = self.create_subscription(
+            Bool,
+            '/aeac/internal/auto_shoot/target_in_aim',
+            self.target_aimed_callback,
             10
         )
-
-        self.target_aimed_sub = self.create_subscription(
-            Bool,
-            '/aeac/internal/auto_shot/target_aimed',
-            self.in_position_callback,
-            10
-        )
-        
+        # Shoot procedure
+        # Triggered by outside operator
         self.shoot_sub = self.create_subscription(
             Bool,
             '/aeac/external/shoot',
-            self.in_position_callback,
+            self.shoot_target_callback,
             10
         )
+        self.shoot_sub = self.create_publisher(
+            Bool,
+            '/aeac/internal/shoot',
+            qos_reliable
+        )
+        # Service that ask for target detection
+        self.locate_target_client = self.create_client(LocateTarget, 'locate_target')
+        # Service that ask that tansform the target position
+        self.transfrom_target_pos_client = self.create_client(ConvertCamDistToLocalDist, 'target_distance')
+
+        while not self.locate_target_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('locate target service not available, waiting...')
         
-        self.start_HR_aiming_pub = self.create_publisher(
-            Bool,
-            '/aeac/internal/start_hr_aiming',
-            qos_reliable
-        )
-
-        self.aim_pub = self.create_publisher(
-            Bool,
-            '/aim_topic',
-            qos_reliable
-        )
-
-        self.aimed_sub = self.create_subscription(
-            Bool,
-            '/aimed_topic',
-            self.aimed_callback,
-            qos_reliable
-        )
-
-        self.target_pub = self.create_publisher(
-            TargetPosePolar,
-            '/goal_pose_polar',
-            qos_reliable
-        )
-
-        # Topics / Nodes needed
-        # /auto_approach (Bool) - to activate/deactivate autonomous approach
-        # /target_acquired (Bool) - to indicate if a target is acquired
-        # /in_position (Bool) - to indicate if in position for payload deployment
-        # /aim_topic (Bool) - to command aiming at the target
-        # /aimed_topic (Bool) - to indicate if aiming is successful
-        # /shoot_topic (Bool) - to command payload deployment
-
-    def auto_approach_activation_callback(self, msg):
-        if msg.data and not self.active:
+        while not self.transfrom_target_pos_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('convert target location not available, waiting...')
+    
+    def auto_approach_activation_callback(self, msg: Bool):
+        """
+        This function is used to activate or deactivate the autonomus approach
+        
+        Parameters:
+            msg: activate or deactivate the autonomus approach
+        """
+        # Check for activation
+        if msg.data and not self.auto_approach_active:
             self.get_logger().info("Autonomous approach activated.")
-            self.active = True
-            if self.target_acquired:
-                self.get_logger().info("Target acquired, commencing approach.")
-                self.send_physical_approach_command()
-            else:
-                self.get_logger().info("No targets acquired, approach aborted.")
-
-        elif not msg.data and self.active:
+            request = Bool()
+            request.data = True
+            auto_approach_active = True
+            self.detect_target_pub.publish(request)
+        # Check for deactivation
+        elif not msg.data and self.auto_approach_active:
             self.get_logger().info("Autonomous approach deactivated.")
             self.define_initial_state()
 
     def auto_shoot_activation_callback(self, msg):
         pass
     
-    
-    def in_position_callback(self, msg):
-        self.target_acquired = msg.data
-        if self.target_acquired:
-            self.get_logger().info("Target acquired.")
-            if self.active and not self.waiting_for_approach:
-                self.get_logger().info("Commencing approach to acquired target.")
-                self.send_physical_approach_command()
-        else:
-            self.get_logger().info("Target lost.")
-            self.waiting_for_approach = False
-            self.waiting_for_aim = False
-
-    def in_position_callback(self, msg):
-        if self.waiting_for_approach and msg.data:
-            self.get_logger().info("In position for payload deployment.")
-            self.waiting_for_approach = False
-            self.aim_target()
-
-    def aimed_callback(self, msg):
-        if self.waiting_for_aim and msg.data:
-            self.get_logger().info("Target aimed successfully. Payload can be deployed.")
-            self.waiting_for_aim = False
-            self.shoot_target()
-
-    def send_physical_approach_command(self):
-        target_msg = TargetPosePolar()
-        target_msg.radius = self.approach_radius
-        target_msg.z = self.approach_height
-        target_msg.theta = None
-        target_msg.relative = False
-        self.target_pub.publish(target_msg)
-        self.get_logger().info("Published physical approach command.")
-        self.waiting_for_approach = True
-
-    def aim_target(self):
-        self.get_logger().info("Aiming at target for payload deployment.")
-        self.waiting_for_aim = True
-        aim_msg = Bool()
-        aim_msg.data = True
-        self.aim_pub.publish(aim_msg)
-
-    def shoot_target(self):
-        self.get_logger().info("Shooting at target.")
-        shoot_msg = Bool()
-        shoot_msg.data = True
-        self.shoot_pub.publish(shoot_msg)
-
 
 def main(args=None):
     rclpy.init(args=args)
