@@ -153,15 +153,19 @@ class GremsyMavros(Node):
 
         self.last_sent_pitch_vel = 0.0
         self.last_sent_yaw_vel = 0.0
-        
-        # --- Services ---
-        self.create_service(SetBool, '/gimbal/lock_mode', self.enable_lock_mode_callback)
-
-        self.get_logger().info("Gimbal MAVROS ready.")
 
     def publish_state(self):
         state_msg = GimbalState()
-        mode_str = "LOCK" if self.gimbal_mode == GimbalMode.LOCK else "FOLLOW"
+
+        if self.gimbal_mode == GimbalMode.LOCK:
+            mode_str = "LOCK"
+        elif self.gimbal_mode == GimbalMode.FOLLOW:
+            mode_str = "FOLLOW"
+        elif self.gimbal_mode == GimbalMode.AUTO_AIM:
+            mode_str = "Auto AIM"
+        else: 
+            mode_str = "UNKNOWN"
+
         state_msg.mode = mode_str
         state_msg.pitch = self.current_pitch
         state_msg.yaw = self.current_yaw
@@ -275,7 +279,6 @@ class GremsyMavros(Node):
         if abs(msg.pitch_error) < AIM_ERROR_ACCEPTANCE and abs(msg.yaw_error) < AIM_ERROR_ACCEPTANCE:
             target_vel_pitch = 0.0   
             target_vel_yaw = 0.0
-            # self.shoot_pub.publish(Bool(data=True))
 
         target_vel_pitch, target_vel_yaw = self.check_angle_limit(target_vel_pitch, target_vel_yaw)
         self.send_speed_cmd(target_vel_pitch, target_vel_yaw)
