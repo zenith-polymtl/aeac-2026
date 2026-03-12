@@ -208,11 +208,8 @@ class GremsyMavros(Node):
             self.send_speed_cmd(target_pitch, target_yaw)
 
     def reset_pid_memory(self):
-        self.pitch_integral = 0.0
-        self.pitch_prev_error = 0.0
-        self.yaw_integral = 0.0
-        self.yaw_prev_error = 0.0
-        self.last_update_time = self.get_clock().now()
+        self.pid_pitch.reset()
+        self.pid_yaw.reset()
 
     def set_mode_callback(self, msg):
         self.reset_pid_memory()
