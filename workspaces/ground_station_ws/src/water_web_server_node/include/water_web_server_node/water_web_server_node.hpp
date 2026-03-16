@@ -91,6 +91,11 @@ private:
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr start_lap_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr finish_lap_publisher_;
 
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr auto_approach_publisher_;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr auto_shoot_publisher_;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr shoot_publisher_;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr take_picutre_publisher_;
+
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr move_to_scene_publisher_;
 
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr abort_all_mission_publisher_;

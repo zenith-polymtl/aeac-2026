@@ -71,6 +71,10 @@ void WaterWebServerNode::initialize_publisher()
     move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/move_to_scene", 10);
     abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/abort_all", 10);
     gimbal_mode_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/gimbal/lock_mode", 10);
+    auto_approach_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/auto_approach/start", 10);
+    auto_shoot_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/auto_shoot/start", 10);
+    shoot_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/shoot", 10);
+    take_picutre_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/take_picture", 10);
 }
 
 void WaterWebServerNode::initialize_subscriber() 
@@ -106,7 +110,8 @@ void WaterWebServerNode::initialize_subscriber()
                     RCLCPP_WARN(get_logger(), "Error Broadcasting Gimbal State");
                 }
             }
-        });
+        }
+    );
 }
 
 void WaterWebServerNode::broadcast_message(const UiMessage msg)
@@ -269,7 +274,9 @@ WaterWebServerNode::try_handle_api(
     {
         RCLCPP_INFO(get_logger(), "Received Auto Approach!");
 
-        // TODO: Add Auto Approach Logic
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        auto_approach_publisher_->publish(msg);
 
         return generate_responce("Request Auto Approach received", req);
     }
@@ -277,7 +284,9 @@ WaterWebServerNode::try_handle_api(
     {
         RCLCPP_INFO(get_logger(), "Received Auto Shoot!");
 
-        // TODO: Add Auto Shoot Logic
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        auto_shoot_publisher_->publish(msg);
 
         return generate_responce("Request Auto Shoot received", req);
     }
@@ -285,7 +294,9 @@ WaterWebServerNode::try_handle_api(
     {
         RCLCPP_INFO(get_logger(), "Received shoot!");
 
-        // TODO: Add Shoot Logic
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        shoot_publisher_->publish(msg);
 
         return generate_responce("Request Shoot received", req);
     }
@@ -293,7 +304,9 @@ WaterWebServerNode::try_handle_api(
     {
         RCLCPP_INFO(get_logger(), "Received Take Picture!");
         
-        // TODO: Add Take Picture Logic
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        take_picutre_publisher_->publish(msg);
 
         return generate_responce("Request Take Picture received", req);
 

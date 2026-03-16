@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'auto_approach = state_w.auto_approach:main',
         ],
     },
 )
