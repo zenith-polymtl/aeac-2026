@@ -56,11 +56,31 @@ zed-shell: ## Open bash in the ZED container (with ROS sourced)
 	  source /root/ros2_ws/install/setup.bash; \
 	  exec bash -i'
 
+zed-slam:
+	docker compose -f compose/zed.yml up -d zed-ros2
+	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
+	  source /root/ros2_ws/install/setup.bash; \
+	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo_slam.yaml \
+	'
+
 zed-launch:
 	docker compose -f compose/zed.yml up -d zed-ros2
 	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
 	  source /root/ros2_ws/install/setup.bash; \
 	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml \
+	'
+zed-launch-mini:
+	docker compose -f compose/zed.yml up -d zed-ros2
+	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
+	  source /root/ros2_ws/install/setup.bash; \
+	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zedm ros_params_override_path:=config/zenith_stereo_mini.yaml \
+	'
+
+zed-od:
+	docker compose -f compose/zed.yml up -d zed-ros2
+	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
+	  source /root/ros2_ws/install/setup.bash; \
+	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo_od.yaml \
 	'
 
 zenoh-ground: ## Start zenoh ground bridge
@@ -68,7 +88,6 @@ zenoh-ground: ## Start zenoh ground bridge
 
 zenoh-air: ## Start zenoh air bridge
 	docker compose -f compose/zenoh-air.yml up --build
-
 
 
 # ===== Docker lifecycle (selected compose) =====
@@ -112,7 +131,7 @@ launch: up
 	    ros2 daemon start; \
 	    exec bash -i'
 
-payload-stack:
+payload:
 	docker compose -f compose/payload.yml up -d --build
 	# Launch ZED inside the already-running zed-ros2 service (detached)
 	docker compose -f compose/payload.yml exec -T zed-ros2 bash -lc " \
@@ -134,6 +153,26 @@ payload-stack:
 	    ros2 daemon start; \
 	    exec bash -i'
 
+water-stack:
+	docker compose -f compose/water.yml up -d --build
+	
+	docker compose -f compose/water.yml exec -T zed-ros2 bash -lc " \
+		source /root/ros2_ws/install/setup.bash && \
+		nohup ros2 launch zed_wrapper zed_camera.launch.py \
+			camera_model:=zed2i \
+			ros_params_override_path:=config/zenith_stereo.yaml \
+			> /tmp/zed_launch.log 2>&1 & \
+	"
+
+	# Enter water dev shell (your original behavior)
+	WS=$(WS_IN) docker compose -f compose/water.yml exec -it water \
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    colcon build; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    exec bash -i'
 
 mavros-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
@@ -141,9 +180,29 @@ mavros-sim: up
 	  ros2 daemon start; \
 	  ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:$(TCP_PORT) fcu_protocol:=v2.0'
 
-mission-sim: up
+mavros-gazebo: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'source /opt/ros/humble/setup.bash; \
+	  ros2 daemon start; \
+	  ros2 launch mavros apm.launch fcu_url:=udp://:14550@ fcu_protocol:=v2.0 use_sim_time:=true'
+
+mavros-jetson: ## Open bash in the MAVROS container (with ROS sourced)
+	docker compose -f compose/mavros.yml up -d --build
+	docker compose -f compose/mavros.yml exec -T mavros bash -lc '\
+	source /opt/ros/humble/setup.bash; \
+	ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS1:921600 fcu_protocol:=v2.0'
+
+mavros-ofa: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'source /opt/ros/humble/setup.bash; \
+	  ros2 daemon start; \
+	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200'
+
+
+payload-mission-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'cd "$$WS"; \
+	  	cd payload_ws; \
 	    source /opt/ros/humble/setup.bash; \
 	    colcon build; \
 	    source install/setup.bash; \
@@ -158,21 +217,23 @@ gcs: up
 	  bash -lc 'cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \
 	    source install/setup.bash; \
+		colcon build --packages-select web_server_node custom_interfaces; \
 	    ros2 daemon start; \
+		source install/setup.bash; \
 	    ros2 run web_server_node web_server_node \
 	  '
 
-hexa: up
+rviz: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
-	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS1:115200 fcu_protocol:=v2.0'
+	  rviz2'
 
-mavros-ofa: up
+foxglove: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'source /opt/ros/humble/setup.bash; \
 	  ros2 daemon start; \
-	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200'
+	  ros2 launch foxglove_bridge foxglove_bridge_launch.xml port:=8765'
 
 clean: ## Remove build/install/log (host + container)
 	sudo rm -rf "$(WS_REL)/build" "$(WS_REL)/install" "$(WS_REL)/log" "workspaces/install" "workspaces/log" "workspaces/build"

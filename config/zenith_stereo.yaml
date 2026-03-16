@@ -4,7 +4,7 @@
         # General settings  
         general:  
             camera_name: 'zed2i'
-            grab_resolution: 'VGA'  # Good balance for Jetson, or 'VGA' for maximum performance  
+            grab_resolution: '720'  # Good balance for Jetson, or 'VGA' for maximum performance  
             pub_frame_rate: 10.0
             pub_resolution: 'CUSTOM'  
             pub_downscale_factor: 2.0  
@@ -43,10 +43,9 @@
           
         # POSITIONAL TRACKING DISABLED  
         pos_tracking:  
-            pos_tracking_enabled: false  # DISABLED - no SLAM  
-            publish_tf: false  
-            publish_map_tf: false  
-          
+            pos_tracking_enabled: false
+            publish_tf: false
+            publish_map_tf: false          
         # MAPPING DISABLED  
         mapping:  
             mapping_enabled: false  # DISABLED - no SLAM  
@@ -57,71 +56,22 @@
           
         # Object Detection - CUSTOM ONNX MODEL  
         object_detection:  
-            od_enabled: true 
-            detection_model: 'MULTI_CLASS_BOX_FAST' 
-            custom_onnx_file: '/root/ros2_ws/models/phase1_nano.onnx'  
+            od_enabled: false 
+            enable_tracking: true
+            
+            detection_model: 'CUSTOM_YOLOLIKE_BOX_OBJECTS'
+            custom_onnx_file: '/root/ros2_ws/models/phase1_rect.onnx'  
+            custom_label_file: '/root/ros2_ws/models/phase1_rect.yaml'  
             custom_onnx_input_size: 640  
             custom_class_count: 8
-            
-            # Class definitions based on phase1_nano.yaml
-            #class_000:
-            #    label: 'window'
-            #    model_class_id: 0
-            #    enabled: true
-            #
-            #class_001:
-            #    label: 'door'
-            #    model_class_id: 1
-            #    enabled: true
-            #
-            #class_002:
-            #    label: 'red circle'
-            #    model_class_id: 2
-            #    enabled: true
-            #    is_grounded: false
-            #    is_static: true
-            #
-            #class_003:
-            #    label: 'green circle'
-            #    model_class_id: 3
-            #    enabled: true
-            #    is_grounded: false
-            #    is_static: true
-            #
-            #class_004:
-            #    label: 'blue circle'
-            #    model_class_id: 4
-            #    enabled: true
-            #    is_grounded: false
-            #    is_static: true
-            #
-            #class_005:
-            #    label: 'yellow circle'
-            #    model_class_id: 5
-            #    enabled: true
-            #    is_grounded: false
-            #    is_static: true
-            #
-            #class_006:
-            #    label: 'white circle'
-            #    model_class_id: 6
-            #    enabled: true
-            #    is_grounded: false
-            #    is_static: true
-            #
-            #class_007:
-            #    label: 'black circle'
-            #    model_class_id: 7
-            #    enabled: true
-            #    is_grounded: false
-            #    is_static: true
-            
-            allow_reduced_precision_inference: true  
-            max_range: 12.0  
-            confidence_threshold: 50.0  
-            prediction_timeout: 0.2  
-            enable_tracking: false  
-          
+
+            max_range: 10.0  
+            confidence_threshold: 50.0
+
+            filtering_mode: 'NMS3D'
+            allow_reduced_precision_inference: true    
+            prediction_timeout: 2.0 
+
         # Jetson optimization  
         advanced:  
             thread_sched_policy: 'SCHED_FIFO'  

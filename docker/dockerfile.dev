@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y \
     geographiclib-tools \
     && rm -rf /var/lib/apt/lists/* 
   
-# Use the correct GeographicLib script  
+
 RUN /opt/ros/humble/lib/mavros/install_geographiclib_datasets.sh  
 
 RUN apt-get update && apt-get install -y \
@@ -48,6 +48,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-numpy \
     python3-geopy \
     && python3 -m pip install --upgrade pip \
+    && pip install --no-cache-dir "numpy<2" ultralytics \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install -y \
@@ -59,6 +60,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN apt-get update && apt-get install -y \
     ros-${ROS_DISTRO}-zed-msgs \
+    ros-${ROS_DISTRO}-foxglove-bridge \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

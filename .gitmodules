@@ -2,10 +2,6 @@
 	path = packages/custom_interfaces
 	url = https://github.com/zenith-polymtl/custom_interfaces
 	branch = main
-[submodule "packages/UI"]
-	path = packages/UI
-	url = https://github.com/zenith-polymtl/UI
-	branch = main
 [submodule "packages/tools"]
 	path = packages/tools
 	url = https://github.com/zenith-polymtl/tools
