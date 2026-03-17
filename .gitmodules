@@ -26,3 +26,7 @@
 	path = packages/zed-ros2-wrapper
 	url = https://github.com/zenith-polymtl/zed-ros2-wrapper
 	branch = zenith
+[submodule "packages/TerminationSystem"]
+	path = packages/TerminationSystem
+	url = https://github.com/zenith-polymtl/TerminationSystem
+	branch = main
