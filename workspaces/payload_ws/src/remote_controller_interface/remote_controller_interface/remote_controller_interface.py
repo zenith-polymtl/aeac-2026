@@ -4,199 +4,120 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 
-from mavros_msgs.msg import RCIn
-from std_msgs.msg import String
-from mavros_msgs.srv import MessageInterval 
-from mavros_msgs.srv import SetMode
-from mavros_msgs.msg import State
-import threading
+from mavros_msgs.msg import RCIn, State
+from mavros_msgs.srv import MessageInterval, SetMode
 
 class RemoteControlInterface(Node):
-    """ROS2 node for reading RC channel inputs and triggering events."""
-
     def __init__(self):
         super().__init__('remote_control_interface')
         
-        # Create QoS profiles
-        qos_best_effort = self._create_qos_profile(QoSReliabilityPolicy.BEST_EFFORT)
-        qos_reliable = self._create_qos_profile(QoSReliabilityPolicy.RELIABLE)
-
-        # Using MAVROS Python client  
-        self.msg_interval_client = self.create_client(MessageInterval, '/mavros/set_message_interval')  
-        
-        
-        self.state_sub = self.create_subscription(  
-            State, '/mavros/state', self.state_callback, 10)  
-          
-        # self.mode_changed_event = threading.Event()  
-
-        self.set_mode_client = self.create_client(SetMode, '/mavros/set_mode')
-                
-        # States for servo motor
-        self.active_servo_1 = False
-        self.active_servo_2 = False
-        self.last_active_servo_1 = self.active_servo_1
-        self.last_active_servo_2 = self.active_servo_2
-        
-        # States for polar lock
-        self.active_polar_lock = False
-        self.last_active_polar_lock = self.active_polar_lock
-        self.requested_polar_lock = False
-        
-        # Declare parameters
         self._declare_parameters()
-        self._load_parameters()
 
-        # Create subscriptions
-        self.rc_sub = self.create_subscription(
-            RCIn,
-            '/mavros/rc/in',
-            self.rc_callback,
-            qos_best_effort
-        )
-
-        # Create publishers
-        self.servo_pub = self.create_publisher(
-            String,
-            '/servo_topic',
-            qos_reliable
-        )
+        self.controls = {
+            'camera':    {'ch': 5, 'last_state': None},
+            'servo_1':   {'ch': 7, 'last_state': None},
+            'lap_controle' : {'ch': 8, 'last_state': None},
+            'servo_2':   {'ch': 10, 'last_state': None},
+            'polar_lock':{'ch': 9, 'last_state': None},
+        }
         
-        while not self.set_mode_client.wait_for_service(timeout_sec=1.0):  
-            self.get_logger().info('Waiting for set_mode service...')  
+        self.inital_state()
+
+        qos_be = QoSProfile(reliability=QoSReliabilityPolicy.BEST_EFFORT, history=QoSHistoryPolicy.KEEP_LAST, depth=10)
         
-        self.get_logger().info("Remote Controller Interface started")
+        self.set_mode_client = self.create_client(SetMode, '/mavros/set_mode')
+        self.rc_sub = self.create_subscription(RCIn, '/mavros/rc/in', self.rc_callback, qos_be)
+        self.state_sub = self.create_subscription(State, '/mavros/state', self.state_callback, 10)
 
-    @staticmethod
-    def _create_qos_profile(reliability_policy):
-        """Create a QoS profile with specified reliability policy."""
-        return QoSProfile(
-            reliability=reliability_policy,
-            history=QoSHistoryPolicy.KEEP_LAST,
-            depth=10
-        )
+        self.get_logger().info("Remote Controller Interface Initialized")
 
+    def inital_state(self):
+        self.requested_polar_lock = False
+    
     def _declare_parameters(self):
-        """Declare all ROS2 parameters."""
-        self.declare_parameter('talk', True)
-        self.declare_parameter('servo_1_channel_controller', 8)
-        self.declare_parameter('servo_2_channel_controller', 9)
+        self.declare_parameter('threshold_high', 1700)
+        self.declare_parameter('threshold_low', 1300)
+        
+        self.high_threshold = self.get_parameter('threshold_high').value
+        self.low_threshold = self.get_parameter('threshold_low').value
 
-    def _load_parameters(self):
-        """Load parameter values from ROS2 parameter server."""
-        self.talk = self.get_parameter('talk').value
-        self.servo_1_channel = self.get_parameter('servo_1_channel_controller').value
-        self.servo_2_channel = self.get_parameter('servo_2_channel_controller').value  
-
-    def handle_activation(self, msg):
-        """Process activation input from RC channel."""
-        if len(msg.channels) < 8:
-            self.get_logger().warn(f"Insufficient RC channels for activation: {len(msg.channels)}")
+    def rc_callback(self, msg):
+        if len(msg.channels) < 10:
             return
 
-        servo_1_input = msg.channels[7] # Channel 8
-        servo_2_input = msg.channels[8] # Channel 9
-        
-        polar_lock_input = msg.channels[9] # Channel 10
-        
-        if servo_1_input > 1700:
-            self.active_servo_1 = True
-        elif servo_1_input < 1300:
-            self.active_servo_1 = False
-        
-        if servo_2_input > 1700:
-            self.active_servo_2 = True
-        elif servo_2_input < 1300:
-            self.active_servo_2 = False
-        
-        if polar_lock_input > 1700:
-            self.active_polar_lock = True
-        elif polar_lock_input < 1300:
-            self.active_polar_lock = False
-        
-        
-    def handle_servo_controls(self):
-        if self.active_servo_1 and not self.last_active_servo_1:
-            self.get_logger().info(f"Published open command for servo_1")
-        elif not self.active_servo_1 and self.last_active_servo_1:
-            self.get_logger().info(f"Published close command for servo 1")
-            
-        if self.active_servo_2 and not self.last_active_servo_2:
-            self.get_logger().info(f"Published open command for servo_2")
-        elif not self.active_servo_2 and self.last_active_servo_2:
-            self.get_logger().info(f"Published close command for servo 2")
-        
-        if self.active_polar_lock and not self.last_active_polar_lock:
-            self.requested_polar_lock = True
-            self.set_guided_mode()
-        elif not self.active_polar_lock and self.last_active_polar_lock:
-            # TODO Determine the behavior when polar lock is disactivated
-            self.requested_polar_lock = False
-            pass
-        
-        self.last_active_servo_1 = self.active_servo_1
-        self.last_active_servo_2 = self.active_servo_2
-        self.last_active_polar_lock = self.active_polar_lock
-      
-    def rc_callback(self, msg):
-        """
-        Process incoming RC channel data.
+        for name, data in self.controls.items():
+            val = msg.channels[data['ch']]
+            current_state = self.get_switch_state(val)
 
-        Ignores channels 1-4.
-        - Channel 8: Servo 1 control (temp)
-        - Channel 9: Servo 2 control (temp)
-        """
-        self.handle_activation(msg)
-        self.handle_servo_controls()
+            if current_state != data['last_state']:
+                self.handle_switch_change(name, current_state)
+                data['last_state'] = current_state
+                
+    def get_switch_state(self, pwm):
+        """Maps PWM values to discrete states."""
+        if pwm < 1300:
+            return "LOW"
+        elif 1300 <= pwm <= 1700:
+            return "MIDDLE"
+        else:
+            return "HIGH"
         
-    def setup_message_intervals(self):
-        if True:
-            """Set up message intervals after node initialization"""  
-            if not self.msg_interval_client.wait_for_service(timeout_sec=5.0):  
-                self.get_logger().warn('Message interval service not available, aborting request...')  
-                self.destroy_timer(self.setup_timer) 
-                return  
-            
-            request = MessageInterval.Request()  
-            request.message_id = 65  
-            request.message_rate = 25.0  
-            
-            future = self.msg_interval_client.call_async(request)  
-            future.add_done_callback(self.message_interval_callback)  
-            
-        # Destroy the timer since we only need to run this once  
-        self.destroy_timer(self.setup_timer) 
+    def handle_switch_change(self, name, state):
+        """Centralized command center for all RC events."""
+        match name :
+            case "camera":
+                self.camera_change(state)
+
+            case 'servo_1'| 'servo_2':
+                if state == "HIGH":
+                    self.get_logger().info(f"Opening {name}")
+                elif state == "LOW":
+                    self.get_logger().info(f"Closing {name}")
+
+            case 'polar_lock':
+                self.polar_change(state)
+                
+            case 'lap_controle':
+                self.lap_controle_change(state)
+                
+
+    def camera_change(self, state):
+        match state:
+            case "LOW":
+                self.get_logger().info("Camera: Setting LOW angle (e.g., 0°)")
+            case "MIDDLE":
+                self.get_logger().info("Camera: Setting MIDDLE angle (e.g., 45°)")
+            case "HIGH":
+                self.get_logger().info("Camera: Setting HIGH angle (e.g., 90°)")
+    
+    def polar_change(self, state):
+        if state == "HIGH":
+            self.get_logger().info("Requesting Polar Lock...")
+            self.set_mavros_mode("GUIDED")
+            self.requested_polar_lock = True
+        else:
+            self.requested_polar_lock = False
+    
+    def lap_controle_change(self, state):
+        if state == "HIGH":
+            self.get_logger().info("Finishing current lap and going to site")
+        else:
+            self.get_logger().info("Stopping lap now and going to site")
+ 
         
-    def set_guided_mode(self):
-        req = SetMode.Request()  
-        req.base_mode = 0  
-        req.custom_mode = "GUIDED"         
-        self.set_mode_client.call_async(req)  
+    def set_mavros_mode(self, mode_str):
+        req = SetMode.Request()
+        req.custom_mode = mode_str
+        self.set_mode_client.call_async(req)
 
     def state_callback(self, msg):  
-        """Callback to monitor state changes"""  
         if msg.mode == "GUIDED" and self.requested_polar_lock:
-            self.get_logger().info(f'Changing to Polar Lock')
-            # TODO Add the request to polar Mode 
+            self.get_logger().info('Vehicle in GUIDED. Activating Polar Lock logic...')
             self.requested_polar_lock = False
 
-
-    def message_interval_callback(self, future):  
-        try:  
-            response = future.result()  
-            if response.success:  
-                self.get_logger().info("Message interval set successfully")  
-            else:  
-                self.get_logger().error("Failed to set message interval")  
-        except Exception as e:  
-            self.get_logger().error(f"Service call failed: {e}") 
-        
-
 def main(args=None):
-    """Main entry point for the RC Event Trigger node."""
     rclpy.init(args=args)
     node = RemoteControlInterface()
-
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
@@ -204,7 +125,3 @@ def main(args=None):
     finally:
         node.destroy_node()
         rclpy.shutdown()
-
-
-if __name__ == '__main__':
-    main()
