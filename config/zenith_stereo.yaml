@@ -17,15 +17,16 @@
             self_calib: true
           
         # Video settings - outdoor optimized  
-        video:  
-            saturation: 4  # Add this  
-            sharpness: 4   # Add this    
-            gamma: 8       # Add this  
-            brightness: 4  
-            contrast: 4  
-            auto_exposure_gain: true  
+        video:
+            brightness: 4
+            contrast: 4
+            saturation: 4
+            sharpness: 4
+            gamma: 8
+            auto_exposure_gain: true
             auto_whitebalance: true
-          
+            
+            publish_left_right: true          
         # Sensor settings  
         sensors:  
             sensors_pub_rate: 10.0  
@@ -56,21 +57,60 @@
           
         # Object Detection - CUSTOM ONNX MODEL  
         object_detection:  
-            od_enabled: false 
+            od_enabled: true
             enable_tracking: true
-            
+            allow_reduced_precision_inference: true
+
             detection_model: 'CUSTOM_YOLOLIKE_BOX_OBJECTS'
-            custom_onnx_file: '/root/ros2_ws/models/phase1_rect.onnx'  
-            custom_label_file: '/root/ros2_ws/models/phase1_rect.yaml'  
-            custom_onnx_input_size: 640  
-            custom_class_count: 8
+            custom_onnx_file: '/root/ros2_ws/models/yolov8s_square_640.onnx'
+            #custom_label_yaml: '/root/ros2_ws/models/object_classes.yaml'
 
-            max_range: 10.0  
-            confidence_threshold: 50.0
+            custom_class_count:   8
+            onnx_input_size:      640
+            confidence_threshold: 50.0 
+            max_range:            10.0
+            prediction_timeout:   0.5 
+            filtering_mode:      'NMS3D'
 
-            filtering_mode: 'NMS3D'
-            allow_reduced_precision_inference: true    
-            prediction_timeout: 2.0 
+            class_000:
+               label: 'window'
+               model_class_id: 0
+               enabled: true
+            
+            class_001:
+               label: 'door'
+               model_class_id: 1
+               enabled: true
+            
+            class_002:
+               label: 'red circle'
+               model_class_id: 2
+               enabled: true
+            
+            class_003:
+               label: 'green circle'
+               model_class_id: 3
+               enabled: true
+            
+            class_004:
+               label: 'blue circle'
+               model_class_id: 4
+               enabled: true
+            
+            class_005:
+               label: 'yellow circle'
+               model_class_id: 5
+               enabled: true
+            
+            class_006:
+               label: 'white circle'
+               model_class_id: 6
+               enabled: true
+            
+            class_007:
+               label: 'black circle'
+               model_class_id: 7
+               enabled: true
 
         # Jetson optimization  
         advanced:  
