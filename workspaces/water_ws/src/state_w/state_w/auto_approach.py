@@ -7,6 +7,8 @@ from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 from custom_interfaces.msg import TargetPosePolar
 from custom_interfaces.srv import LocateTarget, ConvertCamDistToLocalDist
 from std_msgs.msg import Bool, String
+from geometry_msgs.msg import PoseStamped
+import numpy as np
 
 class AutonomousApproach(Node):
     def __init__(self):
@@ -37,7 +39,7 @@ class AutonomousApproach(Node):
 
         self.approach_radius = self.get_parameter('approach_radius').value
         self.approach_height = self.get_parameter('approach_height').value
-
+        
     def set_up_topics(self):
         qos_reliable = self._create_qos_profile(QoSReliabilityPolicy.RELIABLE)
         
@@ -55,7 +57,7 @@ class AutonomousApproach(Node):
             qos_reliable
         )
         self.activate_polar_pub = self.create_publisher(
-            Bool,
+            String,
             '/aeac/internal/auto_approach/activate_polar',
             qos_reliable
         )
@@ -64,7 +66,11 @@ class AutonomousApproach(Node):
             '/aeac/internal/auto_approach/target_position',
             qos_reliable
         )
-        
+        self.polar_center_location_pub = self.create_publisher(
+            PoseStamped,
+            '/aeac/internal/auto_shoot/center_location',
+            qos_reliable
+        )
         # Autonomous Shoot topics
         self.start_hr_aiming_pub = self.create_publisher(
             Bool,
@@ -108,11 +114,11 @@ class AutonomousApproach(Node):
         )
         
         # Service Clients
-        # self.locate_target_client = self.create_client(LocateTarget, 'locate_target')
+        self.locate_target_client = self.create_client(LocateTarget, '/aeac/auto_approach/locate_target')
         # self.transform_target_pos_client = self.create_client(ConvertCamDistToLocalDist, 'target_distance')
 
-        # while not self.locate_target_client.wait_for_service(timeout_sec=1.0):
-        #     self.get_logger().info('Locate target service not available, waiting...')
+        while not self.locate_target_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Locate target service not available, waiting...')
         
         # while not self.transform_target_pos_client.wait_for_service(timeout_sec=1.0):
         #     self.get_logger().info('Convert target location service not available, waiting...')
@@ -123,17 +129,19 @@ class AutonomousApproach(Node):
         """
         Activates or deactivates the autonomous approach.
         """
+        self.get_logger().info('Auto approach command received')
         if msg.data and not self.auto_approach_active:
             self.get_logger().info("Autonomous approach activated.")
             self.auto_approach_active = True
 
             # Publish activation
-            activate_req = Bool()
-            activate_req.data = True
-            self.activate_polar_pub.publish(activate_req)
+            # activate_req = Bool()
+            # activate_req.data = True
+            # self.activate_polar_pub.publish(activate_req)
             
             # Call locate target service
             srv_request = LocateTarget.Request()
+            srv_request.activate = True
             # TODO: Add any necessary fields to srv_request here depending on your .srv file
             
             future = self.locate_target_client.call_async(srv_request)
@@ -143,37 +151,59 @@ class AutonomousApproach(Node):
             self.get_logger().info("Autonomous approach deactivated.")
             self.define_initial_state()
 
-    def target_position_received_callback(self, future):
+    def target_position_received_callback(self, future: PoseStamped):
         try:
-            response = future.result()
+            # response = future.result()
             
-            srv_request = response         
-            transform_future = self.transform_target_pos_client.call_async(srv_request)
-            transform_future.add_done_callback(self.target_position_transformed_callback)
+            # srv_request = response         
+            # transform_future = self.transform_target_pos_client.call_async(srv_request)
+            # transform_future.add_done_callback(self.target_position_transformed_callback)
             self.target_acquired = True
+            self.target_position_transformed_callback(future)
 
             
         except Exception as e:
-            self.get_logger().error(f"Failed to locate target: {e}")
+            self.get_logger().error(f"Transform service call failed: {e}")
     
-    def target_position_transformed_callback(self, future): # Fixed syntax error here
-        try:
-            response = future.result()
-            
+    def target_position_transformed_callback(self, future: PoseStamped):
+        try:                        
             if not self.auto_approach_active:
                 return
             
-            # TODO: Map response to TargetPosePolar message
-            self.polar_target_pub.publish(response.polar_pose)
-            self.in_movement = True
+            response = future.result()
+            self.polar_center_location_pub.publish(response.target)
+            self.activate_polar_timer = self.create_timer(0.1, self.activate_polar_callback)
 
-            start_aiming_req = Bool()
-            start_aiming_req.data = True
-            self.start_hr_aiming_pub.publish(start_aiming_req)
-            
+                    
         except Exception as e:
             self.get_logger().error(f"Failed to transform target position: {e}")
-            
+    
+    def activate_polar_callback(self):
+        self.activate_polar_timer.cancel()
+        
+        request = String()
+        request.data = "start"
+        self.activate_polar_pub.publish(request)
+        
+        start_aiming_req = Bool()
+        start_aiming_req.data = True
+        self.start_hr_aiming_pub.publish(start_aiming_req)
+        
+        self.send_polar_target_timer = self.create_timer(0.1, self.send_polar_target_pose)
+
+
+    def send_polar_target_pose(self):
+        self.send_polar_target_timer.cancel()
+
+        request = TargetPosePolar()
+        request.relative = False
+        request.z = np.nan
+        request.theta = np.nan
+        request.r = 3.0
+        self.polar_target_pub.publish(request)
+        
+        self.in_movement = True
+          
     def auto_shoot_callback(self, msg: Bool):
         if msg.data:
             self.in_position = True
