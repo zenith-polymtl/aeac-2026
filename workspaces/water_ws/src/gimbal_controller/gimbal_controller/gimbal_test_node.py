@@ -91,7 +91,6 @@ class PIDTester(Node):
         msg.twist.linear.y = float(y)
         msg.twist.linear.z = float(z)
         msg.twist.angular.z = float(yaw_speed) 
-        self.get_logger().info(f"Publishing vel - X: {x}, Y: {y}, Z: {z}, yaw_speed: {yaw_speed}")
         self.vel_pub.publish(msg)
 
     def run(self):
@@ -112,21 +111,17 @@ class PIDTester(Node):
                 if key == '\x1b[A': 
                     fake_vision.pitch_error = float(FAKE_ERROR_MAGNITUDE)
                     user_input_active = True
-                    self.get_logger().info("Up arrow")
                 elif key == '\x1b[B': 
                     fake_vision.pitch_error = -float(FAKE_ERROR_MAGNITUDE)
                     user_input_active = True
-                    self.get_logger().info("Down arrow")
 
                 elif key == '\x1b[C': 
                     fake_vision.yaw_error = float(FAKE_ERROR_MAGNITUDE)
                     user_input_active = True
-                    self.get_logger().info("right Arrow")
 
                 elif key == '\x1b[D': 
                     fake_vision.yaw_error = -float(FAKE_ERROR_MAGNITUDE)
                     user_input_active = True
-                    self.get_logger().info("left Arrow")
 
                 
                 # --- DRONE ---

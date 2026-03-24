@@ -6,9 +6,14 @@ from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 
 from custom_interfaces.msg import TargetPosePolar
 from custom_interfaces.srv import LocateTarget, ConvertCamDistToLocalDist
-from std_msgs.msg import Bool, String
+from std_msgs.msg import Bool, String, UInt8
 from geometry_msgs.msg import PoseStamped
 import numpy as np
+
+class GimbalMode:
+    LOCK = 0
+    FOLLOW = 1
+    AUTO_AIM = 2
 
 class AutonomousApproach(Node):
     def __init__(self):
@@ -28,7 +33,8 @@ class AutonomousApproach(Node):
 
     def define_initial_state(self):
         self.auto_approach_active = False
-        self.target_acquired = False 
+        self.target_acquired = False
+        self.auto_aim_enable = False
         self.in_movement = False
         self.in_position = False
         # self.target_aimed = False
@@ -72,21 +78,26 @@ class AutonomousApproach(Node):
             qos_reliable
         )
         # Autonomous Shoot topics
-        self.start_hr_aiming_pub = self.create_publisher(
+        self.start_target_detection_pub = self.create_publisher(
             Bool,
             '/aeac/internal/auto_shoot/start_hr_aiming',
             qos_reliable
         )
-        self.start_auto_shoot = self.create_subscription(
-            Bool,
-            '/aeac/external/auto_shoot/start',
-            self.auto_shoot_callback,
+        self.start_auto_shoot_pub = self.create_publisher(
+            UInt8,
+            '/aeac/external/gimbal/set_mode',
             qos_reliable
         )
         self.target_in_aim_sub = self.create_subscription(
             Bool,
             '/aeac/internal/auto_shoot/target_in_aim',
             self.target_aimed_callback,
+            qos_reliable
+        )
+        self.auto_shoot_sub = self.create_subscription (
+            Bool,
+            '/aeac/external/auto_shoot/start',
+            self.auto_shoot_callback,
             qos_reliable
         )
         # Shoot procedure
@@ -185,9 +196,7 @@ class AutonomousApproach(Node):
         request.data = "start"
         self.activate_polar_pub.publish(request)
         
-        start_aiming_req = Bool()
-        start_aiming_req.data = True
-        self.start_hr_aiming_pub.publish(start_aiming_req)
+        self.toggle_auto_aim()
         
         self.send_polar_target_timer = self.create_timer(0.1, self.send_polar_target_pose)
 
@@ -205,12 +214,23 @@ class AutonomousApproach(Node):
         self.in_movement = True
           
     def auto_shoot_callback(self, msg: Bool):
-        if msg.data:
-            self.in_position = True
-            start_aiming_req = Bool()
-            start_aiming_req.data = True
-            self.start_hr_aiming_pub.publish(start_aiming_req)
+        self.get_logger().info(f"auto shoot callback. msg.data: {msg.data}, self.auto_aim_enable: {self.auto_aim_enable}")
+        if msg.data != self.auto_aim_enable:
+            self.get_logger().info("Toggling auto aim.")
+            self.toggle_auto_aim()
 
+    def toggle_auto_aim(self):
+        self.auto_aim_enable = not self.auto_aim_enable
+        
+        start_target_detection_req = Bool()
+        start_target_detection_req.data = self.auto_aim_enable
+        self.start_target_detection_pub.publish(start_target_detection_req)
+        
+        start_auto_aim_req = UInt8()
+        start_auto_aim_req.data = GimbalMode.AUTO_AIM if self.auto_aim_enable else GimbalMode.FOLLOW
+        self.start_auto_shoot_pub.publish(start_auto_aim_req)
+        
+    
     def in_position_callback(self, msg: Bool):
         self.in_position = msg.data
         self.in_movement = msg.data
@@ -228,6 +248,7 @@ class AutonomousApproach(Node):
     def target_aimed_callback(self, msg: Bool):
         # Note perso: Il faudrait peut etre regarder le temps avant la dernier reponse au cas ou le auto aim fail
         self.target_aimed = msg.data
+        self.get_logger().info(f"Target in aim: {self.target_aimed}")
         if self.target_aimed and self.in_position:
             self.shoot()
     

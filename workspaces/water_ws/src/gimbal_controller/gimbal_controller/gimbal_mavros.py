@@ -116,6 +116,7 @@ class GremsyMavros(Node):
 
         self.state_timer = self.create_timer(0.5, self.publish_state)
         self.state_pub = self.create_publisher(GimbalState, '/aeac/external/gimbal/state', 10)
+        self.target_in_aim_pub = self.create_publisher(Bool, '/aeac/internal/auto_shoot/target_in_aim', 10)
 
         # self.shoot_pub = self.create_publisher(Bool, '', 10)
 
@@ -133,7 +134,7 @@ class GremsyMavros(Node):
             self.gimbal_attitude_callback,
             10)
         
-                # TF broadcaster
+        # TF broadcaster
         self.tf_br = TransformBroadcaster(self)
 
         # Frame names
@@ -272,10 +273,16 @@ class GremsyMavros(Node):
 
         target_vel_pitch = self.pid_pitch.compute(msg.pitch_error, dt)
         target_vel_yaw = self.pid_yaw.compute(msg.yaw_error, dt)
-
+        
+        in_sight_msg = Bool()        
         if abs(msg.pitch_error) < AIM_ERROR_ACCEPTANCE and abs(msg.yaw_error) < AIM_ERROR_ACCEPTANCE:
             target_vel_pitch = 0.0   
             target_vel_yaw = 0.0
+            in_sight_msg.data = True
+            self.target_in_aim_pub(in_sight_msg)
+        else:
+            in_sight_msg.data = False
+            self.target_in_aim_pub(in_sight_msg)
 
         target_vel_pitch, target_vel_yaw = self.check_angle_limit(target_vel_pitch, target_vel_yaw)
         self.send_speed_cmd(target_vel_pitch, target_vel_yaw)
