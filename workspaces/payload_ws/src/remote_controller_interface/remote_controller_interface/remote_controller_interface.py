@@ -93,11 +93,11 @@ class RemoteControlInterface(Node):
         match itensity:
             case "LOW":
                 request.pwm = 1000
-            case "MIDDLE":
-                request.pwm = 1500
             case "HIGH":
                 request.pwm = 2000
-        
+            case _:
+                return
+            
         future = self.servo_cli.call_async(request)
         rclpy.spin_until_future_complete(self, future)
 
