@@ -3,6 +3,7 @@
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
+from custom_interfaces.srv import ServoState
 
 from mavros_msgs.msg import RCIn, State
 from mavros_msgs.srv import MessageInterval, SetMode
@@ -24,12 +25,18 @@ class RemoteControlInterface(Node):
         self.inital_state()
 
         qos_be = QoSProfile(reliability=QoSReliabilityPolicy.BEST_EFFORT, history=QoSHistoryPolicy.KEEP_LAST, depth=10)
+        qos_re = QoSProfile(reliability=QoSReliabilityPolicy.RELIABLE, history=QoSHistoryPolicy.KEEP_LAST, depth=10)
         
         self.set_mode_client = self.create_client(SetMode, '/mavros/set_mode')
         self.rc_sub = self.create_subscription(RCIn, '/mavros/rc/in', self.rc_callback, qos_be)
-        self.state_sub = self.create_subscription(State, '/mavros/state', self.state_callback, 10)
+        self.state_sub = self.create_subscription(State, '/mavros/state', self.state_callback, qos_re)
 
         self.get_logger().info("Remote Controller Interface Initialized")
+        
+        self.servo_cli = self.create_client(ServoState, '/aeac/external/payload/set_state')
+        
+        while not self.servo_cli.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Service not available, waiting...')
 
     def inital_state(self):
         self.requested_polar_lock = False
@@ -79,7 +86,20 @@ class RemoteControlInterface(Node):
                 
             case 'lap_controle':
                 self.lap_controle_change(state)
-                
+
+    def send_servo(self, servo_num, itensity):
+        request = ServoState()
+        request.servo_num = servo_num
+        match itensity:
+            case "LOW":
+                request.pwm = 1000
+            case "MIDDLE":
+                request.pwm = 1500
+            case "HIGH":
+                request.pwm = 2000
+        
+        future = self.servo_cli.call_async(request)
+        rclpy.spin_until_future_complete(self, future)
 
     def camera_change(self, state):
         match state:
@@ -103,7 +123,6 @@ class RemoteControlInterface(Node):
             self.get_logger().info("Finishing current lap and going to site")
         else:
             self.get_logger().info("Stopping lap now and going to site")
- 
         
     def set_mavros_mode(self, mode_str):
         req = SetMode.Request()

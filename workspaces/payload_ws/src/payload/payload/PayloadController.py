@@ -2,17 +2,23 @@ import rclpy
 from rclpy.node import Node
 from mavros_msgs.srv import CommandLong
 from custom_interfaces.srv import ServoState
+from custom_interfaces.msg import UiMessage
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
+from rclpy.qos import QoSProfile, ReliabilityPolicy
 
 class PayloadController(Node):
     def __init__(self):
         super().__init__('PayloadController')
+        
+        reliable_qos = QoSProfile(depth=10)
+        reliable_qos.reliability = ReliabilityPolicy.RELIABLE
 
         self.callback_group = ReentrantCallbackGroup()
 
-        self.srv = self.create_service(ServoState, '/payload/set_state', self.handle_servo_request, callback_group=self.callback_group)
+        self.srv = self.create_service(ServoState, '/aeac/external/payload/set_state', self.handle_servo_request, callback_group=self.callback_group)
 
+        self.ui_notification_pub = self.create_publisher(UiMessage, '/aeac/external/UI/display', reliable_qos) 
         self.mavros_client = self.create_client(CommandLong, '/mavros/cmd/command', callback_group=self.callback_group)
         while not self.mavros_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('waiting for /mavros/cmd/command...')
@@ -37,7 +43,7 @@ class PayloadController(Node):
 
             if mavros_result.success:
                 response.success = True
-                response.message = ""
+                response.message = f"The servo {request.servo_num} was succesfully " + ("opened" if request.pwm == 2000 else "closed")
             else:
                 response.success = False
                 response.message = f"MAVROS has rejected request (Result: {mavros_result.result})"
@@ -47,6 +53,11 @@ class PayloadController(Node):
             response.message = f"Error while processing request: {str(e)}"
             self.get_logger().error(response.message)
 
+        notification = UiMessage()
+        notification.message = response.message
+        notification.is_success = response.success
+        self.ui_notification_pub.publish(notification)
+        
         return response
 
 def main():
