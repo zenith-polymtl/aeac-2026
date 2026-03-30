@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(web_server_node)
+project(payload_web_server_node)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -25,20 +25,20 @@ set(DEPENDENCIES
 )
 
 add_library(${PROJECT_NAME}_lib
-  src/web_server_node.cpp
+  src/payload_web_server_node.cpp
 )
 
 ament_target_dependencies(${PROJECT_NAME}_lib std_msgs nlohmann_json rclcpp custom_interfaces)
 
-add_executable(web_server_node src/web_server_node.cpp)
-install(TARGETS web_server_node DESTINATION lib/${PROJECT_NAME})
+add_executable(payload_web_server_node src/payload_web_server_node.cpp)
+install(TARGETS payload_web_server_node DESTINATION lib/${PROJECT_NAME})
 
-target_link_libraries(web_server_node
+target_link_libraries(payload_web_server_node
   ${PROJECT_NAME}_lib
   ament_index_cpp::ament_index_cpp
 )
 
-target_include_directories(web_server_node_lib PUBLIC
+target_include_directories(payload_web_server_node_lib PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${Boost_INCLUDE_DIRS}
 )
