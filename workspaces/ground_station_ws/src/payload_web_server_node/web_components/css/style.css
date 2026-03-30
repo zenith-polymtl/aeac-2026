@@ -396,6 +396,9 @@ body {
     font-family: inherit; /* Ensure monospace inherits */
 }
 
+.logs-container > span.error { color: var(--color-error, #e74c3c); }
+.logs-container > span.info  { color: var(--color-info, inherit); }
+
 /* --- Switch Styling --- */
 .switch {
   position: relative;

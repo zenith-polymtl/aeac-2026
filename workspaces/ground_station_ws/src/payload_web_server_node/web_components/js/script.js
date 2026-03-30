@@ -7,12 +7,13 @@ const API_SERVO = "/api/mission/servo";
 const TAKE_PICTURE = "/api/mission/take_picture";
 const API_ABORT_ALL = "/api/mission/abort_all";
 
-function appendToLog(msg) {
+function appendToLog(msg, type = 'info') {
     const logsContainer = document.querySelector('.logs-container');
     const newLog = document.createElement('span');
     const timestamp = new Date().toLocaleTimeString("it-IT");
     
     newLog.textContent = `[${timestamp}] ${msg}`;
+    newLog.classList.add(type);
     logsContainer.appendChild(newLog);
     logsContainer.scrollTop = logsContainer.scrollHeight;
 }
