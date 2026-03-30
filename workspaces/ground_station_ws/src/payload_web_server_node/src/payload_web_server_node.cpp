@@ -1,4 +1,4 @@
-#include "web_server_node/web_server_node.hpp"
+#include "payload_web_server_node/payload_web_server_node.hpp"
 
 namespace /* anonymous */
 {
@@ -43,18 +43,20 @@ namespace /* anonymous */
     }
 } // anonymous namespace
 
-WebServerNode::WebServerNode() : Node("web_server_node"),
+PayloadWebServerNode::PayloadWebServerNode() : Node("payload_web_server_node"),
                                  ioc_(1),
                                  acceptor_(ioc_, {net::ip::make_address("0.0.0.0"), SERVER_PORT})
 {
+    initalize_parameters();
+    initalize_variables();
     initialize_publisher();
     initialize_subscriber();
-    package_share_dir_ = ament_index_cpp::get_package_share_directory("web_server_node");
+    package_share_dir_ = ament_index_cpp::get_package_share_directory("payload_web_server_node");
     server_thread_ = std::thread([this]()
                                  { run_server(); });
 }
 
-WebServerNode::~WebServerNode()
+PayloadWebServerNode::~PayloadWebServerNode()
 {
     acceptor_.close();
     if (server_thread_.joinable())
@@ -63,29 +65,108 @@ WebServerNode::~WebServerNode()
     }
 }
 
-void WebServerNode::initialize_publisher()
+void PayloadWebServerNode::initalize_parameters()
 {
-    mission_go_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/go", 10);
-    start_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/lap/start", 10);
-    finish_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/lap/finish", 10);
+    // Declare parameters
+    this->declare_parameter<double>("drone_heartbeat_rate", 1.0); //Hz
+    this->declare_parameter<std::string>("drone_heartbeat_topic", "/aeac/external/drone_heartbeat");
+    this->declare_parameter<int>("heartbeat_drone_failure_threashold", 3); // Number of missed heartbeat before flagging
 
-    move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/move_to_scene", 10);
-    abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/abort_all", 10);
+    // // Get parameters
+    drone_heartbeat_frequency_ = this->get_parameter("drone_heartbeat_rate").as_double();
+    drone_heartbeat_topic_ = this->get_parameter("drone_heartbeat_topic").as_string();
+    heartbeat_drone_failure_threashold_ = this->get_parameter("heartbeat_drone_failure_threashold").as_int();
 }
 
-void WebServerNode::initialize_subscriber() 
+void PayloadWebServerNode::initalize_variables()
 {
-    message_to_ui_subsciber_ = create_subscription<UiMessage>(
-		"/send_to_ui", 10, std::bind(&WebServerNode::broadcast_message, this, std::placeholders::_1));
+    auto period = std::chrono::duration<double>(1.0 / drone_heartbeat_frequency_);
+    heartbeat_timer_ = this->create_wall_timer(
+        std::chrono::duration_cast<std::chrono::milliseconds>(period),
+        std::bind(&PayloadWebServerNode::heartbeat_timer_callback, this)
+    );
 }
 
-void WebServerNode::broadcast_message(const UiMessage msg)
+void PayloadWebServerNode::initialize_publisher()
+{
+    rclcpp::QoS reliable_qos = rclcpp::QoS(rclcpp::KeepLast(10));
+    reliable_qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
+
+    mission_go_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/go", reliable_qos);
+    start_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/lap/start", reliable_qos);
+    finish_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/lap/finish", reliable_qos);
+    move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/move_to_scene", reliable_qos);
+
+    servo_client_ = create_client<ServoState>("/aeac/external/payload/set_state");
+
+    abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/abort_all", reliable_qos);
+
+    // while (!servo_client_->wait_for_service(std::chrono::seconds(1))) {
+    //     RCLCPP_INFO(this->get_logger(), "Waiting for servo client...");
+    // }
+}
+
+void PayloadWebServerNode::initialize_subscriber() 
+{
+    auto reliable_qos = rclcpp::QoS(rclcpp::KeepLast(10));
+    reliable_qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
+    
+    message_to_ui_subsciber_ = create_subscription<UiMessage>("/aeac/external/UI/display", reliable_qos, std::bind(&PayloadWebServerNode::ui_message_callback, this, std::placeholders::_1));
+    drone_heartbeat_subsciber_ = create_subscription<DroneHealth>(drone_heartbeat_topic_, reliable_qos, std::bind(&PayloadWebServerNode::drone_heartbeat_callback, this, std::placeholders::_1));
+}
+
+void PayloadWebServerNode::heartbeat_timer_callback()
+{
+    if (!is_connected_) return;
+
+    missed_drone_heartbeat_++;
+    if (missed_drone_heartbeat_ > heartbeat_drone_failure_threashold_)
+    {
+        is_connected_ = false;
+        send_connection_notification();
+    }
+}
+
+void PayloadWebServerNode::ui_message_callback(const UiMessage msg)
+{
+    send_log(msg.is_success, msg.message);
+}
+
+void PayloadWebServerNode::drone_heartbeat_callback(const DroneHealth)
+{
+    if (!is_connected_)
+    {
+        is_connected_ = true;
+        send_connection_notification();
+    }
+    missed_drone_heartbeat_ = 0;
+}
+
+void PayloadWebServerNode::send_log(bool is_success, std::string message)
 {
     nlohmann::json status_json = {
-        {"is_success", msg.is_success},
-        {"message", msg.message},
+        {"type", "message"},
+        {"is_success", is_success},
+        {"message", message},
     };
 
+    send_notification(status_json);
+}
+
+void PayloadWebServerNode::send_connection_notification(const bool ignore_log)
+{
+    nlohmann::json status_json = {
+        {"type", "connection"},
+        {"is_connected", is_connected_},
+    };
+    send_notification(status_json);
+    if (!ignore_log)
+        send_log(is_connected_, is_connected_ ? "Drone Connection established" : "Drone Connection lost");
+}
+
+
+void PayloadWebServerNode::send_notification(const nlohmann::json status_json) 
+{
     std::string message = status_json.dump();
 
     std::lock_guard<std::mutex> lock(ws_mutex_);
@@ -108,11 +189,11 @@ void WebServerNode::broadcast_message(const UiMessage msg)
     }
 }
 
-void WebServerNode::run_server()
+void PayloadWebServerNode::run_server()
 {
     std::string doc_root = package_share_dir_ + WEB_COMPONENT_FOLDER;
     std::cout << doc_root.c_str() << std::endl;
-    RCLCPP_INFO(this->get_logger(), "Starting web server on port 8080");
+    RCLCPP_INFO_STREAM(this->get_logger(), "Starting web server on port http://localhost:" << SERVER_PORT);
     for (;;)
     {
         beast::error_code ec;
@@ -131,7 +212,7 @@ void WebServerNode::run_server()
     }
 }
 
-beast::string_view WebServerNode::mime_type(beast::string_view path)
+beast::string_view PayloadWebServerNode::mime_type(beast::string_view path)
 {
     using beast::iequals;
     auto const ext = [&path]
@@ -170,7 +251,7 @@ beast::string_view WebServerNode::mime_type(beast::string_view path)
     return "application/text";
 }
 
-std::string WebServerNode::path_cat(beast::string_view base, beast::string_view path)
+std::string PayloadWebServerNode::path_cat(beast::string_view base, beast::string_view path)
 {
     if (base.empty())
     {
@@ -186,7 +267,7 @@ std::string WebServerNode::path_cat(beast::string_view base, beast::string_view 
 }
 
 http::response<http::string_body>
-WebServerNode::handle_request(
+PayloadWebServerNode::handle_request(
     std::string const &doc_root,
     http::request<http::string_body> &&req)
 {
@@ -211,8 +292,17 @@ WebServerNode::handle_request(
     return make_not_found(req, target);
 }
 
+ServoCommand PayloadWebServerNode::parse_servo_command(const std::string& body)
+{
+    auto j = json::parse(body);
+    ServoCommand cmd;
+    cmd.servo_num = j.at("servo_num").get<int>();
+    cmd.pwm       = j.at("pwm").get<int>();
+    return cmd;
+}
+
 std::optional<http::response<http::string_body>>
-WebServerNode::try_handle_api(
+PayloadWebServerNode::try_handle_api(
     beast::string_view target,
     const http::request<http::string_body> &req)
 {
@@ -223,65 +313,65 @@ WebServerNode::try_handle_api(
         msg.data = true;
         mission_go_publisher_->publish(msg);
 
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "application/json");
-        res.body() = R"({"message": "Request Mission Go received"})";
-        res.prepare_payload();
-        res.keep_alive(req.keep_alive());
-        return res;
+        return generate_responce("Request Mission Go received", req);
     }
     if (target == API_START_LAP)
     {
-        RCLCPP_INFO(get_logger(), "Starting Laps!");
-        std_msgs::msg::Bool msg;
-        msg.data = true;
-        start_lap_publisher_->publish(msg);
+        RCLCPP_INFO(get_logger(), "Start Lap Received!");
 
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "application/json");
-        res.body() = R"({"message": "Request Start Lap received"})";
-        res.prepare_payload();
-        res.keep_alive(req.keep_alive());
-        return res;
+        return generate_responce("Start Lap received", req);
     }
-
-    // API_MISSION_GO = "/api/mission/go";
-    // const std::string API_START_LAP = "/api/mission/lap/start";
-    // const std::string API_FINISH_LAP = "/api/mission/lap/finish";
-    // const std::string API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
-    // const std::string API_ABORT_ALL = "/api/mission/abort_all";
-
     if (target == API_FINISH_LAP)
     {
-        RCLCPP_INFO(get_logger(), "Finishing the current lap and stopping");
-        std_msgs::msg::Bool msg;
-        msg.data = true;
-        finish_lap_publisher_->publish(msg);
+        RCLCPP_INFO(get_logger(), "Finish Lap Received!");
 
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "application/json");
-        res.body() = R"({"message": "Request Finish Lap received"})";
-        res.prepare_payload();
-        res.keep_alive(req.keep_alive());
-        return res;
+        return generate_responce("Finish Lap received", req);
+    }
+    if (target == API_STOP_LAP)
+    {
+        RCLCPP_INFO(get_logger(), "Stop Lap Received!");
+
+        return generate_responce("Stop Lap received", req);
     }
     if (target == API_MOVE_TO_SCENE)
     {
-        RCLCPP_INFO(get_logger(), "Starting Scene movement procedure!");
+        RCLCPP_INFO(get_logger(), "Received Scene movement command!");
         std_msgs::msg::Bool msg;
         msg.data = true;
         move_to_scene_publisher_->publish(msg);
 
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "application/json");
-        res.body() = R"({"message": "Request Move to Scene received"})";
-        res.prepare_payload();
-        res.keep_alive(req.keep_alive());
-        return res;
+        return generate_responce("Request Scene movement received", req);
+    }
+    if (target == API_SERVO) 
+    {
+        RCLCPP_INFO(get_logger(), "Received Servo command!");
+
+        try
+        {
+            ServoCommand cmd = parse_servo_command(req.body());
+
+            RCLCPP_INFO(get_logger(), "Servo: %d, PWM: %d",
+                        cmd.servo_num, cmd.pwm);
+
+            auto request = std::make_shared<ServoState::Request>();
+            request->servo_num = cmd.servo_num;
+            request->pwm = cmd.pwm;
+
+            servo_client_->async_send_request(request);
+
+            return generate_responce("Servo command received", req);
+        }
+        catch (const std::exception& e)
+        {
+            RCLCPP_ERROR(get_logger(), "Invalid JSON: %s", e.what());
+            return generate_responce("Invalid JSON", req);
+        }
+    }
+    if (target == API_TAKE_PICTURE)
+    {
+        RCLCPP_INFO(get_logger(), "Take Picture Received!");
+
+        return generate_responce("Take Picture received", req);
     }
     if (target == API_ABORT_ALL)
     {
@@ -290,18 +380,22 @@ WebServerNode::try_handle_api(
         msg.data = true;
         abort_all_mission_publisher_->publish(msg);
 
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "application/json");
-        res.body() = R"({"message": "Abort received"})";
-        res.prepare_payload();
-        res.keep_alive(req.keep_alive());
-        return res;
+        return generate_responce("Request Abort received", req);
     }
     return std::nullopt;
 }
 
-std::optional<http::response<http::string_body>> WebServerNode::try_serve_static_file(
+http::response<http::string_body> PayloadWebServerNode::generate_responce(std::string message, const http::request<http::string_body> &req) {
+    http::response<http::string_body> res{http::status::ok, req.version()};
+    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+    res.set(http::field::content_type, "application/json");
+    res.body() = "{\"message\": \"" + message + "\"}";
+    res.prepare_payload();
+    res.keep_alive(req.keep_alive());
+    return res;
+}
+
+std::optional<http::response<http::string_body>> PayloadWebServerNode::try_serve_static_file(
     std::string const &doc_root,
     beast::string_view target,
     const http::request<http::string_body> &req)
@@ -337,7 +431,12 @@ std::optional<http::response<http::string_body>> WebServerNode::try_serve_static
     return res;
 }
 
-void WebServerNode::do_session(tcp::socket socket, std::string const &doc_root)
+void PayloadWebServerNode::on_client_connection()
+{
+    send_connection_notification(true);
+}
+
+void PayloadWebServerNode::do_session(tcp::socket socket, std::string const &doc_root)
 {
     beast::error_code ec;
     beast::flat_buffer buffer;
@@ -362,18 +461,19 @@ void WebServerNode::do_session(tcp::socket socket, std::string const &doc_root)
             std::lock_guard<std::mutex> lock(ws_mutex_);
             ws_sessions_.insert(ws_ptr);
         }
-        RCLCPP_INFO(get_logger(), "New WebSocket client connected. Total: %zu", ws_sessions_.size());
-
         auto cleanup = [&]() {
             std::lock_guard<std::mutex> lock(ws_mutex_);
             ws_sessions_.erase(ws_ptr);
-            RCLCPP_INFO(get_logger(), "WebSocket client disconnected. Total: %zu", ws_sessions_.size());
+            // RCLCPP_INFO(get_logger(), "WebSocket client disconnected. Total: %zu", ws_sessions_.size());
         };
         struct Guard {
             std::function<void()> fn;
             ~Guard() { if (fn) fn(); }
         } guard{cleanup};
-        RCLCPP_INFO(get_logger(), "New WebSocket client connected. Total: %zu", ws_sessions_.size());
+
+        on_client_connection();
+
+        // RCLCPP_INFO(get_logger(), "New WebSocket client connected. Total: %zu", ws_sessions_.size());
         for (;;)
         {
             beast::flat_buffer ws_buffer;
@@ -394,7 +494,7 @@ void WebServerNode::do_session(tcp::socket socket, std::string const &doc_root)
         ws.close(websocket::close_code::normal, ec);
         if (ec && ec != websocket::error::closed)
         {
-            RCLCPP_WARN(get_logger(), "WebSocket close failed: %s", ec.message().c_str());
+            // RCLCPP_WARN(get_logger(), "WebSocket close failed: %s", ec.message().c_str());
         }
     }
     else
@@ -410,7 +510,7 @@ void WebServerNode::do_session(tcp::socket socket, std::string const &doc_root)
     socket.shutdown(tcp::socket::shutdown_send, ec);
 }
 
-void WebServerNode::broadcast_status()
+void PayloadWebServerNode::broadcast_status()
 {
     nlohmann::json status_json = {
         {"timestamp", rclcpp::Clock().now().seconds()},
@@ -436,7 +536,7 @@ void WebServerNode::broadcast_status()
 int main(int argc, char *argv[])
 {
     rclcpp::init(argc, argv);
-    auto node = std::make_shared<WebServerNode>();
+    auto node = std::make_shared<PayloadWebServerNode>();
     rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;

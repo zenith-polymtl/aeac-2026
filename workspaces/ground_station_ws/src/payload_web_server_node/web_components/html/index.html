@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super page de Zenith</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+</head>
+<body>
+    <div class="main-container">
+        <div class="left-container">
+            <div class="top-container">
+                <div class="mission-status-info-container">
+                    <span id="mission-status-span">Mission Status: IDDLE</span>
+                    <span id="connection-span">Connection: XXX</span>
+                </div>
+                <div class="mission-progresson-info-container">
+                    <span id="lap-time-span">Lap time: XX:XX</span>
+                    <span id="time-to-reach-site-span">Time to reach site: XX:XX</span>
+                    <span id="detected-targets-span">Target detected: X</span>
+                </div>
+                <div class="zenith-logo-container">
+                    <img src="/images/LOGO.png" alt="logo" id="logo-image">
+                    <h2>Zenith Mission 1 Control Page</h2>
+                </div>
+            </div>
+            <div class="middle-top-container">
+                <div class="button-container">
+                    <h3>Buttons</h3>
+                    <div class="buttons-grid">
+                        <button id="start-button">Start</button>
+                        <button id="start-lap-button">Start Lap</button>
+                        <button id="finish-lap-button">Finish Lap</button>
+                        <button id="stop-lap-button">Stop Lap</button>
+                        <button id="go-to-site-button">Go to Site</button>
+                        <button id="take-picture-button">Take Picture</button>
+                        <button id="abort-button">Abort</button>
+                    </div>
+                </div>
+                <div class="image-display-container">
+                    <img class="target-image" src="/images/targets/rgb_0012.png" alt="target">
+                </div>
+            </div>
+            <div class="middle-bottom-container">
+                <div class="toggle-servo-container">
+                    <div class="servo-toggle-item">
+                        <span>Servo 1</span>
+                        <label class="switch">
+                            <input type="checkbox" id="servo-1-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="servo-toggle-item">
+                        <span>Servo 2</span>
+                        <label class="switch">
+                            <input type="checkbox" id="servo-2-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="confirm-deny-container">
+                </div>
+            </div>
+            <div class="bottom-container">
+            </div>
+        </div>
+        <div class="logs-container">
+        </div>
+    </div>
+    <script src="/js/script.js"></script>
+</body>
+</html>
