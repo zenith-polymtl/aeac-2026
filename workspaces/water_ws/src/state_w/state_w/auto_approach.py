@@ -6,7 +6,7 @@ from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 
 from custom_interfaces.msg import TargetPosePolar
 from custom_interfaces.srv import LocateTarget, ConvertCamDistToLocalDist
-from std_msgs.msg import Bool, String, UInt8
+from std_msgs.msg import Bool, String, UInt8, Empty
 from geometry_msgs.msg import PoseStamped
 import numpy as np
 
@@ -119,17 +119,17 @@ class AutonomousApproach(Node):
             qos_reliable
         )
         self.take_picture_pub = self.create_publisher(
-            Bool,
+            Empty,
             '/aeac/internal/take_picture',
             qos_reliable
         )
         
-        # Service Clients
-        self.locate_target_client = self.create_client(LocateTarget, '/aeac/auto_approach/locate_target')
-        # self.transform_target_pos_client = self.create_client(ConvertCamDistToLocalDist, 'target_distance')
+        # # Service Clients
+        # self.locate_target_client = self.create_client(LocateTarget, '/aeac/auto_approach/locate_target')
+        # # self.transform_target_pos_client = self.create_client(ConvertCamDistToLocalDist, 'target_distance')
 
-        while not self.locate_target_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('Locate target service not available, waiting...')
+        # while not self.locate_target_client.wait_for_service(timeout_sec=1.0):
+        #     self.get_logger().info('Locate target service not available, waiting...')
         
         # while not self.transform_target_pos_client.wait_for_service(timeout_sec=1.0):
         #     self.get_logger().info('Convert target location service not available, waiting...')
@@ -242,6 +242,7 @@ class AutonomousApproach(Node):
             self.shoot()
             
     def take_picture_callback(self, msg: Bool):
+        self.get_logger().info(f"Take picture command received with data: {msg.data}.")
         if msg.data:
             self.take_picture()
     
@@ -253,6 +254,7 @@ class AutonomousApproach(Node):
             self.shoot()
     
     def shoot(self):
+        return
         request = Bool()
         request.data = True
         self.shoot_pub.publish(request)
@@ -260,8 +262,7 @@ class AutonomousApproach(Node):
         self.get_logger().info("Target shot and picture taken.")
     
     def take_picture(self):
-        request = Bool()
-        request.data = True
+        request = Empty()
         self.take_picture_pub.publish(request)
 
 

@@ -5,10 +5,13 @@ set(PACKAGE_NAME water_web_server_node)
 set(DEPENDENCIES
   rclcpp
   std_msgs
+  sensor_msgs
   ament_index_cpp
   Boost
   nlohmann_json
   custom_interfaces
+  OpenCV
+  cv_bridge
 )
 
 set(LIB_NAME ${PACKAGE_NAME}_lib)
@@ -28,7 +31,12 @@ add_library(${PROJECT_NAME}_lib
   src/water_web_server_node.cpp
 )
 
-ament_target_dependencies(${LIB_NAME} std_msgs nlohmann_json rclcpp custom_interfaces)
+ament_target_dependencies(${LIB_NAME} std_msgs nlohmann_json rclcpp custom_interfaces OpenCV cv_bridge)
+# foreach(pkg IN LISTS DEPENDENCIES)
+#   ament_target_dependencies(${LIB_NAME} ${pkg})
+# endforeach()
+
+
 
 add_executable(${PACKAGE_NAME} src/${EXECUTABLE_NAME}.cpp)
 install(TARGETS ${PACKAGE_NAME} DESTINATION lib/${PROJECT_NAME})

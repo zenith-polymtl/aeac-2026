@@ -4,6 +4,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include "std_msgs/msg/bool.hpp"
+#include "std_msgs/msg/u_int8.hpp"
 #include <thread>
 #include <fstream>
 #include <string>
@@ -15,9 +16,16 @@
 #include <boost/beast/http/file_body.hpp>
 #include <boost/beast/websocket.hpp>
 #include <nlohmann/json.hpp>
+#include "sensor_msgs/msg/image.hpp"
 #include "custom_interfaces/msg/ui_message.hpp"
 #include "custom_interfaces/msg/gimbal_state.hpp"
 #include <memory>
+#include <filesystem>
+#include <opencv2/opencv.hpp>
+#include <cv_bridge/cv_bridge.h>
+#include <chrono>
+
+namespace fs = std::filesystem;
 
 const std::string WEB_COMPONENT_FOLDER = "/web_components/";
 const int SERVER_PORT = 8080;
@@ -41,6 +49,7 @@ namespace net = boost::asio;
 using tcp = boost::asio::ip::tcp;
 using UiMessage = custom_interfaces::msg::UiMessage;
 using GimbalState = custom_interfaces::msg::GimbalState;
+using Image = sensor_msgs::msg::Image;
 
 class WaterWebServerNode : public rclcpp::Node
 {
@@ -74,6 +83,7 @@ private:
     // Socket functions
     void broadcast_status();
     void broadcast_message(const UiMessage msg);
+    void picture_callback(const Image msg);
     // Variables
     std::set<websocket::stream<tcp::socket> *> ws_sessions_;
     std::mutex ws_mutex_;
@@ -86,6 +96,7 @@ private:
     
 	rclcpp::Subscription<UiMessage>::SharedPtr message_to_ui_subsciber_;
     rclcpp::Subscription<GimbalState>::SharedPtr gimbal_state_subscriber_;
+    rclcpp::Subscription<Image>::SharedPtr picture_subscriber_;
 
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr mission_go_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr start_lap_publisher_;
@@ -100,7 +111,7 @@ private:
 
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr abort_all_mission_publisher_;
 
-    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr gimbal_mode_publisher_;
+    rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr gimbal_mode_publisher_;
 
     boost::asio::io_context ioc_;
     boost::asio::ip::tcp::acceptor acceptor_;

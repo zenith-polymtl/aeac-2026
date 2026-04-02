@@ -96,6 +96,8 @@ function initaliseSocket() {
                     pitchElement.textContent = data.pitch.toFixed(2);
                     yawElement.textContent = data.yaw.toFixed(2);
                     break;
+                case "new_picture":
+                    document.getElementById("target-image").src = data.url;
                 default:
                     console.warn("Unknown message type:", data.type);
             }

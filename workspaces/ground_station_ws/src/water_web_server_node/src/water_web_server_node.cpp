@@ -79,8 +79,11 @@ void WaterWebServerNode::initialize_publisher()
 
 void WaterWebServerNode::initialize_subscriber() 
 {
+    rclcpp::QoS qos_profile(rclcpp::KeepLast(10));
+    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
+
     message_to_ui_subsciber_ = create_subscription<UiMessage>(
-		"/send_to_ui", 10, std::bind(&WaterWebServerNode::broadcast_message, this, std::placeholders::_1));
+		"/aeac/external/send_to_ui", 10, std::bind(&WaterWebServerNode::broadcast_message, this, std::placeholders::_1));
 
     gimbal_state_subscriber_ = create_subscription<GimbalState>(
         "/aeac/external/gimbal/state", 10, [this](const GimbalState::SharedPtr msg)
@@ -112,6 +115,10 @@ void WaterWebServerNode::initialize_subscriber()
             }
         }
     );
+
+    picture_subscriber_ = create_subscription<Image>(
+        "/aeac/external/target_picture", qos_profile,
+        std::bind(&WaterWebServerNode::picture_callback, this, std::placeholders::_1));
 }
 
 void WaterWebServerNode::broadcast_message(const UiMessage msg)
@@ -141,6 +148,46 @@ void WaterWebServerNode::broadcast_message(const UiMessage msg)
             RCLCPP_WARN(get_logger(), "Error Broadcasting");
         }
 
+    }
+}
+
+void WaterWebServerNode::picture_callback(const Image msg)
+{
+    try {
+        RCLCPP_INFO(this->get_logger(), "Recived picture");
+
+        cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+
+        std::string image_directory = "/images/targets";
+
+        std::string images_dir = package_share_dir_ + WEB_COMPONENT_FOLDER + image_directory;
+        if (!fs::exists(images_dir)) {
+            fs::create_directories(images_dir);
+        }
+
+        auto now = std::chrono::system_clock::now();
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+        std::string filename = "drone_pic_" + std::to_string(ms) + ".jpg";
+        std::string full_path = images_dir + "/" + filename;
+
+        cv::imwrite(full_path, cv_ptr->image);
+        RCLCPP_INFO(this->get_logger(), "Saved picture to: %s", full_path.c_str());
+
+        nlohmann::json img_json = {
+            {"type", "new_picture"},
+            {"url", image_directory + "/" + filename}
+        };
+        
+        std::string ws_msg = img_json.dump();
+        std::lock_guard<std::mutex> lock(ws_mutex_);
+        for (auto *ws_ptr : ws_sessions_) {
+            beast::error_code ec;
+            ws_ptr->text(true);
+            ws_ptr->write(net::buffer(ws_msg), ec);
+        }
+
+    } catch (cv_bridge::Exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
     }
 }
 
