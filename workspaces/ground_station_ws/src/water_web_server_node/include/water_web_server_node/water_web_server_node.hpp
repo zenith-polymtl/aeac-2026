@@ -99,9 +99,6 @@ private:
     rclcpp::Subscription<Image>::SharedPtr picture_subscriber_;
 
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr mission_go_publisher_;
-    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr start_lap_publisher_;
-    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr finish_lap_publisher_;
-
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr auto_approach_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr auto_shoot_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr shoot_publisher_;

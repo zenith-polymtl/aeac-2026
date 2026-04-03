@@ -65,9 +65,7 @@ WaterWebServerNode::~WaterWebServerNode()
 
 void WaterWebServerNode::initialize_publisher()
 {
-    mission_go_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/go", 10);
-    start_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/lap/start", 10);
-    finish_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/lap/finish", 10);
+    mission_go_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/go", 10);
     move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/move_to_scene", 10);
     abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/abort_all", 10);
     gimbal_mode_publisher_ = create_publisher<std_msgs::msg::UInt8>("/aeac/external/gimbal/set_mode", 10);
@@ -325,7 +323,7 @@ WaterWebServerNode::try_handle_api(
         msg.data = true;
         auto_approach_publisher_->publish(msg);
 
-        return generate_responce("Request Auto Approach received", req);
+        // return generate_responce("Request Auto Approach received", req);
     }
     if (target == API_AUTO_SHOOT)
     {
@@ -506,6 +504,7 @@ void WaterWebServerNode::do_session(tcp::socket socket, std::string const &doc_r
 
 void WaterWebServerNode::broadcast_status()
 {
+    RCLCPP_INFO(get_logger(), "BroadCast Reiceived");
     nlohmann::json status_json = {
         {"timestamp", rclcpp::Clock().now().seconds()},
         {"status", current_status_},

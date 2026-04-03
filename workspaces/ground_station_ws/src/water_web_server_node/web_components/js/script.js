@@ -9,12 +9,13 @@ const API_GIMBAL_FOLLOW = "/api/gimbal_follow";
 const API_GIMBAL_LOCK = "/api/gimbal_lock";
 
 
-function appendToLog(msg) {
+function appendToLog(msg, type = 'info') {
     const logsContainer = document.querySelector('.logs-container');
     const newLog = document.createElement('span');
-    const timestamp = new Date().toLocaleTimeString();
+    const timestamp = new Date().toLocaleTimeString("it-IT");
     
     newLog.textContent = `[${timestamp}] ${msg}`;
+    newLog.classList.add(type);
     logsContainer.appendChild(newLog);
     logsContainer.scrollTop = logsContainer.scrollHeight;
 }
@@ -30,7 +31,7 @@ async function sendCommand(endpoint) {
         if (response.ok) {
             const data = await response.json();
             const successMessage = `Success: ${JSON.stringify(data.message)}`;
-            appendToLog(successMessage)
+            // appendToLog(successMessage)
         } else {
             const errorMessage = `Error: ${response.statusText}`;
         }
@@ -84,7 +85,7 @@ function initaliseSocket() {
             switch(data.type) {
                 case "message":
                     console.log("Status update:", data);
-                    appendToLog(`Received Message: ${data.message}`, data.is_success ? 'info':'error')
+                    appendToLog(`${data.message}`, data.is_success ? 'info':'error')
                     break;
                     
                 case "gimbal_state":
@@ -97,6 +98,7 @@ function initaliseSocket() {
                     yawElement.textContent = data.yaw.toFixed(2);
                     break;
                 case "new_picture":
+                    console.log("New picture: ", data.url);
                     document.getElementById("target-image").src = data.url;
                 default:
                     console.warn("Unknown message type:", data.type);

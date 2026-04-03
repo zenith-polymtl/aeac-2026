@@ -57,7 +57,7 @@
           
         # Object Detection - CUSTOM ONNX MODEL  
         object_detection:  
-            od_enabled: true
+            od_enabled: false
             enable_tracking: true
             allow_reduced_precision_inference: true
 
