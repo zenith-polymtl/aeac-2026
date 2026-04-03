@@ -19,6 +19,7 @@ class ImageCapture(Node):
         
         self.target_count = 1
         self.bridge = CvBridge()
+        self.latest_image_msg = None
         os.makedirs(self.save_dir, exist_ok=True)
         self.get_logger().info('ImageCapture Node Started!')
 

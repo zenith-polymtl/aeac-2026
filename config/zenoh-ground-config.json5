@@ -13,7 +13,7 @@
           "/zed/zed_node/status/heartbeat",
           "/zed/zed_node/obj_det/objects",
           "/chatter",  
-          "/mavros.*"  
+          "/aeac/external.*"  
         ],  
         subscribers: [  
           "/tf",  
@@ -25,7 +25,7 @@
           "/zed/zed_node/status/heartbeat",
           "/zed/zed_node/obj_det/objects",
           "/chatter",  
-          "/mavros.*"  
+          "/aeac/external.*"  
         ]  
       }  
     }  
