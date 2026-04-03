@@ -15,7 +15,11 @@ services:
       - ROS_DOMAIN_ID=2
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       - ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
-    command: ["bash", "-lc", "sleep infinity"]
+    command: >
+      bash -lc "
+        source /opt/ros/humble/setup.bash &&
+        ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS1:921600 fcu_protocol:=v2.0
+      "
 
 # ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyTHS1:921600 fcu_protocol:=v2.0
 
