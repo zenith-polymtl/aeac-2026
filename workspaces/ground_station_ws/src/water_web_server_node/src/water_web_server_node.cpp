@@ -66,8 +66,8 @@ WaterWebServerNode::~WaterWebServerNode()
 void WaterWebServerNode::initialize_publisher()
 {
     mission_go_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/go", 10);
-    move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/move_to_scene", 10);
-    abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/abort_all", 10);
+    move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/move_to_scene", 10);
+    abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/abort_all", 10);
     gimbal_mode_publisher_ = create_publisher<std_msgs::msg::UInt8>("/aeac/external/gimbal/set_mode", 10);
     auto_approach_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/auto_approach/start", 10);
     auto_shoot_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/auto_shoot/start", 10);
