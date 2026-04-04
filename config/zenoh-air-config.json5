@@ -25,7 +25,7 @@
           "/zed/zed_node/status/heartbeat",
           "/zed/zed_node/obj_det/objects",
           "/chatter",  
-          "/aeac/external.* "   
+          "/aeac/external.*"   
         ]  
       } 
     }  

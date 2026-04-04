@@ -161,6 +161,8 @@ water-stack:
 		nohup ros2 launch zed_wrapper zed_camera.launch.py \
 			camera_model:=zed2i \
 			ros_params_override_path:=config/zenith_stereo.yaml \
+			publish_tf:=false \
+			publish_map_tf:=false \
 			> /tmp/zed_launch.log 2>&1 & \
 	"
 

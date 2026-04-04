@@ -5,11 +5,12 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 
 from custom_interfaces.msg import TargetPosePolar, UiMessage
-from custom_interfaces.srv import LocateTarget, ConvertCamDistToLocalDist
 from std_msgs.msg import Bool, String, UInt8, Empty
-from geometry_msgs.msg import PoseStamped, Point
+from geometry_msgs.msg import PoseStamped, Point, Pose
 from zed_msgs.msg import ObjectsStamped
 import numpy as np
+from tf2_ros import Buffer, TransformListener
+from tf2_geometry_msgs import do_transform_pose
 
 class GimbalMode:
     LOCK = 0
@@ -52,10 +53,22 @@ class AutonomousApproach(Node):
     def set_up_topics(self):
         qos_reliable = self._create_qos_profile(QoSReliabilityPolicy.RELIABLE)
         
+        
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
+        
         self.message_to_ui_pub = self.create_publisher(
             UiMessage,
             'aeac/external/send_to_ui',
             qos_reliable
+        )
+        
+        self.abort_publisher = self.create_subscription(
+            Bool,
+            '/aeac/external/mission/abort_all',
+            self.abort_callback,
+            qos_reliable
+            
         )
         
         # Autonomous Approach topics
@@ -177,36 +190,44 @@ class AutonomousApproach(Node):
             self.get_logger().info("Autonomous approach deactivated.")
             self.define_initial_state()
 
-
-    def float_array_to_point(self, arr):
-        point = Point()
-        point.x = float(arr[0])
-        point.y = float(arr[1])
-        point.z = float(arr[2])
-        return point
-
-
     def target_position_received_callback(self, msg: ObjectsStamped):
         try:
             if len(msg.objects) == 0:
                 self.send_message_to_ui("No object detected", Falses)
             
             best_confidence = 0
-            object_position = Point()
+            best_found_object = None
             for obj in msg.objects:
                 if best_confidence < obj.confidence:
                     best_confidence = obj.confidence
-                    object_position = self.float_array_to_point(obj.position)
+                    best_found_object = obj
 
-            self.send_message_to_ui(f"Object detected with {best_confidence*100}% confidence at position: {object_position}")
+            self.send_message_to_ui(f"Object {best_found_object.label} detected with {best_confidence*100}% confidence at position: {best_found_object.position}")
 
             self.target_acquired = True
         
             pose_stamped = PoseStamped()
-            pose_stamped.pose.position = object_position
+            pose_stamped.header = msg.header
+
+            target_position = Pose()
+            target_position.position.x = float(best_found_object.position[0])
+            target_position.position.y = float(best_found_object.position[1])
+            target_position.position.z = float(best_found_object.position[2])
             
+            transform = self.tf_buffer.lookup_transform(
+                'zed_camera_center',
+                # 'map',
+                'base_link',
+                rclpy.time.Time()
+            )
+            pose_stamped.pose = do_transform_pose(target_position, transform)
             self.polar_center_location_pub.publish(pose_stamped)
-            self.activate_polar_timer = self.create_timer(0.1, self.activate_polar_callback)
+            
+            self.get_logger().info(f"creating timer")
+            # self.activate_polar_timer = self.create_timer(1.0, self.activate_polar_callback)
+            self.activate_polar_callback()
+            self.get_logger().info(f"timer created")
+
             
         except Exception as e:
             self.get_logger().error(f"Transform service call failed: {e}")
@@ -217,34 +238,26 @@ class AutonomousApproach(Node):
         req.is_success = True
         
         self.message_to_ui_pub.publish(req)
-        
-    # def target_position_transformed_callback(self, future: PoseStamped):
-    #     try:                        
-    #         if not self.auto_approach_active:
-    #             return
-            
-    #         response = future.result()
-    #         self.polar_center_location_pub.publish(response.target)
-    #         self.activate_polar_timer = self.create_timer(0.1, self.activate_polar_callback)
-
-                    
-    #     except Exception as e:
-    #         self.get_logger().error(f"Failed to transform target position: {e}")
     
+    def abort_callback(self, msg: Bool):
+        if msg.data:
+            self.define_initial_state()
+            
     def activate_polar_callback(self):
-        self.activate_polar_timer.cancel()
+        self.get_logger().info(f"activate_polar_callback called")
         
         request = String()
         request.data = "start"
         self.activate_polar_pub.publish(request)
         
-        self.toggle_auto_aim()
+        # self.toggle_auto_aim()
         
-        self.send_polar_target_timer = self.create_timer(0.1, self.send_polar_target_pose)
-
+        self.send_polar_target_pose()
+        # self.send_polar_target_timer = self.create_timer(0.1, self.send_polar_target_pose)
+        # self.activate_polar_timer.destroy()
 
     def send_polar_target_pose(self):
-        self.send_polar_target_timer.cancel()
+        # self.send_polar_target_timer.cancel()
 
         request = TargetPosePolar()
         request.relative = False

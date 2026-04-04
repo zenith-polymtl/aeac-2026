@@ -58,8 +58,8 @@
         # Object Detection - CUSTOM ONNX MODEL  
         object_detection:  
             od_enabled: false
-            enable_tracking: true
-            allow_reduced_precision_inference: true
+            enable_tracking: false
+            allow_reduced_precision_inference: false
 
             detection_model: 'CUSTOM_YOLOLIKE_BOX_OBJECTS'
             custom_onnx_file: '/root/ros2_ws/models/yolov8s_square_640.onnx'
