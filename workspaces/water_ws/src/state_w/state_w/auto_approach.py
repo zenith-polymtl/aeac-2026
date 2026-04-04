@@ -223,10 +223,8 @@ class AutonomousApproach(Node):
             pose_stamped.pose = do_transform_pose(target_position, transform)
             self.polar_center_location_pub.publish(pose_stamped)
             
-            self.get_logger().info(f"creating timer")
             # self.activate_polar_timer = self.create_timer(1.0, self.activate_polar_callback)
             self.activate_polar_callback()
-            self.get_logger().info(f"timer created")
 
             
         except Exception as e:
@@ -242,10 +240,10 @@ class AutonomousApproach(Node):
     def abort_callback(self, msg: Bool):
         if msg.data:
             self.define_initial_state()
+            self.send_message_to_ui("Aborted command processed!")
+
             
-    def activate_polar_callback(self):
-        self.get_logger().info(f"activate_polar_callback called")
-        
+    def activate_polar_callback(self):        
         request = String()
         request.data = "start"
         self.activate_polar_pub.publish(request)
@@ -265,7 +263,7 @@ class AutonomousApproach(Node):
         request.theta = np.nan
         request.r = 3.0
         self.polar_target_pub.publish(request)
-        
+        self.send_message_to_ui(f"Starting auto approach with distance {request.r}")
         self.in_movement = True
           
     def auto_shoot_callback(self, msg: Bool):
@@ -289,8 +287,10 @@ class AutonomousApproach(Node):
     def in_position_callback(self, msg: Bool):
         self.in_position = msg.data
         self.in_movement = msg.data
+        self.send_message_to_ui(f"Target reached. Ready to shoot")
         if self.target_aimed and self.in_position:
-            self.shoot()
+            pass
+            # self.shoot()
     
     def shoot_target_callback(self, msg: Bool):
         if msg.data:
