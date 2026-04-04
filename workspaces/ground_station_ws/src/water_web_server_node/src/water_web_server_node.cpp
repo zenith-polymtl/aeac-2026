@@ -47,9 +47,10 @@ WaterWebServerNode::WaterWebServerNode() : Node("water_web_server_node"),
                                  ioc_(1),
                                  acceptor_(ioc_, {net::ip::make_address("0.0.0.0"), SERVER_PORT})
 {
+    initalize_parameters();
+    initalize_variables();
     initialize_publisher();
     initialize_subscriber();
-    package_share_dir_ = ament_index_cpp::get_package_share_directory("water_web_server_node");
     server_thread_ = std::thread([this]()
                                  { run_server(); });
 }
@@ -75,13 +76,39 @@ void WaterWebServerNode::initialize_publisher()
     take_picutre_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/take_picture", 10);
 }
 
+void WaterWebServerNode::initalize_parameters()
+{
+    // Declare parameters
+    this->declare_parameter<double>("drone_heartbeat_rate", 1.0); //Hz
+    this->declare_parameter<std::string>("drone_heartbeat_topic", "/aeac/external/drone_heartbeat");
+    this->declare_parameter<int>("heartbeat_drone_failure_threashold", 3); // Number of missed heartbeat before flagging
+
+    // // Get parameters
+    drone_heartbeat_frequency_ = this->get_parameter("drone_heartbeat_rate").as_double();
+    drone_heartbeat_topic_ = this->get_parameter("drone_heartbeat_topic").as_string();
+    heartbeat_drone_failure_threashold_ = this->get_parameter("heartbeat_drone_failure_threashold").as_int();
+}
+
+void WaterWebServerNode::initalize_variables()
+{
+    auto period = std::chrono::duration<double>(1.0 / drone_heartbeat_frequency_);
+    heartbeat_timer_ = this->create_wall_timer(
+        std::chrono::duration_cast<std::chrono::milliseconds>(period),
+        std::bind(&WaterWebServerNode::heartbeat_timer_callback, this)
+    );
+    package_share_dir_ = ament_index_cpp::get_package_share_directory("water_web_server_node");
+}
+
 void WaterWebServerNode::initialize_subscriber() 
 {
-    rclcpp::QoS qos_profile(rclcpp::KeepLast(10));
-    qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
+    auto reliable_qos = rclcpp::QoS(rclcpp::KeepLast(10));
+    reliable_qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
+
 
     message_to_ui_subsciber_ = create_subscription<UiMessage>(
 		"/aeac/external/send_to_ui", 10, std::bind(&WaterWebServerNode::broadcast_message, this, std::placeholders::_1));
+
+    drone_heartbeat_subsciber_ = create_subscription<DroneHealth>(drone_heartbeat_topic_, reliable_qos, std::bind(&WaterWebServerNode::drone_heartbeat_callback, this, std::placeholders::_1));
 
     gimbal_state_subscriber_ = create_subscription<GimbalState>(
         "/aeac/external/gimbal/state", 10, [this](const GimbalState::SharedPtr msg)
@@ -115,8 +142,81 @@ void WaterWebServerNode::initialize_subscriber()
     );
 
     picture_subscriber_ = create_subscription<Image>(
-        "/aeac/external/target_picture", qos_profile,
+        "/aeac/external/target_picture", reliable_qos,
         std::bind(&WaterWebServerNode::picture_callback, this, std::placeholders::_1));
+}
+
+void WaterWebServerNode::heartbeat_timer_callback()
+{
+    if (!is_connected_) return;
+
+    missed_drone_heartbeat_++;
+    if (missed_drone_heartbeat_ > heartbeat_drone_failure_threashold_)
+    {
+        is_connected_ = false;
+        send_connection_notification();
+    }
+}
+
+void WaterWebServerNode::drone_heartbeat_callback(const DroneHealth)
+{
+    if (!is_connected_)
+    {
+        is_connected_ = true;
+        send_connection_notification();
+    }
+    missed_drone_heartbeat_ = 0;
+}
+
+void WaterWebServerNode::send_connection_notification(const bool ignore_log)
+{
+    nlohmann::json status_json = {
+        {"type", "connection"},
+        {"is_connected", is_connected_},
+    };
+    send_notification(status_json);
+    if (!ignore_log)
+        send_log(is_connected_, is_connected_ ? "Drone Connection established" : "Drone Connection lost");
+}
+
+void WaterWebServerNode::send_log(bool is_success, std::string message)
+{
+    nlohmann::json status_json = {
+        {"type", "message"},
+        {"is_success", is_success},
+        {"message", message},
+    };
+
+    send_notification(status_json);
+}
+
+void WaterWebServerNode::on_client_connection()
+{
+    send_connection_notification(true);
+}
+
+void WaterWebServerNode::send_notification(const nlohmann::json status_json) 
+{
+    std::string message = status_json.dump();
+
+    std::lock_guard<std::mutex> lock(ws_mutex_);
+
+    for (auto *ws_ptr : ws_sessions_)
+    {
+        try {
+            beast::error_code ec;
+            ws_ptr->text(true);
+            ws_ptr->write(net::buffer(message), ec);
+            if (ec)
+            {
+                RCLCPP_WARN(get_logger(), "Failed to send to one client: %s", ec.message().c_str());
+            }
+        }
+        catch(...){
+            RCLCPP_WARN(get_logger(), "Error Broadcasting");
+        }
+
+    }
 }
 
 void WaterWebServerNode::broadcast_message(const UiMessage msg)
@@ -194,6 +294,7 @@ void WaterWebServerNode::run_server()
     std::string doc_root = package_share_dir_ + WEB_COMPONENT_FOLDER;
     std::cout << doc_root.c_str() << std::endl;
     RCLCPP_INFO_STREAM(this->get_logger(), "Starting web server on port http://localhost:" << SERVER_PORT);
+
     for (;;)
     {
         beast::error_code ec;
@@ -466,6 +567,9 @@ void WaterWebServerNode::do_session(tcp::socket socket, std::string const &doc_r
             ~Guard() { if (fn) fn(); }
         } guard{cleanup};
         // RCLCPP_INFO(get_logger(), "New WebSocket client connected. Total: %zu", ws_sessions_.size());
+
+        on_client_connection();
+
         for (;;)
         {
             beast::flat_buffer ws_buffer;

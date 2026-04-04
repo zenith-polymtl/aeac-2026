@@ -97,6 +97,10 @@ function initaliseSocket() {
                     pitchElement.textContent = data.pitch.toFixed(2);
                     yawElement.textContent = data.yaw.toFixed(2);
                     break;
+                case "connection":
+                    const connected_element =  document.getElementById("connection-span");
+                    connected_element.innerHTML = "Connection: " + (data.is_connected ? "Connected" : "Disconneted")
+                    break;
                 case "new_picture":
                     console.log("New picture: ", data.url);
                     document.getElementById("target-image").src = data.url;
