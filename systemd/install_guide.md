@@ -2,6 +2,8 @@
 
 This guide shows how to run MAVROS (inside Docker Compose) automatically at boot on a Jetson, **and retry until `/dev/ttyTHS1` exists**.
 
+Every service works the same way as the example, make sure to change mavros-jetson by the correct service you have created and put in the systemd folder.
+
 ---
 
 ## 1) Create the systemd service file
@@ -24,14 +26,9 @@ Requires=docker.service
 [Service]
 Type=simple
 WorkingDirectory=/home/zenith/aeac-2026
-
-
 ExecStartPre=/bin/bash -lc 'until [ -c /dev/ttyTHS1 ]; do sleep 1; done'
-
-
 ExecStart=/usr/bin/docker compose -p mavros-jetson -f compose/mavros.yml up --build
 ExecStop=/usr/bin/docker compose -p mavros-jetson -f compose/mavros.yml down
-
 Restart=always
 RestartSec=2
 StartLimitIntervalSec=0
