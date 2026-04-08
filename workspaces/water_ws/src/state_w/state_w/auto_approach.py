@@ -193,7 +193,7 @@ class AutonomousApproach(Node):
     def target_position_received_callback(self, msg: ObjectsStamped):
         try:
             if len(msg.objects) == 0:
-                self.send_message_to_ui("No object detected", Falses)
+                self.send_message_to_ui("No object detected", False)
             
             best_confidence = 0
             best_found_object = None
@@ -204,6 +204,11 @@ class AutonomousApproach(Node):
 
             self.send_message_to_ui(f"Object {best_found_object.label} detected with {best_confidence*100}% confidence at position: {best_found_object.position}")
 
+            if best_confidence < 0.5:
+                self.define_initial_state()
+                self.send_message_to_ui(f"Object detected with too low confidence. Returning to initale state")
+                return
+            
             self.target_acquired = True
         
             pose_stamped = PoseStamped()
@@ -216,8 +221,8 @@ class AutonomousApproach(Node):
             
             transform = self.tf_buffer.lookup_transform(
                 'zed_camera_center',
-                # 'map',
-                'base_link',
+                'map',
+                #'base_link',
                 rclpy.time.Time()
             )
             pose_stamped.pose = do_transform_pose(target_position, transform)
