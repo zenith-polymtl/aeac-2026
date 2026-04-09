@@ -1,19 +1,19 @@
-[Unit]  
-Description=Zenoh Air Bridge (Docker Compose) - auto start + retry  
-After=docker.service network-online.target  
-Wants=network-online.target  
-Requires=docker.service  
-  
-[Service]  
-Type=simple  
-WorkingDirectory=/home/zenith/aeac-2026  
-  
-ExecStart=/usr/bin/docker compose -f compose/zenoh-air.yml up -d  
-  
-ExecStop=/usr/bin/docker compose -f compose/zenoh-air.yml down  
-Restart=always  
-RestartSec=2  
-StartLimitIntervalSec=0  
-  
-[Install]  
+[Unit]
+Description=Zenoh Air Bridge (Docker Compose) - auto start + retry
+After=docker.service network-online.target
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+WorkingDirectory=/home/zenith/aeac-2026
+
+ExecStart=/usr/bin/docker compose -f compose/zenoh-air.yml up
+
+ExecStop=/usr/bin/docker compose -f compose/zenoh-air.yml down
+Restart=always
+RestartSec=2
+StartLimitIntervalSec=0
+
+[Install]
 WantedBy=multi-user.target

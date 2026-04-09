@@ -1,28 +1,24 @@
-[Unit]  
-Description=ZED Camera with ROS2 Stack (Docker Compose) - auto start + retry  
-After=docker.service network-online.target  
-Wants=network-online.target  
-Requires=docker.service  
-  
-[Service]  
-Type=simple  
-WorkingDirectory=/home/zenith/aeac-2026  
-  
-# verifier que le tag de cam détecté pas lsusb est vrm zed ou stereolabs
-ExecStartPre=/bin/bash -lc 'until lsusb | grep -i "zed\|stereolabs"; do sleep 1; done'  
-  
+[Unit]
+Description=ZED Camera ROS2 Stack
+After=docker.service network-online.target
+Requires=docker.service
 
-ExecStart=/usr/bin/docker compose -f compose/zed.yml up -d zed-ros2  
-  
-# Attends que container existe 
-ExecStartPost=/bin/bash -lc 'until docker compose -f compose/zed.yml ps zed-ros2 | grep -q "running\|Up"; do sleep 1; done && sleep 2 && /usr/bin/docker compose -f compose/zed.yml exec -T zed-ros2 bash -lc "source /root/ros2_ws/install/setup.bash && nohup ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i publish_tf:=false publish_map_tf:=false \ros_params_override_path:=config/zenith_stereo.yaml > /tmp/zed_launch.log 2>&1 &"'  
-  
-ExecStop=/usr/bin/docker compose -f compose/zed.yml down zed-ros2  
-Restart=always  
-RestartSec=2  
-StartLimitIntervalSec=0  
-  
-[Install]  
+[Service]
+Type=simple
+User=zenith
+Group=docker
+WorkingDirectory=/home/zenith/aeac-2026
+
+# Wait for the hardware to be physically present
+ExecStartPre=/bin/bash -c 'until lsusb | grep -i "stereolabs"; do sleep 1; done'
+
+# Launch in the foreground (no -d) so systemd can monitor the ROS2 logs
+ExecStart=/usr/bin/docker compose -f compose/zed.yml up zed-ros2
+
+ExecStop=/usr/bin/docker compose -f compose/zed.yml stop zed-ros2
+Restart=always
+RestartSec=5
+
+[Install]
 WantedBy=multi-user.target
-
 
