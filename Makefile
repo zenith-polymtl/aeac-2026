@@ -49,7 +49,7 @@ zed-launch:
 	docker compose -f compose/zed.yml up -d zed-ros2
 	docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
 	  source /root/ros2_ws/install/setup.bash; \
-	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml \
+	  ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml publish_tf:=false publish_map_tf:=false \
 	'
 zed-launch-mini:
 	docker compose -f compose/zed.yml up -d zed-ros2
@@ -77,7 +77,7 @@ build: ## Build image for C
 
 
 up: ## Up (detached) for C, rebuild if needed
-	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) up -d 
+	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) up -d
 
 down: ## Down for C (remove orphans)
 	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) down --remove-orphans
@@ -104,6 +104,51 @@ connect: up
 
 launch: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    colcon build; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    exec bash -i'
+
+payload:
+	docker compose -f compose/payload.yml up -d --build
+	# Launch ZED inside the already-running zed-ros2 service (detached)
+	docker compose -f compose/payload.yml exec -T zed-ros2 bash -lc " \
+		source /root/ros2_ws/install/setup.bash && \
+		nohup ros2 launch zed_wrapper zed_camera.launch.py \
+			camera_model:=zed2i \
+			ros_params_override_path:=config/zenith_stereo.yaml \
+			> /tmp/zed_launch.log 2>&1 & \
+	"
+
+
+	# Enter payload dev shell (your original behavior)
+	WS=$(WS_IN) docker compose -f compose/payload.yml exec -it payload \
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    colcon build; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    exec bash -i'
+
+water-stack:
+	docker compose -f compose/water.yml up -d
+	
+	docker compose -f compose/water.yml exec -T zed-ros2 bash -lc " \
+		source /root/ros2_ws/install/setup.bash && \
+		nohup ros2 launch zed_wrapper zed_camera.launch.py \
+			camera_model:=zed2i \
+			ros_params_override_path:=config/zenith_stereo.yaml \
+			publish_tf:=false \
+			publish_map_tf:=false \
+			> /tmp/zed_launch.log 2>&1 & \
+	"
+
+	# Enter water dev shell (your original behavior)
+	WS=$(WS_IN) docker compose -f compose/water.yml exec -it water \
 	  bash -lc '\
 	    cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \

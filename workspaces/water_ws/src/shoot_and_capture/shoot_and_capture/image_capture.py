@@ -7,7 +7,7 @@ import cv2
 import os
 from cv_bridge import CvBridge
 
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 from std_msgs.msg import Empty
 
 class ImageCapture(Node):
@@ -38,7 +38,7 @@ class ImageCapture(Node):
         qos_re = QoSProfile(reliability=QoSReliabilityPolicy.RELIABLE, history=QoSHistoryPolicy.KEEP_LAST, depth=10)
 
         self.image_sub = self.create_subscription(
-            Image,
+            CompressedImage,
             self.image_topic,
             self.image_callback,
             qos_re
@@ -52,12 +52,12 @@ class ImageCapture(Node):
         )
 
         self.snapshot_pub = self.create_publisher(
-            Image,
+            CompressedImage,
             self.snapshot_topic,
             qos_re
         )
         
-    def image_callback(self, msg: Image):
+    def image_callback(self, msg: CompressedImage):
         self.latest_image_msg = msg
 
     def trigger_callback(self, msg: Empty):
@@ -70,13 +70,14 @@ class ImageCapture(Node):
         self.snapshot_pub.publish(self.latest_image_msg)   
         
         try:
-            cv_image = self.bridge.imgmsg_to_cv2(self.latest_image_msg, desired_encoding='bgr8')
+            pass
+            # cv_image = self.bridge.imgmsg_to_cv2(self.latest_image_msg, desired_encoding='bgr8')
 
-            filename = os.path.join(self.save_dir, f'Task_2_Zenith_target_{self.target_count}.png')
-            self.get_logger().info(f'File name: {filename}')
+            # filename = os.path.join(self.save_dir, f'Task_2_Zenith_target_{self.target_count}.png')
+            # self.get_logger().info(f'File name: {filename}')
 
-            cv2.imwrite(filename, cv_image)
-            self.target_count+=1
+            # cv2.imwrite(filename, cv_image)
+            # self.target_count+=1
 
         except Exception as e:
             self.get_logger().error(f'Failed to save snapshot: {e}')     

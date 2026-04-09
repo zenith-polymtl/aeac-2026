@@ -41,15 +41,18 @@ class AutonomousApproach(Node):
         self.auto_aim_enable = False
         self.in_movement = False
         self.in_position = False
-        # self.target_aimed = False
+        self.target_aimed = False
+
 
     def set_up_parameters(self):
         self.declare_parameter('approach_radius', 2.0)
         self.declare_parameter('approach_height', 1.0)
+        self.declare_parameter('sim', False)
 
         self.approach_radius = self.get_parameter('approach_radius').value
         self.approach_height = self.get_parameter('approach_height').value
-        
+        self.sim = self.get_parameter('sim').value
+
     def set_up_topics(self):
         qos_reliable = self._create_qos_profile(QoSReliabilityPolicy.RELIABLE)
         
@@ -181,8 +184,10 @@ class AutonomousApproach(Node):
             # srv_request.activate = True
             # TODO: Add any necessary fields to srv_request here depending on your .srv file
             req = Empty()
-            self.trigger_target_detection_pub.publish(req)
-            
+            if not self.sim:
+                self.trigger_target_detection_pub.publish(req)
+            else:
+                self.send_polar_target(None)
             # future = self.locate_target_client.call_async(srv_request)
             # future.add_done_callback(self.target_position_received_callback)
             
@@ -191,42 +196,62 @@ class AutonomousApproach(Node):
             self.define_initial_state()
 
     def target_position_received_callback(self, msg: ObjectsStamped):
-        try:
-            if len(msg.objects) == 0:
-                self.send_message_to_ui("No object detected", Falses)
-            
-            best_confidence = 0
-            best_found_object = None
-            for obj in msg.objects:
-                if best_confidence < obj.confidence:
-                    best_confidence = obj.confidence
-                    best_found_object = obj
 
-            self.send_message_to_ui(f"Object {best_found_object.label} detected with {best_confidence*100}% confidence at position: {best_found_object.position}")
-
-            self.target_acquired = True
+        if len(msg.objects) == 0:
+            self.send_message_to_ui("No object detected", False)
+            return
         
+        best_confidence = 0
+        best_found_object = None
+        for obj in msg.objects:
+            if best_confidence < obj.confidence:
+                best_confidence = obj.confidence
+                best_found_object = obj
+
+        self.send_message_to_ui(f"Object {best_found_object.label} detected with {best_confidence*100}% confidence at position: {best_found_object.position}")
+
+        if best_confidence < 0.5:
+            self.define_initial_state()
+            self.send_message_to_ui(f"Object detected with too low confidence. Returning to initale state")
+            return
+        
+        self.target_acquired = True
+
+        self.send_polar_target(best_found_object)
+        
+    def send_polar_target(self, best_found_object):
+        try : 
             pose_stamped = PoseStamped()
-            pose_stamped.header = msg.header
+            pose_stamped.header.stamp = self.get_clock().now().to_msg()
+            pose_stamped.header.frame_id = "zed_camera_link"
 
             target_position = Pose()
-            target_position.position.x = float(best_found_object.position[0])
-            target_position.position.y = float(best_found_object.position[1])
-            target_position.position.z = float(best_found_object.position[2])
+            if not self.sim:
+                target_position.position.x = float(best_found_object.position[0])
+                target_position.position.y = float(best_found_object.position[1])
+                target_position.position.z = float(best_found_object.position[2])
+            else:
+                target_position.position.x = float(5.0)
+                target_position.position.y = float(0.0)
+                target_position.position.z = float(0.0)
+            #Need to verify correctness of variable attribution here
+            #Normally, ros2 uses ENU local, and FLU for the camera
+            #Confirm camera is in FLU, like base_link
             
             transform = self.tf_buffer.lookup_transform(
-                'zed_camera_center',
-                # 'map',
-                'base_link',
+                'map',
+                'zed_camera_link',
+                #'base_link',
                 rclpy.time.Time()
             )
+            
             pose_stamped.pose = do_transform_pose(target_position, transform)
             self.polar_center_location_pub.publish(pose_stamped)
             
             # self.activate_polar_timer = self.create_timer(1.0, self.activate_polar_callback)
             self.activate_polar_callback()
 
-            
+                
         except Exception as e:
             self.get_logger().error(f"Transform service call failed: {e}")
     
@@ -247,10 +272,12 @@ class AutonomousApproach(Node):
         request = String()
         request.data = "start"
         self.activate_polar_pub.publish(request)
+        self.get_logger().info("Send activation to polar")
         
         # self.toggle_auto_aim()
-        
         self.send_polar_target_pose()
+        self.get_logger().info("Created goal timer callback")
+
         # self.send_polar_target_timer = self.create_timer(0.1, self.send_polar_target_pose)
         # self.activate_polar_timer.destroy()
 
@@ -288,6 +315,11 @@ class AutonomousApproach(Node):
         self.in_position = msg.data
         self.in_movement = msg.data
         self.send_message_to_ui(f"Target reached. Ready to shoot")
+
+        msg = String()
+        msg.data = 'stop'
+        self.activate_polar_pub.publish(msg)
+
         if self.target_aimed and self.in_position:
             pass
             # self.shoot()

@@ -16,7 +16,8 @@
 #include <boost/beast/http/file_body.hpp>
 #include <boost/beast/websocket.hpp>
 #include <nlohmann/json.hpp>
-#include "sensor_msgs/msg/image.hpp"
+// #include "sensor_msgs/msg/image.hpp"
+#include <sensor_msgs/msg/compressed_image.hpp>
 #include "custom_interfaces/msg/ui_message.hpp"
 #include "custom_interfaces/msg/gimbal_state.hpp"
 #include "custom_interfaces/msg/drone_health.hpp"
@@ -50,7 +51,8 @@ namespace net = boost::asio;
 using tcp = boost::asio::ip::tcp;
 using UiMessage = custom_interfaces::msg::UiMessage;
 using GimbalState = custom_interfaces::msg::GimbalState;
-using Image = sensor_msgs::msg::Image;
+// using Image = sensor_msgs::msg::Image;
+using Image = sensor_msgs::msg::CompressedImage;
 using DroneHealth = custom_interfaces::msg::DroneHealth;
 
 class WaterWebServerNode : public rclcpp::Node
