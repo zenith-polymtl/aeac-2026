@@ -22,38 +22,38 @@ services:
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       - ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
 
-  zed-ros2:    
-    image: zed_ros2_l4t_36.4.0_sdk_5.1.0:latest  
-    runtime: nvidia    
-    privileged: true    
-    network_mode: host    
-    ipc: host    
-    pid: host 
-    tty: true
-    stdin_open: true   
-    environment:    
-      - NVIDIA_DRIVER_CAPABILITIES=all    
-      - DISPLAY=${DISPLAY}   
-      - ROS_DOMAIN_ID=2 
-      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-      - ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST 
-    volumes:    
-      - /tmp/.X11-unix/:/tmp/.X11-unix    
-      - /dev:/dev    
-      - /dev/shm:/dev/shm    
-      - /usr/local/zed/resources/:/usr/local/zed/resources/    
-      - /usr/local/zed/settings/:/usr/local/zed/settings/    
-      - ../config:/root/ros2_ws/config 
-      - ../models:/root/ros2_ws/models 
-    command: ["bash", "-lc", "source /root/ros2_ws/install/setup.bash && sleep infinity"]
+  # zed-ros2:    
+  #   image: zed_ros2_l4t_36.4.0_sdk_5.1.0:latest  
+  #   runtime: nvidia    
+  #   privileged: true    
+  #   network_mode: host    
+  #   ipc: host    
+  #   pid: host 
+  #   tty: true
+  #   stdin_open: true   
+  #   environment:    
+  #     - NVIDIA_DRIVER_CAPABILITIES=all    
+  #     - DISPLAY=${DISPLAY}   
+  #     - ROS_DOMAIN_ID=2 
+  #     - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+  #     - ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST 
+  #   volumes:    
+  #     - /tmp/.X11-unix/:/tmp/.X11-unix    
+  #     - /dev:/dev    
+  #     - /dev/shm:/dev/shm    
+  #     - /usr/local/zed/resources/:/usr/local/zed/resources/    
+  #     - /usr/local/zed/settings/:/usr/local/zed/settings/    
+  #     - ../config:/root/ros2_ws/config 
+  #     - ../models:/root/ros2_ws/models 
+  #   command: ["bash", "-lc", "source /root/ros2_ws/install/setup.bash && sleep infinity"]
 
-  zenoh-bridge-air:  
-    image: eclipse/zenoh-bridge-ros2dds:latest  
-    network_mode: host  
-    volumes:  
-      - ../config/zenoh-air-config.json5:/config.json5:ro  
-    command: ["-c", "/config.json5"]  
-    environment:  
-      - ROS_DOMAIN_ID=2  
-      - RUST_LOG=debug
-      - ROS_DISTRO=humble
+  # zenoh-bridge-air:  
+  #   image: eclipse/zenoh-bridge-ros2dds:latest  
+  #   network_mode: host  
+  #   volumes:  
+  #     - ../config/zenoh-air-config.json5:/config.json5:ro  
+  #   command: ["-c", "/config.json5"]  
+  #   environment:  
+  #     - ROS_DOMAIN_ID=2  
+  #     - RUST_LOG=debug
+  #     - ROS_DISTRO=humble

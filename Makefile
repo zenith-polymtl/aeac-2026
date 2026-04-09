@@ -216,32 +216,6 @@ mavros-ofa: up
 	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200'
 
 
-payload-mission-sim: up
-	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	  bash -lc 'cd "$$WS"; \
-	  	cd payload_ws; \
-	    source /opt/ros/humble/setup.bash; \
-	    colcon build; \
-	    source install/setup.bash; \
-	    ros2 daemon start; \
-	    ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:$(TCP_PORT) fcu_protocol:=v2.0 & \
-	    sleep 2; \
-	    ros2 launch bringup payload_mission.launch.py \
-	  '
-
-payload-mission: up
-	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	  bash -lc 'cd "$$WS"; \
-	  	cd payload_ws; \
-	    source /opt/ros/humble/setup.bash; \
-	    colcon build; \
-	    source install/setup.bash; \
-	    ros2 daemon start; \
-	    ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:$(TCP_PORT) fcu_protocol:=v2.0 & \
-	    sleep 2; \
-	    ros2 launch bringup payload_mission.launch.py \
-	  '
-
 water:
 	docker compose -f compose/water.yml up -d
 
@@ -250,10 +224,19 @@ water:
 	  bash -lc '\
 	    cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \
-	    colcon build; \
 	    source install/setup.bash; \
 	    ros2 daemon start; \
 	    ros2 launch bringup water_mission.launch.py'
+
+water-build:
+	docker compose -f compose/water.yml up -d
+
+	# Launch water mission in the container session
+	WS=$(WS_IN) docker compose -f compose/water.yml exec -it water \
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    colcon build'
 
 payload:
 	docker compose -f compose/payload.yml up -d
@@ -262,12 +245,31 @@ payload:
 	  bash -lc '\
 	    cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \
-	    colcon build; \
 	    source install/setup.bash; \
 	    ros2 daemon start; \
 	    ros2 launch bringup payload_mission.launch.py'
 
+payload-build:
+	docker compose -f compose/payload.yml up -d
+
+	WS=$(WS_IN) docker compose -f compose/payload.yml exec -it payload \
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    colcon build'
+		
+
 gcs-payload: up
+	docker compose -f compose/zenoh-ground.yml up -d
+
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    ros2 daemon start; \
+		source install/setup.bash; \
+	    ros2 run web_server_node web_server_node'
+
+gcs-payload-build: up
 	docker compose -f compose/zenoh-ground.yml up -d
 
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
@@ -276,8 +278,7 @@ gcs-payload: up
 		colcon build --packages-select web_server_node custom_interfaces; \
 	    ros2 daemon start; \
 		source install/setup.bash; \
-	    ros2 run web_server_node web_server_node \
-	  '
+	    ros2 run web_server_node web_server_node'
 
 gcs-water: up
 	docker compose -f compose/zenoh-ground.yml up -d
@@ -288,8 +289,18 @@ gcs-water: up
 		colcon build --packages-select water_web_server_node custom_interfaces; \
 	    source install/setup.bash; \
 		ros2 daemon start; \
-	    ros2 run water_web_server_node water_web_server_node \
-	  '
+	    ros2 run water_web_server_node water_web_server_node'
+
+gcs-water-build: up
+	docker compose -f compose/zenoh-ground.yml up -d
+	
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+		colcon build --packages-select water_web_server_node custom_interfaces; \
+	    source install/setup.bash; \
+		ros2 daemon start; \
+	    ros2 run water_web_server_node water_web_server_node'
 
 rviz: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
