@@ -6,8 +6,6 @@ TCP_PORT ?= 5762
 COMPOSE_FILE := compose/$(C).yml
 CONTAINER    ?= aeac-$(C)
 
-DRONE_IP ?= 192.168.144.12
-
 # Workspace path RELATIVE to repo root (e.g., workspaces/dev_ws)
 WS_REL := workspaces/$(C)_ws
 
@@ -28,7 +26,7 @@ export UID GID
 ENV_INJECT := C=$(C) WS=$(WS_REL)
 
 # All compose files for the *-all targets
-COMPOSES := compose/dev.yml compose/payload.yml compose/water.yml compose/relay.yml
+COMPOSES := compose/dev.yml compose/payload.yml compose/water.yml compose/mavros.yml compose/zed.yml compose/zenoh-air.yml compose/zenoh-ground.yml
 
 # ===== Pretty help =====
 help: ## Show help
@@ -114,56 +112,6 @@ launch: up
 	    ros2 daemon start; \
 	    exec bash -i'
 
-
-
-water-stack-build:
-	docker compose -f compose/water.yml up -d --build
-	
-	docker compose -f compose/water.yml exec -T zed-ros2 bash -lc " \
-		source /root/ros2_ws/install/setup.bash && \
-		nohup ros2 launch zed_wrapper zed_camera.launch.py \
-			camera_model:=zed2i \
-			ros_params_override_path:=config/zenith_stereo.yaml \
-			publish_tf:=false \
-			publish_map_tf:=false \
-			> /tmp/zed_launch.log 2>&1 & \
-	"
-
-	# Enter water dev shell (your original behavior)
-	WS=$(WS_IN) docker compose -f compose/water.yml exec -it water \
-	  bash -lc '\
-	    cd "$$WS"; \
-	    source /opt/ros/humble/setup.bash; \
-	    colcon build; \
-	    source install/setup.bash; \
-	    ros2 daemon start; \
-	    exec bash -i'
-
-water-stack:
-	docker compose -f compose/water.yml up -d
-	
-	docker compose -f compose/water.yml exec -T zed-ros2 bash -lc " \
-		source /root/ros2_ws/install/setup.bash && \
-		nohup ros2 launch zed_wrapper zed_camera.launch.py \
-			camera_model:=zed2i \
-			ros_params_override_path:=config/zenith_stereo.yaml \
-			publish_tf:=false \
-			publish_map_tf:=false \
-			> /tmp/zed_launch.log 2>&1 & \
-	"
-
-	# Enter water dev shell (your original behavior)
-	WS=$(WS_IN) docker compose -f compose/water.yml exec -it water \
-	  bash -lc '\
-	    cd "$$WS"; \
-	    source /opt/ros/humble/setup.bash; \
-	    colcon build; \
-	    source install/setup.bash; \
-	    ros2 daemon start; \
-	    exec bash -i'
-
-	
-
 mavros-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'source /opt/ros/humble/setup.bash; \
@@ -215,7 +163,6 @@ mavros-ofa: up
 	  ros2 daemon start; \
 	  ros2 launch mavros apm.launch fcu_url:=serial:///dev/ttyAMA10:115200'
 
-
 water:
 	docker compose -f compose/water.yml up -d
 
@@ -257,7 +204,6 @@ payload-build:
 	    cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \
 	    colcon build'
-		
 
 gcs-payload: up
 	docker compose -f compose/zenoh-ground.yml up -d
