@@ -15,7 +15,7 @@ ExecStartPre=/bin/bash -lc 'until lsusb | grep -i "zed\|stereolabs"; do sleep 1;
 ExecStart=/usr/bin/docker compose -f compose/zed.yml up -d zed-ros2  
   
 # Attends que container existe 
-ExecStartPost=/bin/bash -lc 'until docker compose -f compose/zed.yml ps zed-ros2 | grep -q "running\|Up"; do sleep 1; done && sleep 2 && /usr/bin/docker compose -f compose/zed.yml exec -T zed-ros2 bash -lc "source /root/ros2_ws/install/setup.bash && nohup ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml > /tmp/zed_launch.log 2>&1 &"'  
+ExecStartPost=/bin/bash -lc 'until docker compose -f compose/zed.yml ps zed-ros2 | grep -q "running\|Up"; do sleep 1; done && sleep 2 && /usr/bin/docker compose -f compose/zed.yml exec -T zed-ros2 bash -lc "source /root/ros2_ws/install/setup.bash && nohup ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i publish_tf:=false publish_map_tf:=false \ros_params_override_path:=config/zenith_stereo.yaml > /tmp/zed_launch.log 2>&1 &"'  
   
 ExecStop=/usr/bin/docker compose -f compose/zed.yml down zed-ros2  
 Restart=always  
