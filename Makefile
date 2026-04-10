@@ -193,6 +193,15 @@ zed-status:
 zed-logs:
 	journalctl -u zed -f
 
+zed-mini-restart:
+	sudo systemctl restart zed-mini
+
+zed-mini-status:
+	systemctl status zed-mini --no-pager
+
+zed-mini-logs:
+	journalctl -u zed-mini -f
+
 zenoh-restart:
 	sudo systemctl restart zenoh-air
 
