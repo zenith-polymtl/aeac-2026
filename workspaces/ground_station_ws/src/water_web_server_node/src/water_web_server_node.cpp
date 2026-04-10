@@ -148,35 +148,59 @@ void WaterWebServerNode::initialize_subscriber()
 
 void WaterWebServerNode::heartbeat_timer_callback()
 {
-    if (!is_connected_) return;
+    if (!drone_is_connected_) return;
 
     missed_drone_heartbeat_++;
     if (missed_drone_heartbeat_ > heartbeat_drone_failure_threashold_)
     {
-        is_connected_ = false;
+        drone_is_connected_ = false;
+        zed_is_connected_ = false;
         send_connection_notification();
     }
 }
 
-void WaterWebServerNode::drone_heartbeat_callback(const DroneHealth)
+void WaterWebServerNode::drone_heartbeat_callback(const DroneHealth msg)
 {
-    if (!is_connected_)
+    bool should_send_notification = false;
+    bool ignore_logging = false;
+    if (!zed_is_connected_ && msg.zed_healthy) 
     {
-        is_connected_ = true;
-        send_connection_notification();
+        RCLCPP_INFO_STREAM(this->get_logger(), "allo");
+
+        should_send_notification = true;
+        ignore_logging = true;
     }
+    if (!drone_is_connected_)
+    {
+        RCLCPP_INFO_STREAM(this->get_logger(), "allo2");
+        should_send_notification = true;
+        drone_is_connected_ = true;
+        ignore_logging = false;
+    }
+    zed_is_connected_ = msg.zed_healthy;
     missed_drone_heartbeat_ = 0;
+    RCLCPP_INFO_STREAM(this->get_logger(), "drone_heartbeat_callback " << msg.mavros_healthy << ", " << msg.zed_healthy);
+
+    if (should_send_notification) 
+    {
+        RCLCPP_INFO_STREAM(this->get_logger(), "drone_heartbeat_callback " << ignore_logging);
+        send_connection_notification(ignore_logging);
+    }
 }
 
 void WaterWebServerNode::send_connection_notification(const bool ignore_log)
 {
+    RCLCPP_INFO_STREAM(this->get_logger(), "ignore_log " << ignore_log);
+    RCLCPP_INFO_STREAM(this->get_logger(), "drone_is_connected_: " << drone_is_connected_ << ", " << zed_is_connected_);
+
     nlohmann::json status_json = {
         {"type", "connection"},
-        {"is_connected", is_connected_},
+        {"drone_is_connected", drone_is_connected_},
+        {"zed_is_connected", zed_is_connected_}
     };
     send_notification(status_json);
     if (!ignore_log)
-        send_log(is_connected_, is_connected_ ? "Drone Connection established" : "Drone Connection lost");
+        send_log(drone_is_connected_, drone_is_connected_ ? "Drone Connection established" : "Drone Connection lost");
 }
 
 void WaterWebServerNode::send_log(bool is_success, std::string message)

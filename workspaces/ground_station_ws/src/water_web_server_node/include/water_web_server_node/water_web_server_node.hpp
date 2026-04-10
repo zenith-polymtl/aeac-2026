@@ -114,7 +114,8 @@ private:
     int heartbeat_drone_failure_threashold_;
     int missed_drone_heartbeat_ = 0;
     rclcpp::TimerBase::SharedPtr heartbeat_timer_;
-    bool is_connected_ = false;
+    bool drone_is_connected_ = false;
+    bool zed_is_connected_ = false;
     
 	rclcpp::Subscription<UiMessage>::SharedPtr message_to_ui_subsciber_;
     rclcpp::Subscription<GimbalState>::SharedPtr gimbal_state_subscriber_;

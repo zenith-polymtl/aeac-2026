@@ -71,6 +71,16 @@ function loadTheme() {
     });
 }
 
+function connection_logique(data) {
+    console.log("Dronce connection change: ", data)
+    const drone_connected_element =  document.getElementById("connection-span");
+    drone_connected_element.innerHTML = "Drone Connection: " + (data.drone_is_connected ? "Connected" : "Disconneted")
+
+    const zed_connected_element =  document.getElementById("zed-connection-span");
+    zed_connected_element.innerHTML = "Zed Connection: " + (data.zed_is_connected ? "Connected" : "Disconneted")
+}
+
+
 function initaliseSocket() {
     const ws = new WebSocket("ws://" + window.location.host + "/ws/status");
 
@@ -98,8 +108,7 @@ function initaliseSocket() {
                     yawElement.textContent = data.yaw.toFixed(2);
                     break;
                 case "connection":
-                    const connected_element =  document.getElementById("connection-span");
-                    connected_element.innerHTML = "Connection: " + (data.is_connected ? "Connected" : "Disconneted")
+                    connection_logique(data);
                     break;
                 case "new_picture":
                     console.log("New picture: ", data.url);
