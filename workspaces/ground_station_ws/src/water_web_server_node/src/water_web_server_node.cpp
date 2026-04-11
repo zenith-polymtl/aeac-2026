@@ -163,36 +163,28 @@ void WaterWebServerNode::drone_heartbeat_callback(const DroneHealth msg)
 {
     bool should_send_notification = false;
     bool ignore_logging = false;
-    if (!zed_is_connected_ && msg.zed_healthy) 
+    if (zed_is_connected_ != msg.zed_healthy) 
     {
-        RCLCPP_INFO_STREAM(this->get_logger(), "allo");
-
         should_send_notification = true;
         ignore_logging = true;
     }
     if (!drone_is_connected_)
     {
-        RCLCPP_INFO_STREAM(this->get_logger(), "allo2");
         should_send_notification = true;
         drone_is_connected_ = true;
         ignore_logging = false;
     }
     zed_is_connected_ = msg.zed_healthy;
     missed_drone_heartbeat_ = 0;
-    RCLCPP_INFO_STREAM(this->get_logger(), "drone_heartbeat_callback " << msg.mavros_healthy << ", " << msg.zed_healthy);
 
     if (should_send_notification) 
     {
-        RCLCPP_INFO_STREAM(this->get_logger(), "drone_heartbeat_callback " << ignore_logging);
         send_connection_notification(ignore_logging);
     }
 }
 
 void WaterWebServerNode::send_connection_notification(const bool ignore_log)
 {
-    RCLCPP_INFO_STREAM(this->get_logger(), "ignore_log " << ignore_log);
-    RCLCPP_INFO_STREAM(this->get_logger(), "drone_is_connected_: " << drone_is_connected_ << ", " << zed_is_connected_);
-
     nlohmann::json status_json = {
         {"type", "connection"},
         {"drone_is_connected", drone_is_connected_},
