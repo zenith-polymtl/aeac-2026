@@ -24,6 +24,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'auto_approach = state_w.auto_approach:main',
+            'target_detection_mock = state_w.target_detection_mock:main',
         ],
     },
 )

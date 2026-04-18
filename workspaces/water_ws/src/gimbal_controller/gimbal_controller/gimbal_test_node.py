@@ -1,15 +1,14 @@
 import rclpy
 from rclpy.node import Node
 from custom_interfaces.msg import AimError
-from std_srvs.srv import SetBool
-from std_msgs.msg import Bool
+from std_msgs.msg import UInt8
 from geometry_msgs.msg import TwistStamped 
 from mavros_msgs.srv import CommandBool, SetMode, CommandTOL
 import sys, select, termios, tty
 import time
 
 # Configuration
-FAKE_ERROR_MAGNITUDE = 5.0 
+FAKE_ERROR_MAGNITUDE = 2.0 
 DRONE_SPEED = 1.0 
 DRONE_ROT_SPEED = 0.5 
 CLIMB_SPEED = 0.5 
@@ -39,9 +38,9 @@ class PIDTester(Node):
     def __init__(self):
         super().__init__('pid_tester_keys')
         
-        self.aim_pub = self.create_publisher(AimError, '/aeac/internal/gimbal/target_error', 10)
+        self.aim_pub = self.create_publisher(AimError, '/aeac/external/gimbal/move', 10)
         self.vel_pub = self.create_publisher(TwistStamped, '/mavros/setpoint_velocity/cmd_vel', 10)
-        self.mode_pub = self.create_publisher(Bool, '/aeac/external/gimbal/lock_mode', 10)
+        self.mode_pub = self.create_publisher(UInt8, '/aeac/external/gimbal/set_mode', 10)
         
         self.arming_client = self.create_client(CommandBool, '/mavros/cmd/arming')
         self.takeoff_client = self.create_client(CommandTOL, '/mavros/cmd/takeoff')
@@ -92,7 +91,6 @@ class PIDTester(Node):
         msg.twist.linear.y = float(y)
         msg.twist.linear.z = float(z)
         msg.twist.angular.z = float(yaw_speed) 
-        self.get_logger().info(f"Publishing vel - X: {x}, Y: {y}, Z: {z}, yaw_speed: {yaw_speed}")
         self.vel_pub.publish(msg)
 
     def run(self):
@@ -112,18 +110,18 @@ class PIDTester(Node):
                 # --- GIMBAL ---
                 if key == '\x1b[A': 
                     fake_vision.pitch_error = float(FAKE_ERROR_MAGNITUDE)
-                    self.get_logger().info("Up arrow")
+                    user_input_active = True
                 elif key == '\x1b[B': 
                     fake_vision.pitch_error = -float(FAKE_ERROR_MAGNITUDE)
-                    self.get_logger().info("Down arrow")
+                    user_input_active = True
 
                 elif key == '\x1b[C': 
                     fake_vision.yaw_error = float(FAKE_ERROR_MAGNITUDE)
-                    self.get_logger().info("right Arrow")
+                    user_input_active = True
 
                 elif key == '\x1b[D': 
                     fake_vision.yaw_error = -float(FAKE_ERROR_MAGNITUDE)
-                    self.get_logger().info("left Arrow")
+                    user_input_active = True
 
                 
                 # --- DRONE ---
@@ -156,27 +154,25 @@ class PIDTester(Node):
                 elif k == 't': 
                     self.get_logger().info("Action: Arm + Takeoff")
                     self.arm_and_guided()
-                elif k == 'l': self.call_mode_service(True)
-                elif k == 'f': self.call_mode_service(False)
+                elif k == 'l': self.call_set_mode_gimbal(0)
+                elif k == 'f': self.call_set_mode_gimbal(1)
+                elif k == 'p': self.call_set_mode_gimbal(2)
                 elif k == '\x03': break 
-
-                self.aim_pub.publish(fake_vision)
-                
+          
                 # --- LOGIQUE DE SURPLACE ---
+                self.aim_pub.publish(fake_vision)
                 if user_input_active:
                     self.send_velocity(vx, vy, vz, vyaw)
-                
+ 
                 elif self.flight_started:
                     if (time.time() - self.start_time) > 5.0:
                         self.send_velocity(0.0, 0.0, 0.0, 0.0)
-                    else:
-                        pass
 
         except Exception as e:
             self.get_logger().error(f"Erreur loop: {e}")
 
-    def call_mode_service(self, val):
-        self.mode_pub.publish(Bool(data=val))
+    def call_set_mode_gimbal(self, val):
+        self.mode_pub.publish(UInt8(data=val))
 
 def main(args=None):
     rclpy.init(args=args)

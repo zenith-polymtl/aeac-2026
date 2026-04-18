@@ -11,8 +11,6 @@ WorkingDirectory=/home/zenith/aeac-2026
 # Wait until the UART device exists (Pixhawk/Jetson baseboard ready)
 ExecStartPre=/bin/bash -lc 'until [ -c /dev/ttyTHS1 ]; do sleep 1; done'
 
-#
-# IMPORTANT: isolate project name so it doesn't remove other stacks
 ExecStart=/usr/bin/docker compose -p mavros-jetson -f compose/mavros.yml up --build
 
 ExecStop=/usr/bin/docker compose -p mavros-jetson -f compose/mavros.yml down
