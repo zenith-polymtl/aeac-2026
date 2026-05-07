@@ -6,8 +6,9 @@ from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 import cv2
 import os
 from cv_bridge import CvBridge
+import time
 
-from sensor_msgs.msg import Image, CompressedImage
+from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import Empty
 
 class ImageCapture(Node):
@@ -26,8 +27,8 @@ class ImageCapture(Node):
     def declare_default_parameters(self):
         self.declare_parameter('image_topic', '/camera/image_raw')
         self.declare_parameter('trigger_topic', '/aeac/internal/take_picture')
-        self.declare_parameter('snapshot_topic', '/aeac/external/target_picture')
-        self.declare_parameter('save_dir', '/water_ws/snapshots')
+        self.declare_parameter('snapshot_topic', '/aeac/internal/target_picture')
+        self.declare_parameter('save_dir', f'/water_ws/snapshots/{time.strftime("%Y%m%d-%H%M%S")}')
         
         self.image_topic = self.get_parameter('image_topic').get_parameter_value().string_value
         self.trigger_topic = self.get_parameter('trigger_topic').get_parameter_value().string_value
@@ -71,13 +72,13 @@ class ImageCapture(Node):
         
         try:
             pass
-            # cv_image = self.bridge.imgmsg_to_cv2(self.latest_image_msg, desired_encoding='bgr8')
+        #     cv_image = self.bridge.imgmsg_to_cv2(self.latest_image_msg, desired_encoding='bgr8')
 
-            # filename = os.path.join(self.save_dir, f'Task_2_Zenith_target_{self.target_count}.png')
-            # self.get_logger().info(f'File name: {filename}')
+        #     filename = os.path.join(self.save_dir, f'Task_2_Zenith_target_{self.target_count}.png')
+        #     self.get_logger().info(f'File name: {filename}')
 
-            # cv2.imwrite(filename, cv_image)
-            # self.target_count+=1
+        #     cv2.imwrite(filename, cv_image)
+        #     self.target_count+=1
 
         except Exception as e:
             self.get_logger().error(f'Failed to save snapshot: {e}')     
