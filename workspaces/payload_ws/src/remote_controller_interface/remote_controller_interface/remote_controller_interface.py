@@ -15,11 +15,11 @@ class RemoteControlInterface(Node):
         self._declare_parameters()
 
         self.controls = {
-            'camera':    {'ch': 5, 'last_state': None},
-            'servo_1':   {'ch': 7, 'last_state': None},
-            'lap_controle' : {'ch': 8, 'last_state': None},
-            'servo_2':   {'ch': 10, 'last_state': None},
-            'polar_lock':{'ch': 9, 'last_state': None},
+            'camera':    {'rc_ch': 13, 'servo_ch' : 13, 'last_state': None,  "LOW" : 1850, "MIDDLE" : 1000 ,"HIGH" : 700},
+            'servo_1':   {'rc_ch': 7, 'servo_ch' : 9, 'last_state': None, "LOW" : 2050, "MIDDLE" : 1700 ,"HIGH" : 1600},
+            'lap_controle' : {'rc_ch': 9, 'last_state': None},
+            'servo_2':   {'rc_ch': 8,'servo_ch' : 10, 'last_state': None, "LOW" : 1000, "MIDDLE" : 1500, "HIGH" : 2000},
+            # 'polar_lock':{'ch': 9, 'last_state': None},
         }
         
         self.inital_state()
@@ -53,7 +53,7 @@ class RemoteControlInterface(Node):
             return
 
         for name, data in self.controls.items():
-            val = msg.channels[data['ch']]
+            val = msg.channels[data['rc_ch']]
             current_state = self.get_switch_state(val)
 
             if current_state != data['last_state']:
@@ -78,28 +78,35 @@ class RemoteControlInterface(Node):
             case 'servo_1'| 'servo_2':
                 if state == "HIGH":
                     self.get_logger().info(f"Opening {name}")
+                    
                 elif state == "LOW":
                     self.get_logger().info(f"Closing {name}")
+                self.send_servo(name, state)
 
             case 'polar_lock':
                 self.polar_change(state)
                 
-            case 'lap_controle':
+            case 'lap_control':
                 self.lap_controle_change(state)
 
-    def send_servo(self, servo_num, itensity):
-        request = ServoState()
-        request.servo_num = servo_num
-        match itensity:
-            case "LOW":
-                request.pwm = 1000
-            case "HIGH":
-                request.pwm = 2000
-            case _:
-                return
-            
+    def send_servo(self, name, state):
+        request = ServoState.Request()
+        request.servo_num = self.controls[name]["servo_ch"]
+
+        request.pwm = self.controls[name][state]
+        self.get_logger().info(f"Sending {name} command: servo_num={request.servo_num}, pwm={request.pwm}") 
+
         future = self.servo_cli.call_async(request)
-        rclpy.spin_until_future_complete(self, future)
+        future.add_done_callback(lambda fut: self.servo_response_callback(fut, name))
+
+    def servo_response_callback(self, future, name):
+        try:
+            response = future.result()
+            self.get_logger().info(
+                f"{name} response: success={response.success}, message='{response.message}'"
+            )
+        except Exception as e:
+            self.get_logger().error(f"Servo service call failed for {name}: {e}")
 
     def camera_change(self, state):
         match state:
@@ -109,6 +116,8 @@ class RemoteControlInterface(Node):
                 self.get_logger().info("Camera: Setting MIDDLE angle (e.g., 45°)")
             case "HIGH":
                 self.get_logger().info("Camera: Setting HIGH angle (e.g., 90°)")
+
+        self.send_servo("camera", state)
     
     def polar_change(self, state):
         if state == "HIGH":

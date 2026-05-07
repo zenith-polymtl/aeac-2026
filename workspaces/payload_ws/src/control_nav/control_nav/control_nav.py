@@ -64,17 +64,18 @@ class ControlNav(Node):
     
     def initialize_parameters(self):
         ## Param decalration
-        self.declare_parameter('json_filename', 'lap_waypoints.json')
+        self.declare_parameter('json_filename', 'cimetiere_course.json')
         self.declare_parameter('json_subfolder', 'data')
         self.declare_parameter('delais_for_position_check', 0.5)
         self.declare_parameter('distance_from_objectif_threashold', 3.0)
         
         #Pour julien
+        #self.declare_parameter('latitude_of_scene', -35.361450)
+        #self.declare_parameter('longitude_of_scene', 149.161448)
+
+        #Cimetière
         self.declare_parameter('latitude_of_scene', -35.361450)
         self.declare_parameter('longitude_of_scene', 149.161448)
-        #Pour Colin 
-        # self.declare_parameter('latitude_of_scene', -34.357147)
-        # self.declare_parameter('longitude_of_scene', 150.163406)
 
         self.declare_parameter('altitude_of_scene', 10.0)
         
