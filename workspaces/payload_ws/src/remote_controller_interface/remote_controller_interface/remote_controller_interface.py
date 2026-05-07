@@ -19,6 +19,7 @@ class RemoteControlInterface(Node):
             'ladder_servo_1':   {'rc_ch': 7, 'servo_ch' : 9, 'last_state': None, "LOW" : 2050, "MIDDLE" : 1600 ,"HIGH" : 1600},
             'ladder_servo_2':   {'rc_ch': 7, 'servo_ch' : 10, 'last_state': None, "LOW" : 1600, "MIDDLE" : 2050 ,"HIGH" : 2050},
             'lap_control' : {'rc_ch': 9, 'last_state': None},
+            'lap_control' : {'rc_ch': 9, 'last_state': None},
             # 'radio_servo':   {'rc_ch': 8,'servo_ch' : 10, 'last_state': None, "LOW" : 1000, "MIDDLE" : 1500, "HIGH" : 2000},
             # 'polar_lock':{'ch': 9, 'last_state': None},
         }
@@ -40,6 +41,10 @@ class RemoteControlInterface(Node):
         self.get_logger().info("Remote Controller Interface Initialized")
         
         self.servo_cli = self.create_client(ServoState, '/aeac/external/payload/set_state')
+
+        # Topics to send to control nav to enable movements
+
+
         
         while not self.servo_cli.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('Service not available, waiting...')

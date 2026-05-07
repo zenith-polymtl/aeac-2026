@@ -88,7 +88,7 @@ class MissionStatsController(Node):
     def undefined_state_handler(self, state):
         self.get_logger().info(f'Entered {state} state, but no handeling')
         
-    def start_lag_handler(self):
+    def start_lap_handler(self):
         self.get_logger().info('Handling start lap')
         start_lap_msg = Bool()
         start_lap_msg.data = True

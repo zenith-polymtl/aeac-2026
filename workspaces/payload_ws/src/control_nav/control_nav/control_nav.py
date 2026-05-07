@@ -39,11 +39,15 @@ class ControlNav(Node):
         self.is_last_lap = False
         self.is_doing_laps = False
         self.current_point_objectif = Point()
+
+        qos_be = QoSProfile(reliability=QoSReliabilityPolicy.BEST_EFFORT, history=QoSHistoryPolicy.KEEP_LAST, depth=10)
+        qos_re = QoSProfile(reliability=QoSReliabilityPolicy.RELIABLE, history=QoSHistoryPolicy.KEEP_LAST, depth=10)
+        
         
         # Publisher
-        self.publisher_raw = self.create_publisher(PositionTarget, '/mavros/setpoint_raw/local', 10)
-        self.lap_finished_pub = self.create_publisher(Bool, '/mission/control_nav/lap/finished', 10)
-        self.move_to_scene_pub = self.create_publisher(Bool, '/mission/control_nav/move_to_scene/finished', 10)
+        self.publisher_raw = self.create_publisher(PositionTarget, '/mavros/setpoint_raw/local', qos_re)
+        self.lap_finished_pub = self.create_publisher(Bool, '/aeac/internal/lap/finished', qos_re)
+        self.move_to_scene_pub = self.create_publisher(Bool, '/aeac/internal/move_to_scene/finished', qos_re)
         
         # Subscribers
         # Lap specific subscriber
@@ -335,6 +339,13 @@ class ControlNav(Node):
     def finish_current_lap_and_stop(self, _):
         self.get_logger().info(f"Finishing the current lap")
         self.stop_after_finishing_lap = True
+    
+    def finish_now(self, msg):
+        self.stop_laps()
+        lap_finished_msg = Bool()
+        lap_finished_msg.data = True
+        self.lap_finished_pub.publish(lap_finished_msg)
+        
 
 def main(args=None):
     rclpy.init(args=args)
