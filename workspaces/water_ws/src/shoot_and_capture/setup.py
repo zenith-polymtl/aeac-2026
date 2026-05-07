@@ -26,6 +26,7 @@ setup(
         'console_scripts': [
             'shoot_controller = shoot_and_capture.shoot_controller:main',
             'image_capture = shoot_and_capture.image_capture:main',
+            'image_transfer = shoot_and_capture.image_transfer:main',
         ],
     },
 )

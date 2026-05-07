@@ -16,9 +16,10 @@ class RemoteControlInterface(Node):
 
         self.controls = {
             'camera':    {'rc_ch': 13, 'servo_ch' : 13, 'last_state': None,  "LOW" : 1850, "MIDDLE" : 1000 ,"HIGH" : 700},
-            'servo_1':   {'rc_ch': 7, 'servo_ch' : 9, 'last_state': None, "LOW" : 2050, "MIDDLE" : 1700 ,"HIGH" : 1600},
+            'ladder_servo_1':   {'rc_ch': 7, 'servo_ch' : 9, 'last_state': None, "LOW" : 2050, "MIDDLE" : 1600 ,"HIGH" : 1600},
+            'ladder_servo_2':   {'rc_ch': 7, 'servo_ch' : 10, 'last_state': None, "LOW" : 1600, "MIDDLE" : 2050 ,"HIGH" : 2050},
             'lap_controle' : {'rc_ch': 9, 'last_state': None},
-            'servo_2':   {'rc_ch': 8,'servo_ch' : 10, 'last_state': None, "LOW" : 1000, "MIDDLE" : 1500, "HIGH" : 2000},
+            # 'radio_servo':   {'rc_ch': 8,'servo_ch' : 10, 'last_state': None, "LOW" : 1000, "MIDDLE" : 1500, "HIGH" : 2000},
             # 'polar_lock':{'ch': 9, 'last_state': None},
         }
         
@@ -75,7 +76,7 @@ class RemoteControlInterface(Node):
             case "camera":
                 self.camera_change(state)
 
-            case 'servo_1'| 'servo_2':
+            case 'ladder_servo_1'| 'ladder_servo_2' | 'radio_servo':
                 if state == "HIGH":
                     self.get_logger().info(f"Opening {name}")
                     
