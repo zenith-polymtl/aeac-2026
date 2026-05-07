@@ -267,7 +267,7 @@ gcs-payload: up
 	    source /opt/ros/humble/setup.bash; \
 	    ros2 daemon start; \
 		source install/setup.bash; \
-	    ros2 run web_server_node web_server_node'
+	    ros2 run payload_web_server_node payload_web_server_node'
 
 gcs-payload-build: up
 	docker compose -f compose/zenoh-ground.yml up -d
@@ -275,10 +275,10 @@ gcs-payload-build: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \
-		colcon build --packages-select web_server_node custom_interfaces; \
+		colcon build --packages-select payload_web_server_node custom_interfaces; \
 	    ros2 daemon start; \
 		source install/setup.bash; \
-	    ros2 run web_server_node web_server_node'
+	    ros2 run payload_web_server_node payload_web_server_node'
 
 gcs-water: up
 	docker compose -f compose/zenoh-ground.yml up -d

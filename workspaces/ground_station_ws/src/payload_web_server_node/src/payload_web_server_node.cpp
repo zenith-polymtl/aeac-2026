@@ -96,8 +96,9 @@ void PayloadWebServerNode::initialize_publisher()
     start_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/lap/start", reliable_qos);
     finish_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/lap/finish", reliable_qos);
     move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/move_to_scene", reliable_qos);
+    servo_control_publisher_ = create_publisher<ServoControl>("/aeac/external/payload/toggle_servo", reliable_qos);
 
-    servo_client_ = create_client<ServoState>("/aeac/external/payload/set_state");
+    // servo_client_ = create_client<ServoState>("/aeac/external/payload/set_state");
 
     abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/abort_all", reliable_qos);
 
@@ -117,12 +118,13 @@ void PayloadWebServerNode::initialize_subscriber()
 
 void PayloadWebServerNode::heartbeat_timer_callback()
 {
-    if (!is_connected_) return;
+    if (!drone_is_connected_) return;
 
     missed_drone_heartbeat_++;
     if (missed_drone_heartbeat_ > heartbeat_drone_failure_threashold_)
     {
-        is_connected_ = false;
+        drone_is_connected_ = false;
+        zed_is_connected_ = false;
         send_connection_notification();
     }
 }
@@ -132,14 +134,29 @@ void PayloadWebServerNode::ui_message_callback(const UiMessage msg)
     send_log(msg.is_success, msg.message);
 }
 
-void PayloadWebServerNode::drone_heartbeat_callback(const DroneHealth)
+void PayloadWebServerNode::drone_heartbeat_callback(const DroneHealth msg)
 {
-    if (!is_connected_)
+    bool should_send_notification = false;
+    bool ignore_logging = false;
+    if (zed_is_connected_ != msg.zed_healthy) 
     {
-        is_connected_ = true;
-        send_connection_notification();
+        should_send_notification = true;
+        ignore_logging = true;
     }
+    if (!drone_is_connected_)
+    {
+        should_send_notification = true;
+        drone_is_connected_ = true;
+        ignore_logging = false;
+    }
+    zed_is_connected_ = msg.zed_healthy;
     missed_drone_heartbeat_ = 0;
+
+    if (should_send_notification) 
+    {
+        send_connection_notification(ignore_logging);
+    }
+
 }
 
 void PayloadWebServerNode::send_log(bool is_success, std::string message)
@@ -157,11 +174,12 @@ void PayloadWebServerNode::send_connection_notification(const bool ignore_log)
 {
     nlohmann::json status_json = {
         {"type", "connection"},
-        {"is_connected", is_connected_},
+        {"drone_is_connected", drone_is_connected_},
+        {"zed_is_connected", zed_is_connected_}
     };
     send_notification(status_json);
     if (!ignore_log)
-        send_log(is_connected_, is_connected_ ? "Drone Connection established" : "Drone Connection lost");
+        send_log(drone_is_connected_, drone_is_connected_ ? "Drone Connection established" : "Drone Connection lost");
 }
 
 
@@ -292,10 +310,10 @@ PayloadWebServerNode::handle_request(
     return make_not_found(req, target);
 }
 
-ServoCommand PayloadWebServerNode::parse_servo_command(const std::string& body)
+ServoControl PayloadWebServerNode::parse_servo_command(const std::string& body)
 {
     auto j = json::parse(body);
-    ServoCommand cmd;
+    ServoControl cmd;
     cmd.servo_num = j.at("servo_num").get<int>();
     cmd.pwm       = j.at("pwm").get<int>();
     return cmd;
@@ -348,16 +366,11 @@ PayloadWebServerNode::try_handle_api(
 
         try
         {
-            ServoCommand cmd = parse_servo_command(req.body());
+            ServoControl cmd = parse_servo_command(req.body());
 
             RCLCPP_INFO(get_logger(), "Servo: %d, PWM: %d",
                         cmd.servo_num, cmd.pwm);
-
-            auto request = std::make_shared<ServoState::Request>();
-            request->servo_num = cmd.servo_num;
-            request->pwm = cmd.pwm;
-
-            servo_client_->async_send_request(request);
+            servo_control_publisher_->publish(cmd);
 
             return generate_responce("Servo command received", req);
         }

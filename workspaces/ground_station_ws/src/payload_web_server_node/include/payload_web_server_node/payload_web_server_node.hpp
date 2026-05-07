@@ -18,6 +18,7 @@
 #include <nlohmann/json.hpp>
 #include "custom_interfaces/msg/ui_message.hpp"
 #include "custom_interfaces/msg/drone_health.hpp"
+#include "custom_interfaces/msg/servo_control.hpp"
 #include "custom_interfaces/srv/servo_state.hpp"
 #include <memory>
 
@@ -44,6 +45,7 @@ using UiMessage = custom_interfaces::msg::UiMessage;
 using DroneHealth = custom_interfaces::msg::DroneHealth;
 using ServoState = custom_interfaces::srv::ServoState;
 using json = nlohmann::json;
+using ServoControl = custom_interfaces::msg::ServoControl;
 
 struct ServoCommand
 {
@@ -99,7 +101,7 @@ private:
     std::mutex ws_mutex_;
     std::atomic<bool> running_{true};
 
-    ServoCommand parse_servo_command(const std::string& body);
+    ServoControl parse_servo_command(const std::string& body);
 
     std::string current_status_ = "IDLE";
 
@@ -111,7 +113,9 @@ private:
     int heartbeat_drone_failure_threashold_;
     int missed_drone_heartbeat_ = 0;
     rclcpp::TimerBase::SharedPtr heartbeat_timer_;
-    bool is_connected_ = false;
+    bool drone_is_connected_ = false;
+    bool zed_is_connected_ = false;
+
     
 	rclcpp::Subscription<UiMessage>::SharedPtr message_to_ui_subsciber_;
     rclcpp::Subscription<DroneHealth>::SharedPtr drone_heartbeat_subsciber_;
@@ -119,10 +123,10 @@ private:
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr mission_go_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr start_lap_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr finish_lap_publisher_;
-
+    rclcpp::Publisher<ServoControl>::SharedPtr servo_control_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr move_to_scene_publisher_;
 
-    rclcpp::Client<ServoState>::SharedPtr servo_client_;
+    // rclcpp::Client<ServoState>::SharedPtr servo_client_;
 
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr abort_all_mission_publisher_;
 
