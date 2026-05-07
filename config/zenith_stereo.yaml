@@ -4,8 +4,8 @@
         # General settings  
         general:  
             camera_name: 'zed2i'
-            grab_resolution: '720'  # Good balance for Jetson, or 'VGA' for maximum performance  
-            pub_frame_rate: 10.0
+            grab_resolution: 'VGA'  # 720 is Good balance for Jetson, or 'VGA' for maximum performance  
+            pub_frame_rate: 15.0    # Previously was 10.0
             pub_resolution: 'CUSTOM'  
             pub_downscale_factor: 2.0  
             gpu_id: -1  
@@ -35,7 +35,7 @@
           
         # Depth settings - minimal for object detection  
         depth:  
-            depth_mode: 'NEURAL_LIGHT'  # Required for object detection  
+            depth_mode: 'NONE'  # NEURAL_LIGHT is required for object detection  
             point_cloud_freq: 5.0   
             depth_confidence: 80  
             depth_texture_conf: 80  
