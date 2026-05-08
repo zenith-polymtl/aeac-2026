@@ -4,7 +4,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 from custom_interfaces.srv import ServoState
-
+from std_msgs.msg import Bool
 from mavros_msgs.msg import RCIn, State
 from mavros_msgs.srv import MessageInterval, SetMode
 
@@ -18,7 +18,7 @@ class RemoteControlInterface(Node):
             'camera':    {'rc_ch': 13, 'servo_ch' : 13, 'last_state': None,  "LOW" : 1850, "MIDDLE" : 1000 ,"HIGH" : 700},
             'ladder_servo_1':   {'rc_ch': 7, 'servo_ch' : 9, 'last_state': None, "LOW" : 2050, "MIDDLE" : 1600 ,"HIGH" : 1600},
             'ladder_servo_2':   {'rc_ch': 7, 'servo_ch' : 10, 'last_state': None, "LOW" : 1600, "MIDDLE" : 2050 ,"HIGH" : 2050},
-            'lap_controle' : {'rc_ch': 9, 'last_state': None},
+            'lap_control' : {'rc_ch': 9, 'last_state': None},
             # 'radio_servo':   {'rc_ch': 8,'servo_ch' : 10, 'last_state': None, "LOW" : 1000, "MIDDLE" : 1500, "HIGH" : 2000},
             # 'polar_lock':{'ch': 9, 'last_state': None},
         }
@@ -31,6 +31,11 @@ class RemoteControlInterface(Node):
         self.set_mode_client = self.create_client(SetMode, '/mavros/set_mode')
         self.rc_sub = self.create_subscription(RCIn, '/mavros/rc/in', self.rc_callback, qos_be)
         self.state_sub = self.create_subscription(State, '/mavros/state', self.state_callback, qos_re)
+
+
+        self.finish_lap_pub = self.create_publisher(Bool, '/mission/control_nav/lap/finish', qos_re)
+        self.finish_now_pub = self.create_publisher(Bool, '/mission/control_nav/lap/finish_now', qos_re)
+
 
         self.get_logger().info("Remote Controller Interface Initialized")
         
@@ -130,9 +135,13 @@ class RemoteControlInterface(Node):
     
     def lap_controle_change(self, state):
         if state == "HIGH":
+            self.get_logger().info("NOT, finishing current lap, going NOW to site")
+            self.finish_lap_pub.publish(Bool(data=True))
+        elif state == "LOW":
+            self.get_logger().info("Lap switch reset to default position")
+        elif state == "MIDDLE":
             self.get_logger().info("Finishing current lap and going to site")
-        else:
-            self.get_logger().info("Stopping lap now and going to site")
+            self.finish_lap_pub.publish(Bool(data=True))
         
     def set_mavros_mode(self, mode_str):
         req = SetMode.Request()

@@ -21,6 +21,12 @@ qos_profile_BE = QoSProfile(
     depth=8
 )
 
+qos_profile_RE = QoSProfile(
+    reliability=QoSReliabilityPolicy.RELIABLE,
+    history=QoSHistoryPolicy.KEEP_LAST,
+    depth=8
+)
+
 class ControlNav(Node):
 
     def __init__(self):
@@ -41,14 +47,15 @@ class ControlNav(Node):
         
         # Subscribers
         # Lap specific subscriber
-        self.start_lap_sub = self.create_subscription(Bool, '/mission/control_nav/lap/start', self.start_laps, 10)
-        self.finish_lap_sub = self.create_subscription(Bool, '/mission/control_nav/lap/finish', self.finish_current_lap_and_stop, 10)
+        self.start_lap_sub = self.create_subscription(Bool, '/mission/control_nav/lap/start', self.start_laps, qos_profile_RE)
+        self.finish_lap_sub = self.create_subscription(Bool, '/mission/control_nav/lap/finish', self.finish_current_lap_and_stop, qos_profile_RE)
+        self.finish_lap_now_sub = self.create_subscription(Bool, '/mission/control_nav/lap/finish_now', self.stop_now, qos_profile_RE)
         
         # Object delivery specific subscriber
-        self.move_to_scene_sub = self.create_subscription(Bool, '/mission/control_nav/move_to_scene', self.move_to_scene_procedure, 10)
+        self.move_to_scene_sub = self.create_subscription(Bool, '/mission/control_nav/move_to_scene', self.move_to_scene_procedure, qos_profile_RE)
         
         # Genretal controle subscriber
-        self.abort_all_sub = self.create_subscription(Bool, '/mission/abort_all', self.stop_drone, 10)
+        self.abort_all_sub = self.create_subscription(Bool, '/mission/abort_all', self.stop_drone, qos_profile_RE)
 
         self.drone_position_sub = self.create_subscription(
             PoseStamped, "/mavros/local_position/pose", self.drone_pose_callback, qos_profile_BE
@@ -67,7 +74,7 @@ class ControlNav(Node):
         self.declare_parameter('json_filename', 'cimetiere_course.json')
         self.declare_parameter('json_subfolder', 'data')
         self.declare_parameter('delais_for_position_check', 0.5)
-        self.declare_parameter('distance_from_objectif_threashold', 3.0)
+        self.declare_parameter('distance_from_objectif_threashold', 3.5)
         
         #Pour julien
         #self.declare_parameter('latitude_of_scene', -35.361450)
@@ -300,6 +307,11 @@ class ControlNav(Node):
                 
         self.publisher_raw.publish(stop_target)
         self.get_logger().info(f"Drone Stopped")
+
+    def stop_now(self, msg):
+        self.get_logger().info(f"Stopping immediately")
+        self.stop_laps()
+        self.lap_finished_pub.publish(Bool(data=True))
     
     # Pass the to the nex point
     def skip_current_waypoint(self):
