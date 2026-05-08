@@ -46,8 +46,8 @@ class ControlNav(Node):
         
         # Publisher
         self.publisher_raw = self.create_publisher(PositionTarget, '/mavros/setpoint_raw/local', qos_re)
-        self.lap_finished_pub = self.create_publisher(Bool, '/aeac/internal/lap/finished', qos_re)
-        self.move_to_scene_pub = self.create_publisher(Bool, '/aeac/internal/move_to_scene/finished', qos_re)
+        self.lap_finished_pub = self.create_publisher(Bool, '/mission/control_nav/lap/finished', qos_re)
+        self.move_to_scene_pub = self.create_publisher(Bool, '/mission/control_nav/move_to_scene/finished', qos_re)
         
         # Subscribers
         # Lap specific subscriber
@@ -76,7 +76,7 @@ class ControlNav(Node):
     def initialize_parameters(self):
         ## Param decalration
         self.declare_parameter('json_filename', 'cimetiere_course.json')
-        self.declare_parameter('json_subfolder', 'data')
+        self.declare_parameter('json_subfolder', 'config')
         self.declare_parameter('delais_for_position_check', 0.5)
         self.declare_parameter('distance_from_objectif_threashold', 3.5)
         
