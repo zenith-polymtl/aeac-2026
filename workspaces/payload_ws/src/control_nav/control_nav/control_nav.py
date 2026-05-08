@@ -46,20 +46,20 @@ class ControlNav(Node):
         
         # Publisher
         self.publisher_raw = self.create_publisher(PositionTarget, '/mavros/setpoint_raw/local', qos_re)
-        self.lap_finished_pub = self.create_publisher(Bool, '/mission/control_nav/lap/finished', qos_re)
-        self.move_to_scene_pub = self.create_publisher(Bool, '/mission/control_nav/move_to_scene/finished', qos_re)
+        self.lap_finished_pub = self.create_publisher(Bool, '/aeac/internal/mission/control_nav/lap/finished', qos_re)
+        self.move_to_scene_pub = self.create_publisher(Bool, '/aeac/internal/mission/control_nav/move_to_scene/finished', qos_re)
         
         # Subscribers
         # Lap specific subscriber
         self.start_lap_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/lap/start', self.start_laps, qos_profile_RE)
         self.finish_lap_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/lap/finish', self.finish_current_lap_and_stop, qos_profile_RE)
-        self.finish_lap_now_sub = self.create_subscription(Bool, '/mission/control_nav/lap/finish_now', self.stop_now, qos_profile_RE)
+        self.finish_lap_now_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/lap/finish_now', self.stop_now, qos_profile_RE)
         
         # Object delivery specific subscriber
         self.move_to_scene_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/move_to_scene', self.move_to_scene_procedure, qos_profile_RE)
         
         # Genretal controle subscriber
-        self.abort_all_sub = self.create_subscription(Bool, '/mission/abort_all', self.stop_drone, qos_profile_RE)
+        self.abort_all_sub = self.create_subscription(Bool, '/aeac/external/mission/abort_all', self.stop_drone, qos_profile_RE)
 
         self.drone_position_sub = self.create_subscription(
             PoseStamped, "/mavros/local_position/pose", self.drone_pose_callback, qos_profile_BE
@@ -85,8 +85,8 @@ class ControlNav(Node):
         #self.declare_parameter('longitude_of_scene', 149.161448)
 
         #Cimetière
-        self.declare_parameter('latitude_of_scene', -35.361450)
-        self.declare_parameter('longitude_of_scene', 149.161448)
+        self.declare_parameter('latitude_of_scene', 75.505881)
+        self.declare_parameter('longitude_of_scene', -73.607876)
 
         self.declare_parameter('altitude_of_scene', 10.0)
         
@@ -274,6 +274,11 @@ class ControlNav(Node):
             return
         
         distance_form_objectif = self.calculate_distance_from_point(self.current_point_objectif)
+
+        if distance_form_objectif > 10000:
+            self.get_logger().error(f"Distance from objectif is {distance_form_objectif}m, which is abnormally high. Probable GPS error or conversion issue.")
+            self.stop_drone(None)
+            return
         
         self.get_logger().info(f"Current distance : {distance_form_objectif}")
 

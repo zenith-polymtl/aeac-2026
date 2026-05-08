@@ -9,18 +9,18 @@ class MissionStatsController(Node):
         self.get_logger().info('Mission state controller started!')
         
         # Subscriber
-        self.change_state_sub = self.create_subscription(PayloadState, '/mission/set_state', self.change_state_callback, 10)
+        self.change_state_sub = self.create_subscription(PayloadState, '/aeac/internal/mission/set_state', self.change_state_callback, 10)
         self.start_lap_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/lap/start', self.starting_laps, 10)
         self.finish_lap_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/lap/finish', self.finishing_laps, 10)
-        self.lap_finished_sub = self.create_subscription(Bool, '/mission/control_nav/lap/finished', self.laps_finished_callback, 10)
-        self.move_to_scenen_finsihed_sub = self.create_subscription(Bool, '/mission/control_nav/move_to_scene/finished', self.move_to_site_finished_callback, 10)
-        self.takeoff_completed_sub = self.create_subscription(Bool, '/mission/takeoff_completed', self.takeoff_completed_handler, 10)
+        self.lap_finished_sub = self.create_subscription(Bool, '/aeac/internal/mission/control_nav/lap/finished', self.laps_finished_callback, 10)
+        self.move_to_scenen_finsihed_sub = self.create_subscription(Bool, '/aeac/internal/mission/control_nav/move_to_scene/finished', self.move_to_site_finished_callback, 10)
+        self.takeoff_completed_sub = self.create_subscription(Bool, '/aeac/internal/mission/takeoff_completed', self.takeoff_completed_handler, 10)
         self.mission_go_sub = self.create_subscription(Bool, '/aeac/external/mission/go', self.go_mission_received, 10)
         
         # Publisher
-        self.start_lap_publisher = self.create_publisher(Bool, "/mission/control_nav/lap/start", 10)
-        self.move_to_scene_publisher = self.create_publisher(Bool, "/mission/control_nav/move_to_scene", 10)
-        self.state_changed_publisher = self.create_publisher(PayloadState, '/mission/state_changed', 10)
+        self.start_lap_publisher = self.create_publisher(Bool, "/aeac/external/mission/control_nav/lap/start", 10)
+        self.move_to_scene_publisher = self.create_publisher(Bool, "/aeac/external/mission/control_nav/move_to_scene", 10)
+        self.state_changed_publisher = self.create_publisher(PayloadState, '/aeac/internal/mission/state_changed', 10)
         
         self.current_state = PayloadState.INITIAL_STATE
 

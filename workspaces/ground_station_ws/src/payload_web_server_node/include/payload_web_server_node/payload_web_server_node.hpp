@@ -123,6 +123,7 @@ private:
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr mission_go_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr start_lap_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr finish_lap_publisher_;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr finish_stop_now_publisher_;
     rclcpp::Publisher<ServoControl>::SharedPtr servo_control_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr move_to_scene_publisher_;
 
