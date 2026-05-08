@@ -2,6 +2,7 @@
   plugins: {  
     ros2dds: {  
       domain: 3,  
+      ros_localhost_only: true,
       allow: {  
         publishers: [  
           "/tf",  
@@ -21,16 +22,20 @@
   mode: "peer",  
   connect: {  
     endpoints: [  
-      "tcp/192.168.0.11:7447",  
-      "tcp/192.168.30.208:7447",
-      "tcp/192.168.0.194:7447",
-      "tcp/192.168.30.202:7447",
-      "tcp/10.55.0.2:7447"
+      "tcp/100.87.171.82:7447",
     ]  
   },  
   listen: {  
     endpoints: [  
       "tcp/0.0.0.0:7447"  
     ]  
-  }  
+  },
+  scouting: {  
+    multicast: {  
+      enabled: false  
+    },  
+    gossip: {  
+      enabled: false  
+    }  
+  }
 }
