@@ -4,10 +4,10 @@ import math
 
 from mavros_msgs.msg import MountControl
 from mavros_msgs.srv import MountConfigure
+from std_msgs.msg import Bool, UInt8
 from custom_interfaces.msg import AimError, GimbalState
 from geometry_msgs.msg import Quaternion, TransformStamped
 from std_srvs.srv import SetBool
-from std_msgs.msg import Bool
 from tf_transformations import euler_from_quaternion
 from mavros_msgs.msg import GimbalManagerSetPitchyaw, GimbalDeviceAttitudeStatus
 from tf2_ros import TransformBroadcaster
@@ -35,33 +35,76 @@ SPEED_FLAGS = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_LOCK + GIMBAL_MANAGE
 
 # safe limits
 MAX_ANGLE_PITCH = 110.0
-MAX_ANGLE_YAW = 100
+MAX_ANGLE_YAW = 130.0
+
+AIM_ERROR_ACCEPTANCE = 10.0
 
 class GimbalMode:
-    LOCK = 1
-    FOLLOW = 2
+    LOCK = 0
+    FOLLOW = 1
+    AUTO_AIM = 2
+
+class PIDController():
+    def __init__(self, kp, ki, kd, max_output=3.0, max_i=1.0,
+                 deriv_tau=0.0, d_clip=None):
+        self.kp, self.ki, self.kd = kp, ki, kd
+        self.max_output, self.max_i = max_output, max_i
+        self.prev_error = 0.0
+        self.prev_error2 = 0.0
+        self.integral = 0.0
+        self.deriv_tau = deriv_tau  # [s], 0.06–0.12 works well at 30 Hz
+        self._d_state = 0.0
+        self.d_clip = d_clip
+        # expose last computed PID components for logging
+        self.last_p = 0.0
+        self.last_i = 0.0
+        self.last_d = 0.0
+
+
+    def compute(self, error, dt, d_meas=None):
+        if dt <= 0: return 0.0
+        # I
+        self.integral += error * dt
+        self.integral = max(-self.max_i, min(self.integral, self.max_i))
+
+        # store I term (kiintegral) for logging
+        self.last_i = self.ki * self.integral
+
+        # P term for logging
+        self.last_p = self.kp * error
+
+        #Second order backward derivative. If d_meas is provided, it's already a rate.
+        raw_d = d_meas if d_meas is not None else (3 * error - 4 * self.prev_error + self.prev_error2)/ (2 * dt)
+
+        # Low-pass filter
+        a = self.deriv_tau / (self.deriv_tau + dt)  # 0<a<1
+        self._d_state = a * self._d_state + (1.0 - a) * raw_d
+        dterm = self.kd * self._d_state
+        if self.d_clip is not None:
+            dterm = max(-self.d_clip, min(dterm, self.d_clip))
+    
+        # store D term (post clipping) for logging
+        self.last_d = dterm
+
+        # Sum & clamp
+        u = self.last_p + self.last_i + dterm
+        self.prev_error2 = self.prev_error
+        self.prev_error = error
+
+        return max(-self.max_output, min(u, self.max_output))
+
+    def reset(self):
+        self.prev_error = 0.0
+        self.prev_error2 = 0.0
+        self.integral = 0.0
+        self._d_state = 0.0
 
 class GremsyMavros(Node):
     def __init__(self):
         super().__init__('gremsy_mavros_ctrl')
 
-        # --- PID params ---
-        self.kp = 2.0
-        self.ki = 0.1
-        self.kd = 0.05
-        self.max_speed = 30.0 
-
-        # PID Memory
-        self.pitch_integral = 0.0
-        self.pitch_prev_error = 0.0
-        self.yaw_integral = 0.0
-        self.yaw_prev_error = 0.0
-        self.last_update_time = self.get_clock().now()
-        
-        # Current PID ?
-        self.current_pitch = 0.0
-        self.current_yaw = 0.0
-        self.current_roll = 0.0
+        self.pid_pitch = PIDController(kp=0.001, ki=0.0001, kd=0.002, max_output=0.7, max_i=0.5, deriv_tau=0.15)
+        self.pid_yaw = PIDController(kp=0.001, ki=0.0001, kd=0.002, max_output=0.7, max_i=0.5, deriv_tau=0.15)
 
         self.last_sent_pitch_vel = 0.0
         self.last_sent_yaw_vel = 0.0
@@ -73,25 +116,25 @@ class GremsyMavros(Node):
 
         self.state_timer = self.create_timer(0.5, self.publish_state)
         self.state_pub = self.create_publisher(GimbalState, '/aeac/external/gimbal/state', 10)
+        self.target_in_aim_pub = self.create_publisher(Bool, '/aeac/internal/auto_shoot/target_in_aim', 10)
+
+        # self.shoot_pub = self.create_publisher(Bool, '', 10)
 
         # --- Subscribers ---
 
-        self.create_subscription(Bool, '/aeac/external/gimbal/lock_mode', self.enable_lock_mode_callback, 10)
+        self.create_subscription(UInt8, '/aeac/external/gimbal/set_mode', self.set_mode_callback, 10)
 
         self.create_subscription(AimError, '/aeac/external/gimbal/move', self.gimbal_move_callback, 10)
 
         self.create_subscription(AimError, '/aeac/internal/gimbal/target_error', self.aiming_callback, 10)
 
-        self.mode_sub = self.create_subscription(Bool, '/aeac/external/gimbal/lock_mode', self.enable_lock_mode_callback, 10)
-
-        
         self.sub_orientation = self.create_subscription(
             GimbalDeviceAttitudeStatus,
             '/mavros/gimbal_control/device/attitude_status',
             self.gimbal_attitude_callback,
             10)
         
-                # TF broadcaster
+        # TF broadcaster
         self.tf_br = TransformBroadcaster(self)
 
         # Frame names
@@ -111,15 +154,19 @@ class GremsyMavros(Node):
 
         self.last_sent_pitch_vel = 0.0
         self.last_sent_yaw_vel = 0.0
-        
-        # --- Services ---
-        self.create_service(SetBool, '/gimbal/lock_mode', self.enable_lock_mode_callback)
-
-        self.get_logger().info("Gimbal MAVROS ready.")
 
     def publish_state(self):
         state_msg = GimbalState()
-        mode_str = "LOCK" if self.gimbal_mode == GimbalMode.LOCK else "FOLLOW"
+
+        if self.gimbal_mode == GimbalMode.LOCK:
+            mode_str = "LOCK"
+        elif self.gimbal_mode == GimbalMode.FOLLOW:
+            mode_str = "FOLLOW"
+        elif self.gimbal_mode == GimbalMode.AUTO_AIM:
+            mode_str = "Auto AIM"
+        else: 
+            mode_str = "UNKNOWN"
+
         state_msg.mode = mode_str
         state_msg.pitch = self.current_pitch
         state_msg.yaw = self.current_yaw
@@ -162,25 +209,25 @@ class GremsyMavros(Node):
             self.send_speed_cmd(target_pitch, target_yaw)
 
     def reset_pid_memory(self):
-        self.pitch_integral = 0.0
-        self.pitch_prev_error = 0.0
-        self.yaw_integral = 0.0
-        self.yaw_prev_error = 0.0
-        self.last_update_time = self.get_clock().now()
+        self.pid_pitch.reset()
+        self.pid_yaw.reset()
 
-    def enable_lock_mode_callback(self, msg):
+    def set_mode_callback(self, msg):
         self.reset_pid_memory()
 
-        new_mode = GimbalMode.LOCK if msg.data else GimbalMode.FOLLOW
+        new_mode = msg.data
 
         if new_mode == GimbalMode.LOCK:
             self.send_speed_cmd(0.0, 0.0)
             self.get_logger().info("Changed mode to LOCK.")
 
-
         elif new_mode == GimbalMode.FOLLOW:
             self.send_position_cmd(0.0, 0.0)
             self.get_logger().info("Changed mode to FOLLOW.")
+        
+        elif new_mode == GimbalMode.AUTO_AIM:
+            self.send_speed_cmd(0.0, 0.0)
+            self.get_logger().info("Changed mode to AUTO_AIM.")
 
         self.gimbal_mode = new_mode
         self.publish_state()
@@ -207,52 +254,38 @@ class GremsyMavros(Node):
     def gimbal_move_callback(self, msg):
         if self.gimbal_mode != GimbalMode.LOCK:
             return
-
-        self.send_speed_cmd(msg.pitch_error, msg.yaw_error)
+        
+        target_vel_pitch, target_vel_yaw = self.check_angle_limit(msg.pitch_error, msg.yaw_error)
+        self.send_speed_cmd(target_vel_pitch, target_vel_yaw)
 
     def aiming_callback(self, msg):
-        if self.gimbal_mode != GimbalMode.LOCK:
+        if self.gimbal_mode != GimbalMode.AUTO_AIM:
             return
 
-        target_vel_pitch = msg.pitch_error
         target_vel_yaw = msg.yaw_error
+    
+        current_time = self.get_clock().now()
+        dt = (current_time - self.last_update_time).nanoseconds / 1e9
+        self.last_update_time = current_time
+
+        if dt <= 0.0 or dt > 0.1:
+            dt = 0.01
+
+        target_vel_pitch = self.pid_pitch.compute(msg.pitch_error, dt)
+        target_vel_yaw = self.pid_yaw.compute(msg.yaw_error, dt)
+        
+        in_sight_msg = Bool()        
+        if abs(msg.pitch_error) < AIM_ERROR_ACCEPTANCE and abs(msg.yaw_error) < AIM_ERROR_ACCEPTANCE:
+            target_vel_pitch = 0.0   
+            target_vel_yaw = 0.0
+            in_sight_msg.data = True
+            self.target_in_aim_pub(in_sight_msg)
+        else:
+            in_sight_msg.data = False
+            self.target_in_aim_pub(in_sight_msg)
 
         target_vel_pitch, target_vel_yaw = self.check_angle_limit(target_vel_pitch, target_vel_yaw)
-
         self.send_speed_cmd(target_vel_pitch, target_vel_yaw)
-        # return
-    
-        # current_time = self.get_clock().now()
-        # dt = (current_time - self.last_update_time).nanoseconds / 1e9
-        # self.last_update_time = current_time
-
-        # if dt <= 0.0 or dt > 0.1:
-        #     dt = 0.01
-
-        # cmd_pitch = self.compute_pid(msg.pitch_error, "pitch", dt)
-        # cmd_yaw = self.compute_pid(msg.yaw_error, "yaw", dt)
-
-        # cmd_pitch = max(min(cmd_pitch, self.max_speed), -self.max_speed)
-        # cmd_yaw = max(min(cmd_yaw, self.max_speed), -self.max_speed)
-
-        # self.send_speed_cmd(cmd_pitch, cmd_yaw)
-
-    def compute_pid(self, error, axis, dt):
-        if axis == "pitch":
-            p = error * self.kp
-            self.pitch_integral += error * dt
-            self.pitch_integral = max(min(self.pitch_integral, 10.0), -10.0)
-            i = self.pitch_integral * self.ki
-            d = ((error - self.pitch_prev_error) / dt) * self.kd
-            self.pitch_prev_error = error
-        else:
-            p = error * self.kp
-            self.yaw_integral += error * dt
-            self.yaw_integral = max(min(self.yaw_integral, 10.0), -10.0)
-            i = self.yaw_integral * self.ki
-            d = ((error - self.yaw_prev_error) / dt) * self.kd
-            self.yaw_prev_error = error
-        return p + i + d
 
     def send_position_cmd(self, pitch, yaw):
         self.last_sent_pitch_vel = 0.0

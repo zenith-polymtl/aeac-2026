@@ -47,9 +47,10 @@ WaterWebServerNode::WaterWebServerNode() : Node("water_web_server_node"),
                                  ioc_(1),
                                  acceptor_(ioc_, {net::ip::make_address("0.0.0.0"), SERVER_PORT})
 {
+    initalize_parameters();
+    initalize_variables();
     initialize_publisher();
     initialize_subscriber();
-    package_share_dir_ = ament_index_cpp::get_package_share_directory("water_web_server_node");
     server_thread_ = std::thread([this]()
                                  { run_server(); });
 }
@@ -65,18 +66,49 @@ WaterWebServerNode::~WaterWebServerNode()
 
 void WaterWebServerNode::initialize_publisher()
 {
-    mission_go_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/go", 10);
-    start_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/lap/start", 10);
-    finish_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/lap/finish", 10);
-    move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/control_nav/move_to_scene", 10);
-    abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/mission/abort_all", 10);
-    gimbal_mode_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/gimbal/lock_mode", 10);
+    mission_go_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/go", 10);
+    move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/move_to_scene", 10);
+    abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/abort_all", 10);
+    gimbal_mode_publisher_ = create_publisher<std_msgs::msg::UInt8>("/aeac/external/gimbal/set_mode", 10);
+    auto_approach_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/auto_approach/start", 10);
+    auto_shoot_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/auto_shoot/start", 10);
+    shoot_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/shoot", 10);
+    take_picutre_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/take_picture", 10);
+}
+
+void WaterWebServerNode::initalize_parameters()
+{
+    // Declare parameters
+    this->declare_parameter<double>("drone_heartbeat_rate", 1.0); //Hz
+    this->declare_parameter<std::string>("drone_heartbeat_topic", "/aeac/external/drone_heartbeat");
+    this->declare_parameter<int>("heartbeat_drone_failure_threashold", 3); // Number of missed heartbeat before flagging
+
+    // // Get parameters
+    drone_heartbeat_frequency_ = this->get_parameter("drone_heartbeat_rate").as_double();
+    drone_heartbeat_topic_ = this->get_parameter("drone_heartbeat_topic").as_string();
+    heartbeat_drone_failure_threashold_ = this->get_parameter("heartbeat_drone_failure_threashold").as_int();
+}
+
+void WaterWebServerNode::initalize_variables()
+{
+    auto period = std::chrono::duration<double>(1.0 / drone_heartbeat_frequency_);
+    heartbeat_timer_ = this->create_wall_timer(
+        std::chrono::duration_cast<std::chrono::milliseconds>(period),
+        std::bind(&WaterWebServerNode::heartbeat_timer_callback, this)
+    );
+    package_share_dir_ = ament_index_cpp::get_package_share_directory("water_web_server_node");
 }
 
 void WaterWebServerNode::initialize_subscriber() 
 {
+    auto reliable_qos = rclcpp::QoS(rclcpp::KeepLast(10));
+    reliable_qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
+
+
     message_to_ui_subsciber_ = create_subscription<UiMessage>(
-		"/send_to_ui", 10, std::bind(&WaterWebServerNode::broadcast_message, this, std::placeholders::_1));
+		"/aeac/external/send_to_ui", 10, std::bind(&WaterWebServerNode::broadcast_message, this, std::placeholders::_1));
+
+    drone_heartbeat_subsciber_ = create_subscription<DroneHealth>(drone_heartbeat_topic_, reliable_qos, std::bind(&WaterWebServerNode::drone_heartbeat_callback, this, std::placeholders::_1));
 
     gimbal_state_subscriber_ = create_subscription<GimbalState>(
         "/aeac/external/gimbal/state", 10, [this](const GimbalState::SharedPtr msg)
@@ -106,7 +138,101 @@ void WaterWebServerNode::initialize_subscriber()
                     RCLCPP_WARN(get_logger(), "Error Broadcasting Gimbal State");
                 }
             }
-        });
+        }
+    );
+
+    picture_subscriber_ = create_subscription<Image>(
+        "/aeac/external/target_picture", reliable_qos,
+        std::bind(&WaterWebServerNode::picture_callback, this, std::placeholders::_1));
+}
+
+void WaterWebServerNode::heartbeat_timer_callback()
+{
+    if (!drone_is_connected_) return;
+
+    missed_drone_heartbeat_++;
+    if (missed_drone_heartbeat_ > heartbeat_drone_failure_threashold_)
+    {
+        drone_is_connected_ = false;
+        zed_is_connected_ = false;
+        send_connection_notification();
+    }
+}
+
+void WaterWebServerNode::drone_heartbeat_callback(const DroneHealth msg)
+{
+    bool should_send_notification = false;
+    bool ignore_logging = false;
+    if (zed_is_connected_ != msg.zed_healthy) 
+    {
+        should_send_notification = true;
+        ignore_logging = true;
+    }
+    if (!drone_is_connected_)
+    {
+        should_send_notification = true;
+        drone_is_connected_ = true;
+        ignore_logging = false;
+    }
+    zed_is_connected_ = msg.zed_healthy;
+    missed_drone_heartbeat_ = 0;
+
+    if (should_send_notification) 
+    {
+        send_connection_notification(ignore_logging);
+    }
+}
+
+void WaterWebServerNode::send_connection_notification(const bool ignore_log)
+{
+    nlohmann::json status_json = {
+        {"type", "connection"},
+        {"drone_is_connected", drone_is_connected_},
+        {"zed_is_connected", zed_is_connected_}
+    };
+    send_notification(status_json);
+    if (!ignore_log)
+        send_log(drone_is_connected_, drone_is_connected_ ? "Drone Connection established" : "Drone Connection lost");
+}
+
+void WaterWebServerNode::send_log(bool is_success, std::string message)
+{
+    nlohmann::json status_json = {
+        {"type", "message"},
+        {"is_success", is_success},
+        {"message", message},
+    };
+
+    send_notification(status_json);
+}
+
+void WaterWebServerNode::on_client_connection()
+{
+    send_connection_notification(true);
+}
+
+void WaterWebServerNode::send_notification(const nlohmann::json status_json) 
+{
+    std::string message = status_json.dump();
+
+    std::lock_guard<std::mutex> lock(ws_mutex_);
+
+    for (auto *ws_ptr : ws_sessions_)
+    {
+        try {
+            beast::error_code ec;
+            ws_ptr->text(true);
+            ws_ptr->write(net::buffer(message), ec);
+            if (ec)
+            {
+                RCLCPP_WARN(get_logger(), "Failed to send to one client: %s", ec.message().c_str());
+            }
+        }
+        catch(...){
+            RCLCPP_WARN(get_logger(), "Error Broadcasting");
+        }
+
+    }
 }
 
 void WaterWebServerNode::broadcast_message(const UiMessage msg)
@@ -139,11 +265,52 @@ void WaterWebServerNode::broadcast_message(const UiMessage msg)
     }
 }
 
+void WaterWebServerNode::picture_callback(const Image msg)
+{
+    try {
+        RCLCPP_INFO(this->get_logger(), "Recived picture");
+
+        cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+
+        std::string image_directory = "/images/targets";
+
+        std::string images_dir = package_share_dir_ + WEB_COMPONENT_FOLDER + image_directory;
+        if (!fs::exists(images_dir)) {
+            fs::create_directories(images_dir);
+        }
+
+        auto now = std::chrono::system_clock::now();
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+        std::string filename = "drone_pic_" + std::to_string(ms) + ".jpg";
+        std::string full_path = images_dir + "/" + filename;
+
+        cv::imwrite(full_path, cv_ptr->image);
+        RCLCPP_INFO(this->get_logger(), "Saved picture to: %s", full_path.c_str());
+
+        nlohmann::json img_json = {
+            {"type", "new_picture"},
+            {"url", image_directory + "/" + filename}
+        };
+        
+        std::string ws_msg = img_json.dump();
+        std::lock_guard<std::mutex> lock(ws_mutex_);
+        for (auto *ws_ptr : ws_sessions_) {
+            beast::error_code ec;
+            ws_ptr->text(true);
+            ws_ptr->write(net::buffer(ws_msg), ec);
+        }
+
+    } catch (cv_bridge::Exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
+    }
+}
+
 void WaterWebServerNode::run_server()
 {
     std::string doc_root = package_share_dir_ + WEB_COMPONENT_FOLDER;
     std::cout << doc_root.c_str() << std::endl;
     RCLCPP_INFO_STREAM(this->get_logger(), "Starting web server on port http://localhost:" << SERVER_PORT);
+
     for (;;)
     {
         beast::error_code ec;
@@ -269,15 +436,19 @@ WaterWebServerNode::try_handle_api(
     {
         RCLCPP_INFO(get_logger(), "Received Auto Approach!");
 
-        // TODO: Add Auto Approach Logic
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        auto_approach_publisher_->publish(msg);
 
-        return generate_responce("Request Auto Approach received", req);
+        // return generate_responce("Request Auto Approach received", req);
     }
     if (target == API_AUTO_SHOOT)
     {
         RCLCPP_INFO(get_logger(), "Received Auto Shoot!");
 
-        // TODO: Add Auto Shoot Logic
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        auto_shoot_publisher_->publish(msg);
 
         return generate_responce("Request Auto Shoot received", req);
     }
@@ -285,7 +456,9 @@ WaterWebServerNode::try_handle_api(
     {
         RCLCPP_INFO(get_logger(), "Received shoot!");
 
-        // TODO: Add Shoot Logic
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        shoot_publisher_->publish(msg);
 
         return generate_responce("Request Shoot received", req);
     }
@@ -293,7 +466,9 @@ WaterWebServerNode::try_handle_api(
     {
         RCLCPP_INFO(get_logger(), "Received Take Picture!");
         
-        // TODO: Add Take Picture Logic
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        take_picutre_publisher_->publish(msg);
 
         return generate_responce("Request Take Picture received", req);
 
@@ -302,16 +477,16 @@ WaterWebServerNode::try_handle_api(
     {
         RCLCPP_INFO(get_logger(), "Received  Gimbal Follow!");
         
-        auto message = std_msgs::msg::Bool();
-        message.data = false;
+        auto message = std_msgs::msg::UInt8();
+        message.data = 1;
         gimbal_mode_publisher_->publish(message);
         return generate_responce("Request Gimbal Follow received", req);
     }
     if (target == API_GIMBAL_LOCK)
     {
         RCLCPP_INFO(get_logger(), "Received Gimbal Lock!");
-        auto message = std_msgs::msg::Bool();
-        message.data = true;
+        auto message = std_msgs::msg::UInt8();
+        message.data = 0;
         gimbal_mode_publisher_->publish(message);
         return generate_responce("Request  Gimbal Lock received", req);
     }
@@ -408,6 +583,9 @@ void WaterWebServerNode::do_session(tcp::socket socket, std::string const &doc_r
             ~Guard() { if (fn) fn(); }
         } guard{cleanup};
         // RCLCPP_INFO(get_logger(), "New WebSocket client connected. Total: %zu", ws_sessions_.size());
+
+        on_client_connection();
+
         for (;;)
         {
             beast::flat_buffer ws_buffer;
@@ -446,6 +624,7 @@ void WaterWebServerNode::do_session(tcp::socket socket, std::string const &doc_r
 
 void WaterWebServerNode::broadcast_status()
 {
+    RCLCPP_INFO(get_logger(), "BroadCast Reiceived");
     nlohmann::json status_json = {
         {"timestamp", rclcpp::Clock().now().seconds()},
         {"status", current_status_},

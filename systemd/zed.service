@@ -1,0 +1,24 @@
+[Unit]
+Description=ZED Camera ROS2 Stack
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=zenith
+Group=docker
+WorkingDirectory=/home/zenith/aeac-2026
+
+# Wait for the hardware to be physically present
+ExecStartPre=/bin/bash -c 'until lsusb | grep -i "stereolabs"; do sleep 1; done'
+
+# Launch in the foreground (no -d) so systemd can monitor the ROS2 logs
+ExecStart=/usr/bin/docker compose -f compose/zed.yml up zed-ros2
+
+ExecStop=/usr/bin/docker compose -f compose/zed.yml stop zed-ros2
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+

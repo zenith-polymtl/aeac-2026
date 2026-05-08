@@ -21,7 +21,20 @@ services:
       - /usr/local/zed/settings/:/usr/local/zed/settings/
       - ../config:/root/ros2_ws/config
       - ../models:/root/ros2_ws/models
-    command: ["bash", "-lc", "sleep infinity"]
+    command: >
+      bash -lc "
+        source /root/ros2_ws/install/setup.bash && 
+        export ROS_DOMAIN_ID=2 &&
+        ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=/root/ros2_ws/config/zenith_stereo.yaml publish_tf:=false publish_map_tf:=false
+        "
+
+    # zed-launch:
+    # docker compose -f compose/zed.yml up -d zed-ros2
+    # docker compose -f compose/zed.yml exec -it zed-ros2 bash -lc '\
+    #   source /root/ros2_ws/install/setup.bash; \
+    #   ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml publish_tf:=false publish_map_tf:=false \
+    # '
+    # command: ["bash", "-lc", "sleep infinity"]
       #launch zed with :
       #ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=config/zenith_stereo.yaml
     

@@ -5,25 +5,15 @@
       allow: {  
         publishers: [  
           "/tf",  
-          "/tf_static",  
-          "/zed/zed_node/rgb/color/rect/image/compressed",  
-          "/zed/zed_node/point_cloud/cloud_registered",
-          "/zed/zed_node/rgb/color/rect/image/camera_info", 
-          "/zed/zed_node/rgb/color/rect/camera_info", 
-          "/zed/zed_node/status/heartbeat",
+          "/tf_static",
           "/chatter",  
-          "/mavros.*"  
+          "/aeac/external.*"  
         ],  
         subscribers: [  
           "/tf",  
-          "/tf_static",  
-          "/zed/zed_node/rgb/color/rect/image/compressed",  
-          "/zed/zed_node/point_cloud/cloud_registered",
-          "/zed/zed_node/rgb/color/rect/image/camera_info",  
-          "/zed/zed_node/rgb/color/rect/camera_info",
-          "/zed/zed_node/status/heartbeat",
+          "/tf_static",
           "/chatter",  
-          "/mavros.*"  
+          "/aeac/external.*"  
         ]  
       }  
     }  
@@ -34,7 +24,8 @@
       "tcp/192.168.0.11:7447",  
       "tcp/192.168.30.208:7447",
       "tcp/192.168.0.194:7447",
-      "tcp/192.168.30.202:7447"
+      "tcp/192.168.30.202:7447",
+      "tcp/10.55.0.2:7447"
     ]  
   },  
   listen: {  

@@ -46,12 +46,12 @@ function initaliseButtons() {
     document.getElementById('stop-lap-button').addEventListener('click', () => sendCommand(API_STOP_LAP));
     document.getElementById('go-to-site-button').addEventListener('click', () => sendCommand(API_MOVE_TO_SCENE));
     document.getElementById('servo-1-toggle').addEventListener('change', (e) => {
-        const pwm = e.target.checked ? 2000 : 1000;
-        sendCommand(API_SERVO, {servo_num: 1, pwm});
+        const pwm = e.target.checked ? 1700 : 2050;
+        sendCommand(API_SERVO, {servo_num: 9, pwm});
     });
     document.getElementById('servo-2-toggle').addEventListener('change', (e) => {
         const pwm = e.target.checked ? 2000 : 1000;
-        sendCommand(API_SERVO, {servo_num: 2, pwm});
+        sendCommand(API_SERVO, {servo_num: 10, pwm});
     });
     document.getElementById('take-picture-button').addEventListener('click', () => sendCommand(TAKE_PICTURE));
     document.getElementById('abort-button').addEventListener('click', () => sendCommand(API_ABORT_ALL));
@@ -76,6 +76,15 @@ function loadTheme() {
     });
 }
 
+function connection_logique(data) {
+    console.log("Dronce connection change: ", data)
+    const drone_connected_element =  document.getElementById("connection-span");
+    drone_connected_element.innerHTML = "Drone Connection: " + (data.drone_is_connected ? "Connected" : "Disconneted")
+
+    const zed_connected_element =  document.getElementById("zed-connection-span");
+    zed_connected_element.innerHTML = "Zed Connection: " + (data.zed_is_connected ? "Connected" : "Disconneted")
+}
+
 function initaliseSocket() {
     const ws = new WebSocket("ws://" + window.location.host + "/ws/status");
 
@@ -93,8 +102,7 @@ function initaliseSocket() {
                     appendToLog(`${data.message}`, data.is_success ? 'info':'error');
                     break;
                 case "connection":
-                    const connected_element =  document.getElementById("connection-span");
-                    connected_element.innerHTML = "Connection: " + (data.is_connected ? "Connected" : "Disconneted")
+                    connection_logique(data);
                     break;
                 default:
                     console.warn("Unknown message type:", data.type);
