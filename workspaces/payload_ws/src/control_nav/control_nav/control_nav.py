@@ -46,17 +46,17 @@ class ControlNav(Node):
         
         # Publisher
         self.publisher_raw = self.create_publisher(PositionTarget, '/mavros/setpoint_raw/local', qos_re)
-        self.lap_finished_pub = self.create_publisher(Bool, '/aeac/internal/lap/finished', qos_re)
-        self.move_to_scene_pub = self.create_publisher(Bool, '/aeac/internal/move_to_scene/finished', qos_re)
+        self.lap_finished_pub = self.create_publisher(Bool, '/mission/control_nav/lap/finished', qos_re)
+        self.move_to_scene_pub = self.create_publisher(Bool, '/mission/control_nav/move_to_scene/finished', qos_re)
         
         # Subscribers
         # Lap specific subscriber
-        self.start_lap_sub = self.create_subscription(Bool, '/mission/control_nav/lap/start', self.start_laps, qos_profile_RE)
-        self.finish_lap_sub = self.create_subscription(Bool, '/mission/control_nav/lap/finish', self.finish_current_lap_and_stop, qos_profile_RE)
+        self.start_lap_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/lap/start', self.start_laps, qos_profile_RE)
+        self.finish_lap_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/lap/finish', self.finish_current_lap_and_stop, qos_profile_RE)
         self.finish_lap_now_sub = self.create_subscription(Bool, '/mission/control_nav/lap/finish_now', self.stop_now, qos_profile_RE)
         
         # Object delivery specific subscriber
-        self.move_to_scene_sub = self.create_subscription(Bool, '/mission/control_nav/move_to_scene', self.move_to_scene_procedure, qos_profile_RE)
+        self.move_to_scene_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/move_to_scene', self.move_to_scene_procedure, qos_profile_RE)
         
         # Genretal controle subscriber
         self.abort_all_sub = self.create_subscription(Bool, '/mission/abort_all', self.stop_drone, qos_profile_RE)

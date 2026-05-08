@@ -10,12 +10,12 @@ class MissionStatsController(Node):
         
         # Subscriber
         self.change_state_sub = self.create_subscription(PayloadState, '/mission/set_state', self.change_state_callback, 10)
-        self.start_lap_sub = self.create_subscription(Bool, '/mission/control_nav/lap/start', self.starting_laps, 10)
-        self.finish_lap_sub = self.create_subscription(Bool, '/mission/control_nav/lap/finish', self.finishing_laps, 10)
+        self.start_lap_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/lap/start', self.starting_laps, 10)
+        self.finish_lap_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/lap/finish', self.finishing_laps, 10)
         self.lap_finished_sub = self.create_subscription(Bool, '/mission/control_nav/lap/finished', self.laps_finished_callback, 10)
         self.move_to_scenen_finsihed_sub = self.create_subscription(Bool, '/mission/control_nav/move_to_scene/finished', self.move_to_site_finished_callback, 10)
         self.takeoff_completed_sub = self.create_subscription(Bool, '/mission/takeoff_completed', self.takeoff_completed_handler, 10)
-        self.mission_go_sub = self.create_subscription(Bool, '/mission/go', self.go_mission_received, 10)
+        self.mission_go_sub = self.create_subscription(Bool, '/aeac/external/mission/go', self.go_mission_received, 10)
         
         # Publisher
         self.start_lap_publisher = self.create_publisher(Bool, "/mission/control_nav/lap/start", 10)
@@ -37,7 +37,7 @@ class MissionStatsController(Node):
         elif state == PayloadState.TAKEOFF:
             self.undefined_state_handler("takeoff")
         elif state == PayloadState.TAKEOFF_COMPLETED:
-            self.start_lag_handler()
+            self.start_lap_handler()
         elif state == PayloadState.LAP_STARTED:
             self.undefined_state_handler("lap stared")
         elif state == PayloadState.STOPING_LAPS:
