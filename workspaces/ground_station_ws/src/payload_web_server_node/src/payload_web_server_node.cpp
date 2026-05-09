@@ -95,6 +95,7 @@ void PayloadWebServerNode::initialize_publisher()
     mission_go_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/go", reliable_qos);
     start_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/lap/start", reliable_qos);
     finish_lap_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/lap/finish", reliable_qos);
+    finish_stop_now_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/lap/finish_now", reliable_qos);
     move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/move_to_scene", reliable_qos);
     servo_control_publisher_ = create_publisher<ServoControl>("/aeac/external/payload/toggle_servo", reliable_qos);
 
@@ -342,12 +343,18 @@ PayloadWebServerNode::try_handle_api(
     if (target == API_FINISH_LAP)
     {
         RCLCPP_INFO(get_logger(), "Finish Lap Received!");
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        finish_lap_publisher_->publish(msg);
 
         return generate_responce("Finish Lap received", req);
     }
     if (target == API_STOP_LAP)
     {
         RCLCPP_INFO(get_logger(), "Stop Lap Received!");
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        finish_stop_now_publisher_->publish(msg);
 
         return generate_responce("Stop Lap received", req);
     }

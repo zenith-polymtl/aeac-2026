@@ -39,23 +39,27 @@ class ControlNav(Node):
         self.is_last_lap = False
         self.is_doing_laps = False
         self.current_point_objectif = Point()
+
+        qos_be = QoSProfile(reliability=QoSReliabilityPolicy.BEST_EFFORT, history=QoSHistoryPolicy.KEEP_LAST, depth=10)
+        qos_re = QoSProfile(reliability=QoSReliabilityPolicy.RELIABLE, history=QoSHistoryPolicy.KEEP_LAST, depth=10)
+        
         
         # Publisher
-        self.publisher_raw = self.create_publisher(PositionTarget, '/mavros/setpoint_raw/local', 10)
-        self.lap_finished_pub = self.create_publisher(Bool, '/mission/control_nav/lap/finished', 10)
-        self.move_to_scene_pub = self.create_publisher(Bool, '/mission/control_nav/move_to_scene/finished', 10)
+        self.publisher_raw = self.create_publisher(PositionTarget, '/mavros/setpoint_raw/local', qos_re)
+        self.lap_finished_pub = self.create_publisher(Bool, '/aeac/internal/mission/control_nav/lap/finished', qos_re)
+        self.move_to_scene_pub = self.create_publisher(Bool, '/aeac/internal/mission/control_nav/move_to_scene/finished', qos_re)
         
         # Subscribers
         # Lap specific subscriber
-        self.start_lap_sub = self.create_subscription(Bool, '/mission/control_nav/lap/start', self.start_laps, qos_profile_RE)
-        self.finish_lap_sub = self.create_subscription(Bool, '/mission/control_nav/lap/finish', self.finish_current_lap_and_stop, qos_profile_RE)
-        self.finish_lap_now_sub = self.create_subscription(Bool, '/mission/control_nav/lap/finish_now', self.stop_now, qos_profile_RE)
+        self.start_lap_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/lap/start', self.start_laps, qos_profile_RE)
+        self.finish_lap_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/lap/finish', self.finish_current_lap_and_stop, qos_profile_RE)
+        self.finish_lap_now_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/lap/finish_now', self.stop_now, qos_profile_RE)
         
         # Object delivery specific subscriber
-        self.move_to_scene_sub = self.create_subscription(Bool, '/mission/control_nav/move_to_scene', self.move_to_scene_procedure, qos_profile_RE)
+        self.move_to_scene_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/move_to_scene', self.move_to_scene_procedure, qos_profile_RE)
         
         # Genretal controle subscriber
-        self.abort_all_sub = self.create_subscription(Bool, '/mission/abort_all', self.stop_drone, qos_profile_RE)
+        self.abort_all_sub = self.create_subscription(Bool, '/aeac/external/mission/abort_all', self.stop_drone, qos_profile_RE)
 
         self.drone_position_sub = self.create_subscription(
             PoseStamped, "/mavros/local_position/pose", self.drone_pose_callback, qos_profile_BE
@@ -72,7 +76,7 @@ class ControlNav(Node):
     def initialize_parameters(self):
         ## Param decalration
         self.declare_parameter('json_filename', 'cimetiere_course.json')
-        self.declare_parameter('json_subfolder', 'data')
+        self.declare_parameter('json_subfolder', 'config')
         self.declare_parameter('delais_for_position_check', 0.5)
         self.declare_parameter('distance_from_objectif_threashold', 3.5)
         
@@ -81,8 +85,8 @@ class ControlNav(Node):
         #self.declare_parameter('longitude_of_scene', 149.161448)
 
         #Cimetière
-        self.declare_parameter('latitude_of_scene', -35.361450)
-        self.declare_parameter('longitude_of_scene', 149.161448)
+        self.declare_parameter('latitude_of_scene', 75.505881)
+        self.declare_parameter('longitude_of_scene', -73.607876)
 
         self.declare_parameter('altitude_of_scene', 10.0)
         
@@ -270,6 +274,11 @@ class ControlNav(Node):
             return
         
         distance_form_objectif = self.calculate_distance_from_point(self.current_point_objectif)
+
+        if distance_form_objectif > 10000:
+            self.get_logger().error(f"Distance from objectif is {distance_form_objectif}m, which is abnormally high. Probable GPS error or conversion issue.")
+            self.stop_drone(None)
+            return
         
         self.get_logger().info(f"Current distance : {distance_form_objectif}")
 
@@ -335,6 +344,13 @@ class ControlNav(Node):
     def finish_current_lap_and_stop(self, _):
         self.get_logger().info(f"Finishing the current lap")
         self.stop_after_finishing_lap = True
+    
+    def finish_now(self, msg):
+        self.stop_laps()
+        lap_finished_msg = Bool()
+        lap_finished_msg.data = True
+        self.lap_finished_pub.publish(lap_finished_msg)
+        
 
 def main(args=None):
     rclpy.init(args=args)

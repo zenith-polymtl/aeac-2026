@@ -15,8 +15,14 @@ services:
       - ../packages/tools:/payload_ws/src/tools
       - ../packages/vision:/payload_ws/src/vision
       - ../packages/custom_interfaces:/payload_ws/src/custom_interfaces
-    working_dir: /payload_ws     # set WS in .env, e.g. workspaces/payload_ws
-    command: ["bash","-lc","while :; do sleep 86400; done"]
+    working_dir: /payload_ws
+    command: >
+      bash -lc "
+        source /opt/ros/humble/setup.bash; \
+        source install/setup.bash; \
+        ros2 daemon start; \
+        ros2 launch bringup payload_mission.launch.py
+      "
     environment:  
       - ROS_DOMAIN_ID=2
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
