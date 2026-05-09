@@ -46,12 +46,14 @@ function initaliseButtons() {
     document.getElementById('stop-lap-button').addEventListener('click', () => sendCommand(API_STOP_LAP));
     document.getElementById('go-to-site-button').addEventListener('click', () => sendCommand(API_MOVE_TO_SCENE));
     document.getElementById('servo-1-toggle').addEventListener('change', (e) => {
-        const pwm = e.target.checked ? 1700 : 2050;
+        let pwm = e.target.checked ? 1700 : 2050;
         sendCommand(API_SERVO, {servo_num: 9, pwm});
+        pwm = e.target.checked ? 2050 : 1700;
+        sendCommand(API_SERVO, {servo_num: 10, pwm});
     });
     document.getElementById('servo-2-toggle').addEventListener('change', (e) => {
         const pwm = e.target.checked ? 2000 : 1000;
-        sendCommand(API_SERVO, {servo_num: 10, pwm});
+        // sendCommand(API_SERVO, {servo_num: 10, pwm});
     });
     document.getElementById('take-picture-button').addEventListener('click', () => sendCommand(TAKE_PICTURE));
     document.getElementById('abort-button').addEventListener('click', () => sendCommand(API_ABORT_ALL));
