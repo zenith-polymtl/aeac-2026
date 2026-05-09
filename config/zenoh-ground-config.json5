@@ -36,7 +36,8 @@
       enabled: false  
     },  
     gossip: {  
-      enabled: false  
+      enabled: true,
+      autoconnect: { peer: [] }  
     }  
   }
 }
