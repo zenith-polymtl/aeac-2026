@@ -3,6 +3,9 @@
     ros2dds: {  
       domain: 2, 
       ros_localhost_only: true,  
+      queries_timeout: {  
+        default: 2.0
+      },
       allow: {  
         publishers: [  
           "/tf",  
@@ -31,5 +34,5 @@
         enabled: true,  
         autoconnect: { peer: ["peer", "router"] }  
       }    
-    }
+    },
 }  
