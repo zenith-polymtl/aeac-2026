@@ -22,6 +22,7 @@ services:
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       - ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
       - ROS_LOCALHOST_ONLY=1
+      
   # zed-ros2:    
   #   image: zed_ros2_l4t_36.4.0_sdk_5.1.0:latest  
   #   runtime: nvidia    

@@ -9,6 +9,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     ros-humble-ros-base \
     ros-humble-rmw-cyclonedds-cpp \
+    ros-humble-cv-bridge \
+    ros-humble-message-filters \
     python3-pip \
     libopenblas-dev \
     && rm -rf /var/lib/apt/lists/*
@@ -21,21 +23,16 @@ RUN pip3 install --no-cache-dir "numpy<2" && \
 
 # 5. Install Vision Stack
 RUN pip3 install --no-cache-dir --no-deps ultralytics && \
-    pip3 install --no-cache-dir matplotlib pyyaml tqdm scipy requests pandas psutil opencv-python
+    pip3 install --no-cache-dir matplotlib pyyaml tqdm scipy requests pandas psutil opencv-python open3d
 
-# 6. Final Config
-ENV ROS_DOMAIN_ID=2
-ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-ENV ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
-RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+RUN apt-get update && apt-get install -y \
+    ros-${ROS_DISTRO}-zed-msgs \
+    && rm -rf /var/lib/apt/lists/*
 
-CMD ["/bin/bash"]
-docker run -it \
-  --runtime nvidia \
-  --network host \
-  --privileged \
-  -e NVIDIA_DRIVER_CAPABILITIES=all \
-  -v /dev:/dev \
-  -v $(pwd):/app \
-  my_yolo_gpu_test
+WORKDIR /app
+
+ARG UID=1000
+ARG GID=1000
+RUN groupadd -g $GID dev && useradd -m -u $UID -g $GID dev
+RUN usermod -a -G dialout dev
  #apt-get update && apt-get install -y libopenblas-dev

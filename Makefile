@@ -195,6 +195,28 @@ water-build:
 	    source /opt/ros/humble/setup.bash; \
 	    colcon build'
 
+vision:
+	docker compose -f compose/vision.yml up -d
+
+	# Launch vision mission in the container session
+	WS=$(WS_IN) docker compose -f compose/vision.yml exec -it vision \
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    ros2 launch bringup vision_mission.launch.py'
+
+vision-build:
+	docker compose -f compose/vision.yml up -d
+
+	# Launch vision mission in the container session
+	WS=$(WS_IN) docker compose -f compose/vision.yml exec -it vision \
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    colcon build'
+
 payload:
 	docker compose -f compose/payload.yml up -d
 
