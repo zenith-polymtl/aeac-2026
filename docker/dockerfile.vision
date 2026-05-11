@@ -1,0 +1,41 @@
+# 1. Start with the official NVIDIA JetPack 6.1 image
+FROM nvcr.io/nvidia/l4t-jetpack:r36.4.0
+
+# 2. Setup Environment
+ENV DEBIAN_FRONTEND=noninteractive
+WORKDIR /app
+
+# 3. Install ROS 2 Humble & System Math Libs
+RUN apt-get update && apt-get install -y \
+    ros-humble-ros-base \
+    ros-humble-rmw-cyclonedds-cpp \
+    python3-pip \
+    libopenblas-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# 4. Install GPU-Optimized PyTorch (Force NumPy < 2)
+# We install NumPy first to prevent PyTorch or Ultralytics from pulling 2.x
+RUN pip3 install --no-cache-dir "numpy<2" && \
+    pip3 install --no-cache-dir torch==2.8.0 torchvision==0.23.0 \
+    --index-url https://pypi.jetson-ai-lab.io/jp6/cu126
+
+# 5. Install Vision Stack
+RUN pip3 install --no-cache-dir --no-deps ultralytics && \
+    pip3 install --no-cache-dir matplotlib pyyaml tqdm scipy requests pandas psutil opencv-python
+
+# 6. Final Config
+ENV ROS_DOMAIN_ID=2
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ENV ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+
+CMD ["/bin/bash"]
+docker run -it \
+  --runtime nvidia \
+  --network host \
+  --privileged \
+  -e NVIDIA_DRIVER_CAPABILITIES=all \
+  -v /dev:/dev \
+  -v $(pwd):/app \
+  my_yolo_gpu_test
+ #apt-get update && apt-get install -y libopenblas-dev
