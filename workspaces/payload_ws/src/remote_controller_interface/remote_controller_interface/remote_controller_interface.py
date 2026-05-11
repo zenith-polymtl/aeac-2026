@@ -40,10 +40,6 @@ class RemoteControlInterface(Node):
         self.get_logger().info("Remote Controller Interface Initialized")
         
         self.servo_cli = self.create_client(ServoState, '/aeac/external/payload/set_state')
-
-        # Topics to send to control nav to enable movements
-
-
         
         while not self.servo_cli.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('Service not available, waiting...')
