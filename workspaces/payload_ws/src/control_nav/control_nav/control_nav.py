@@ -8,7 +8,7 @@ from sensor_msgs.msg import NavSatFix
 from mavros_msgs.msg import PositionTarget
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 from geometry_msgs.msg import PoseStamped, Point
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, Int32
 from rclpy.qos import QoSProfile
 
 from custom_interfaces.srv import ConvertGpsToLocal
@@ -48,12 +48,16 @@ class ControlNav(Node):
         self.publisher_raw = self.create_publisher(PositionTarget, '/mavros/setpoint_raw/local', qos_re)
         self.lap_finished_pub = self.create_publisher(Bool, '/aeac/internal/mission/control_nav/lap/finished', qos_re)
         self.move_to_scene_pub = self.create_publisher(Bool, '/aeac/internal/mission/control_nav/move_to_scene/finished', qos_re)
-        
+        self.lap_time_pub = self.create_publisher(Int32, '/aeac/external/mission/control_nav/lap/time', qos_re)
+        self.lap_time_left_pub = self.create_publisher(Int32, '/aeac/external/lap/time_left', qos_profile_RE)
+
         # Subscribers
         # Lap specific subscriber
         self.start_lap_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/lap/start', self.start_laps, qos_profile_RE)
         self.finish_lap_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/lap/finish', self.finish_current_lap_and_stop, qos_profile_RE)
         self.finish_lap_now_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/lap/finish_now', self.stop_now, qos_profile_RE)
+        self.gcs_heartbeat_sub = self.create_subscription(Bool, '/aeac/external/gcs/heartbeat', self.gcs_heartbeat, qos_profile_RE)
+        
         
         # Object delivery specific subscriber
         self.move_to_scene_sub = self.create_subscription(Bool, '/aeac/external/mission/control_nav/move_to_scene', self.move_to_scene_procedure, qos_profile_RE)
@@ -72,13 +76,22 @@ class ControlNav(Node):
             self.get_logger().info('Convert service not available, waiting again...')
                         
         self.position_check_timer = self.create_timer(self.delais_for_position_check, self.position_check_timer_callback)
-    
+
+        self.lap_time_pub.publish(Int32(data=int(self.lap_time)))
+
+        self.get_logger().info("Control Nav Node Initialized")
+
     def initialize_parameters(self):
         ## Param decalration
         self.declare_parameter('json_filename', 'cimetiere_course.json')
         self.declare_parameter('json_subfolder', 'config')
         self.declare_parameter('delais_for_position_check', 0.5)
         self.declare_parameter('distance_from_objectif_threashold', 3.5)
+        self.declare_parameter('Mission_minutes', 25)
+        self.declare_parameter('time_of_scene', 8)
+        self.declare_parameter('time_to_move_to_scene', 2)
+        self.declare_parameter('initial_connection_estimated_time', 1)
+
         
         #Pour julien
         #self.declare_parameter('latitude_of_scene', -35.361450)
@@ -96,7 +109,32 @@ class ControlNav(Node):
         self.latitude_of_scene = self.get_parameter('latitude_of_scene').get_parameter_value().double_value
         self.longitude_of_scene = self.get_parameter('longitude_of_scene').get_parameter_value().double_value
         self.altitude_of_scene = self.get_parameter('altitude_of_scene').get_parameter_value().double_value
+
+        minutes = self.get_parameter('Mission_minutes').get_parameter_value().integer_value
+        self.mission_seconds = minutes * 60
+
+        minutes_for_scene = self.get_parameter('time_of_scene').get_parameter_value().integer_value
+        self.scene_seconds = minutes_for_scene * 60
         
+        time_to_move_to_scene = self.get_parameter('time_to_move_to_scene').get_parameter_value().integer_value
+        self.time_to_move_to_scene = time_to_move_to_scene * 60
+
+        initial_connection_estimated_time = self.get_parameter('initial_connection_estimated_time').get_parameter_value().integer_value
+        self.initial_connection_estimated_time = initial_connection_estimated_time * 60
+
+        self.lap_time = self.mission_seconds - self.scene_seconds - self.time_to_move_to_scene - self.initial_connection_estimated_time
+        self.get_logger().info(f"Calculated lap time: {self.lap_time//60} minutes")   
+        
+
+    def gcs_heartbeat(self, msg):
+        if msg.data:
+            self.get_logger().info(f"Received GCS heartbeat, connected to GCS. Assuming initial connection time of {self.initial_connection_estimated_time} seconds before takeoff.")
+            self.gcs_heartbeat_sub.destroy()  # Unsubscribe after receiving the first heartbeat
+            self.lap_time_left_pub.publish(Int32(data=int(self.lap_time)))
+            self.get_logger().info(f"Sent time left for lap: {self.lap_time//60} minutes")
+
+
+
     
     def read_json_waypoints(self):        
         json_filename = self.get_parameter('json_filename').get_parameter_value().string_value
@@ -235,6 +273,8 @@ class ControlNav(Node):
         self.stop_after_finishing_lap = False
         self.is_last_lap = False
         self.lap_waypoint_index = 0
+
+        self.lap_start_time = self.get_clock().now()
         
         self.get_logger().info(f"Waypoint lengh: {len(self.waypoints_raw)}")
 
@@ -246,8 +286,15 @@ class ControlNav(Node):
     def handle_reach_waypoint(self):
         self.lap_waypoint_index += 1
         if len(self.waypoints_raw) == self.lap_waypoint_index:
+
             self.lap_waypoint_index = 0
             self.current_lap += 1
+            lap_end_time = self.get_clock().now()
+            lap_duration = (lap_end_time - self.lap_start_time).nanoseconds / 1e9
+            self.get_logger().info(f"Lap {self.current_lap} completed in {lap_duration:.2f} seconds")
+            self.lap_start_time = lap_end_time
+            self.lap_time_left_pub.publish(Int32(data=int(lap_duration)))
+
             if self.stop_after_finishing_lap and not self.is_last_lap:
                 self.get_logger().info(f"Moving to inital")
                 self.is_last_lap = True
