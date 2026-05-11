@@ -15,6 +15,7 @@ services:
       - NVIDIA_DRIVER_CAPABILITIES=all
       - ROS_DOMAIN_ID=2
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - ROS_LOCALHOST_ONLY=1 
     volumes:
       - /dev:/dev
       - /usr/local/zed/resources/:/usr/local/zed/resources/
