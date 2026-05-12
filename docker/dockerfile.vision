@@ -3,10 +3,14 @@ FROM nvcr.io/nvidia/l4t-jetpack:r36.4.0
 
 # 2. Setup Environment
 ENV DEBIAN_FRONTEND=noninteractive
+ENV ROS_DISTRO=humble
 WORKDIR /app
 
-# 3. Install ROS 2 Humble & System Math Libs
-RUN apt-get update && apt-get install -y \
+# 3. Add ROS 2 Repository & Install Humble + System Libs
+RUN apt-get update && apt-get install -y curl gnupg2 lsb-release && \
+    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null && \
+    apt-get update && apt-get install -y \
     ros-humble-ros-base \
     ros-humble-rmw-cyclonedds-cpp \
     ros-humble-cv-bridge \
@@ -16,23 +20,17 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # 4. Install GPU-Optimized PyTorch (Force NumPy < 2)
-# We install NumPy first to prevent PyTorch or Ultralytics from pulling 2.x
 RUN pip3 install --no-cache-dir "numpy<2" && \
     pip3 install --no-cache-dir torch==2.8.0 torchvision==0.23.0 \
     --index-url https://pypi.jetson-ai-lab.io/jp6/cu126
 
-# 5. Install Vision Stack
+# 5. Install Vision Stack (Added Open3D here as per your original file)
 RUN pip3 install --no-cache-dir --no-deps ultralytics && \
     pip3 install --no-cache-dir matplotlib pyyaml tqdm scipy requests pandas psutil opencv-python open3d
 
+# 6. Install ZED messages (Note: we use the ENV variable we set in Step 2)
 RUN apt-get update && apt-get install -y \
     ros-${ROS_DISTRO}-zed-msgs \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
-
-ARG UID=1000
-ARG GID=1000
-RUN groupadd -g $GID dev && useradd -m -u $UID -g $GID dev
-RUN usermod -a -G dialout dev
- #apt-get update && apt-get install -y libopenblas-dev
+# ... rest of your user/group setup ...
