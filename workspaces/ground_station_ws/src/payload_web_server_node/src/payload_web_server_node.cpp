@@ -85,6 +85,10 @@ void PayloadWebServerNode::initalize_variables()
         std::chrono::duration_cast<std::chrono::milliseconds>(period),
         std::bind(&PayloadWebServerNode::heartbeat_timer_callback, this)
     );
+    time_left_timer_ = this->create_wall_timer(
+        std::chrono::seconds(1),
+        std::bind(&PayloadWebServerNode::time_left_timer_callback, this)
+    );
 }
 
 void PayloadWebServerNode::initialize_publisher()
@@ -115,6 +119,8 @@ void PayloadWebServerNode::initialize_subscriber()
     
     message_to_ui_subsciber_ = create_subscription<UiMessage>("/aeac/external/UI/display", reliable_qos, std::bind(&PayloadWebServerNode::ui_message_callback, this, std::placeholders::_1));
     drone_heartbeat_subsciber_ = create_subscription<DroneHealth>(drone_heartbeat_topic_, reliable_qos, std::bind(&PayloadWebServerNode::drone_heartbeat_callback, this, std::placeholders::_1));
+    lap_time_subscriber_ = create_subscription<std_msgs::msg::Int32>("/aeac/external/mission/control_nav/lap/time", reliable_qos, std::bind(&PayloadWebServerNode::lap_time_callback, this, std::placeholders::_1));
+    time_left_subscriber_ = create_subscription<std_msgs::msg::Int32>("/aeac/external/lap/time_left", reliable_qos, std::bind(&PayloadWebServerNode::time_left_callback, this, std::placeholders::_1));
 }
 
 void PayloadWebServerNode::heartbeat_timer_callback()
@@ -133,6 +139,40 @@ void PayloadWebServerNode::heartbeat_timer_callback()
 void PayloadWebServerNode::ui_message_callback(const UiMessage msg)
 {
     send_log(msg.is_success, msg.message);
+}
+
+void PayloadWebServerNode::lap_time_callback(const std_msgs::msg::Int32 msg)
+{
+    mean_lap_time_ = (mean_lap_time_ * completed_laps_ + msg.data) / (completed_laps_ + 1);
+    completed_laps_++;
+    last_lap_time_ = msg.data;
+    nlohmann::json status_json = {
+        {"type", "lap_time"},
+        {"lap_timer", last_lap_time_},
+        {"mean_lap_time", mean_lap_time_}
+    };
+    send_notification(status_json);
+}
+
+void PayloadWebServerNode::time_left_callback(const std_msgs::msg::Int32 msg)
+{
+    time_left_ = msg.data;
+    nlohmann::json status_json = {
+        {"type", "time_left"},
+        {"time_left", msg.data}
+    };
+    send_notification(status_json);
+}
+
+void PayloadWebServerNode::time_left_timer_callback()
+{
+    if (time_left_ <= 0) return;
+    time_left_--;
+    nlohmann::json status_json = {
+        {"type", "time_left"},
+        {"time_left", time_left_}
+    };
+    send_notification(status_json);
 }
 
 void PayloadWebServerNode::drone_heartbeat_callback(const DroneHealth msg)
@@ -454,6 +494,20 @@ std::optional<http::response<http::string_body>> PayloadWebServerNode::try_serve
 void PayloadWebServerNode::on_client_connection()
 {
     send_connection_notification(true);
+
+    nlohmann::json status_json = {
+        {"type", "lap_time"},
+        {"lap_timer", last_lap_time_},
+        {"mean_lap_time", mean_lap_time_}
+    };
+    send_notification(status_json);
+
+    status_json = {
+        {"type", "time_left"},
+        {"time_left", time_left_}
+    };
+    send_notification(status_json);
+
 }
 
 void PayloadWebServerNode::do_session(tcp::socket socket, std::string const &doc_root)

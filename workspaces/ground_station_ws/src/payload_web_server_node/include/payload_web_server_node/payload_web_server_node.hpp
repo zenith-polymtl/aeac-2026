@@ -4,6 +4,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include "std_msgs/msg/bool.hpp"
+#include "std_msgs/msg/int32.hpp"
 #include <thread>
 #include <fstream>
 #include <string>
@@ -87,6 +88,9 @@ private:
     void ui_message_callback(const UiMessage msg);
     void drone_heartbeat_callback(const DroneHealth msg);
     void heartbeat_timer_callback();
+    void lap_time_callback(const std_msgs::msg::Int32 msg);
+    void time_left_callback(const std_msgs::msg::Int32 msg);
+    void time_left_timer_callback();
 
     // Socket functions
     void broadcast_status();
@@ -113,12 +117,19 @@ private:
     int heartbeat_drone_failure_threashold_;
     int missed_drone_heartbeat_ = 0;
     rclcpp::TimerBase::SharedPtr heartbeat_timer_;
+    rclcpp::TimerBase::SharedPtr time_left_timer_;
     bool drone_is_connected_ = false;
     bool zed_is_connected_ = false;
+    int time_left_ = 0;
+    double mean_lap_time_ = 0.0;
+    int completed_laps_ = 0;
+    int last_lap_time_ = 0;
 
     
 	rclcpp::Subscription<UiMessage>::SharedPtr message_to_ui_subsciber_;
     rclcpp::Subscription<DroneHealth>::SharedPtr drone_heartbeat_subsciber_;
+    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr lap_time_subscriber_;
+    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr time_left_subscriber_;
 
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr mission_go_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr start_lap_publisher_;
