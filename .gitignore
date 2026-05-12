@@ -17,3 +17,5 @@ debug_overlay/
 data*/
 *.zip
 rosbag*
+
+credentials.json
