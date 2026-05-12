@@ -34,8 +34,8 @@ SPEED_FLAGS = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_LOCK + GIMBAL_MANAGE
 # MAX_ANGLE_YAW = 325.0
 
 # safe limits
-MAX_ANGLE_PITCH = 110.0
-MAX_ANGLE_YAW = 130.0
+MAX_ANGLE_PITCH = 40.0
+MAX_ANGLE_YAW =70.0
 
 AIM_ERROR_ACCEPTANCE = 10.0
 
@@ -45,7 +45,7 @@ class GimbalMode:
     AUTO_AIM = 2
 
 class PIDController():
-    def __init__(self, kp, ki, kd, max_output=3.0, max_i=1.0,
+    def __init__(self, kp, ki, kd, max_output=0.5, max_i=1.0,
                  deriv_tau=0.0, d_clip=None):
         self.kp, self.ki, self.kd = kp, ki, kd
         self.max_output, self.max_i = max_output, max_i
@@ -109,8 +109,8 @@ class GremsyMavros(Node):
         if not self.talk:
             self.get_logger().set_level(rclpy.logging.LoggingSeverity.FATAL)
 
-        self.pid_pitch = PIDController(kp=0.001, ki=0.0001, kd=0.002, max_output=0.7, max_i=0.5, deriv_tau=0.15)
-        self.pid_yaw = PIDController(kp=0.001, ki=0.0001, kd=0.002, max_output=0.7, max_i=0.5, deriv_tau=0.15)
+        self.pid_pitch = PIDController(kp=0.001, ki=0.0001, kd=0.0002, max_output=0.7, max_i=0.5, deriv_tau=0.15)
+        self.pid_yaw = PIDController(kp=0.001, ki=0.0001, kd=0.0002, max_output=0.7, max_i=0.5, deriv_tau=0.15)
 
         self.last_sent_pitch_vel = 0.0
         self.last_sent_yaw_vel = 0.0
@@ -273,6 +273,11 @@ class GremsyMavros(Node):
 
     def aiming_callback(self, msg):
         if self.gimbal_mode != GimbalMode.AUTO_AIM:
+            return
+
+        if math.sqrt(msg.pitch_error**2 + msg.yaw_error**2) < 1.0:
+            self.get_logger().info("NOT SENDING COMMANDS - ERROR NONE")
+            self.send_speed_cmd(0.0, 0.0)
             return
 
         target_vel_yaw = msg.yaw_error
