@@ -77,7 +77,9 @@ class ControlNav(Node):
                         
         self.position_check_timer = self.create_timer(self.delais_for_position_check, self.position_check_timer_callback)
 
-        self.lap_time_pub.publish(Int32(data=int(self.lap_time)))
+        self.lap_time_left_pub.publish(Int32(data=int(self.tot_lap_time)))
+
+        self.made_at_least_one_lap = False
 
         self.get_logger().info("Control Nav Node Initialized")
 
@@ -122,16 +124,16 @@ class ControlNav(Node):
         initial_connection_estimated_time = self.get_parameter('initial_connection_estimated_time').get_parameter_value().integer_value
         self.initial_connection_estimated_time = initial_connection_estimated_time * 60
 
-        self.lap_time = self.mission_seconds - self.scene_seconds - self.time_to_move_to_scene - self.initial_connection_estimated_time
-        self.get_logger().info(f"Calculated lap time: {self.lap_time//60} minutes")   
+        self.tot_lap_time = self.mission_seconds - self.scene_seconds - self.time_to_move_to_scene - self.initial_connection_estimated_time
+        self.get_logger().info(f"Calculated lap time: {self.tot_lap_time//60} minutes")   
         
 
     def gcs_heartbeat(self, msg):
         if msg.data:
             self.get_logger().info(f"Received GCS heartbeat, connected to GCS. Assuming initial connection time of {self.initial_connection_estimated_time} seconds before takeoff.")
             self.gcs_heartbeat_sub.destroy()  # Unsubscribe after receiving the first heartbeat
-            self.lap_time_left_pub.publish(Int32(data=int(self.lap_time)))
-            self.get_logger().info(f"Sent time left for lap: {self.lap_time//60} minutes")
+            self.lap_time_left_pub.publish(Int32(data=int(self.tot_lap_time)))
+            self.get_logger().info(f"Sent time left for lap: {self.tot_lap_time//60} minutes")
 
 
 
@@ -285,19 +287,25 @@ class ControlNav(Node):
 
     def handle_reach_waypoint(self):
         self.lap_waypoint_index += 1
-        if len(self.waypoints_raw) == self.lap_waypoint_index:
 
-            self.lap_waypoint_index = 0
-            self.current_lap += 1
+        if self.lap_waypoint_index == 0 and self.made_at_least_one_lap:
             lap_end_time = self.get_clock().now()
             lap_duration = (lap_end_time - self.lap_start_time).nanoseconds / 1e9
             self.get_logger().info(f"Lap {self.current_lap} completed in {lap_duration:.2f} seconds")
             self.lap_start_time = lap_end_time
-            self.lap_time_left_pub.publish(Int32(data=int(lap_duration)))
+            self.lap_time_pub.publish(Int32(data=int(lap_duration)))
+
+        if len(self.waypoints_raw) == self.lap_waypoint_index:
+
+            self.made_at_least_one_lap = True
+            self.lap_waypoint_index = 0
+            self.current_lap += 1
+            
 
             if self.stop_after_finishing_lap and not self.is_last_lap:
                 self.get_logger().info(f"Moving to inital")
                 self.is_last_lap = True
+
         elif self.stop_after_finishing_lap and (self.is_last_lap or self.lap_waypoint_index == 1):
             self.is_moving_to_position = False
             self.is_doing_laps = False
