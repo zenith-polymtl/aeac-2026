@@ -12,9 +12,10 @@ services:
     stdin_open: true
 
     volumes:
-      - ../workspaces/water_ws:/vision_ws
+      - ../workspaces/vision_ws:/vision_ws
       - ../packages/vision:/vision_ws/src/vision
       - ../packages/custom_interfaces:/vision_ws/src/custom_interfaces
+      - ../packages/bringup:/vision_ws/src/bringup
 
     working_dir: /vision_ws
 

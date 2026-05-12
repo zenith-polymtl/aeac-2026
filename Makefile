@@ -26,7 +26,7 @@ export UID GID
 ENV_INJECT := C=$(C) WS=$(WS_REL)
 
 # All compose files for the *-all targets
-COMPOSES := compose/dev.yml compose/payload.yml compose/water.yml compose/mavros.yml compose/zed.yml compose/zenoh-air.yml compose/zenoh-ground.yml
+COMPOSES := compose/dev.yml compose/payload.yml compose/water.yml compose/mavros.yml compose/zed.yml compose/zenoh-air.yml compose/zenoh-ground.yml compose/vision.yml compose/zed_mini.yml
 
 # ===== Pretty help =====
 help: ## Show help
@@ -205,7 +205,7 @@ vision:
 	    source /opt/ros/humble/setup.bash; \
 	    source install/setup.bash; \
 	    ros2 daemon start; \
-	    ros2 launch bringup vision_mission.launch.py'
+	    ros2 launch bringup vision_test.launch.py'
 
 vision-build:
 	docker compose -f compose/vision.yml up -d

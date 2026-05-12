@@ -4,8 +4,8 @@
         # General settings  
         general:  
             camera_name: 'zedm'
-            grab_resolution: 'VGA'  # Good balance for Jetson, or 'VGA' for maximum performance  
-            pub_frame_rate: 10.0
+            grab_resolution: 'HD720'  # Good balance for Jetson, or 'VGA' for maximum performance  
+            pub_frame_rate: 20.0
             pub_resolution: 'CUSTOM'  
             pub_downscale_factor: 2.0  
             gpu_id: -1  
@@ -34,11 +34,15 @@
           
         # Depth settings - minimal for object detection  
         depth:  
-            depth_mode: 'NEURAL_LIGHT'  # Required for object detection  
-            point_cloud_freq: 5.0   
-            depth_confidence: 80  
-            depth_texture_conf: 80  
-            remove_saturated_areas: true  
+            depth_mode: 'NONE'  # Required for object detection  
+            depth_stabilization: 0
+            point_cloud_freq: 0.0
+
+            publish_depth_map: false
+            publish_depth_info: false
+            publish_point_cloud: false
+            publish_depth_confidence: false
+            publish_disparity: false
           
         # POSITIONAL TRACKING DISABLED  
         pos_tracking:  
@@ -56,7 +60,7 @@
           
         # Object Detection - CUSTOM ONNX MODEL  
         object_detection:  
-            od_enabled: true 
+            od_enabled: false 
             detection_model: 'CUSTOM_YOLOLIKE_BOX_OBJECTS'  
             custom_onnx_file: '/root/ros2_ws/models/phase1_nano.onnx'  
             custom_onnx_input_size: 640  

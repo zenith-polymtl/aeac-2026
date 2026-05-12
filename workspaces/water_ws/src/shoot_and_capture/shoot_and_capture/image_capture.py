@@ -25,9 +25,9 @@ class ImageCapture(Node):
         self.get_logger().info('ImageCapture Node Started!')
 
     def declare_default_parameters(self):
-        self.declare_parameter('image_topic', '/camera/image_raw')
+        self.declare_parameter('image_topic', '/zed/zed_node/rgb/color/rect/image/compressed')
         self.declare_parameter('trigger_topic', '/aeac/internal/take_picture')
-        self.declare_parameter('snapshot_topic', '/aeac/internal/target_picture')
+        self.declare_parameter('snapshot_topic', '/aeac/external/target_picture')
         self.declare_parameter('save_dir', f'/water_ws/snapshots/{time.strftime("%Y%m%d-%H%M%S")}')
         
         self.image_topic = self.get_parameter('image_topic').get_parameter_value().string_value

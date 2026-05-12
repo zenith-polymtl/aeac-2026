@@ -15,6 +15,7 @@ services:
       - NVIDIA_DRIVER_CAPABILITIES=all
       - ROS_DOMAIN_ID=2
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - ROS_LOCALHOST_ONLY=1 
     volumes:
       - /dev:/dev
       - /usr/local/zed/resources/:/usr/local/zed/resources/
@@ -25,7 +26,7 @@ services:
       bash -lc "
         source /root/ros2_ws/install/setup.bash && 
         export ROS_DOMAIN_ID=2 &&
-        ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i ros_params_override_path:=/root/ros2_ws/config/zenith_stereo_mini.yaml publish_tf:=false publish_map_tf:=false
+        ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zedm ros_params_override_path:=/root/ros2_ws/config/zenith_stereo_mini.yaml publish_tf:=false publish_map_tf:=false
         "
 
     # zed-launch:
