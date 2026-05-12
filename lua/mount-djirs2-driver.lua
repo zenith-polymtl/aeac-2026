@@ -364,7 +364,7 @@ function init()
   else
       gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: failed to connect to CAN bus")
   end
-
+end
 -- send serial message over CAN bus
 -- returns true on success, false on failure
 function send_msg(serial_msg)
