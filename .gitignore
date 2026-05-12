@@ -16,3 +16,5 @@ approach_log_polar.csv
 data*/
 *.zip
 rosbag*
+
+credentials.json
