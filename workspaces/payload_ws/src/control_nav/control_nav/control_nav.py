@@ -286,14 +286,14 @@ class ControlNav(Node):
         self.drone_pose = msg.pose.position
 
     def handle_reach_waypoint(self):
-        self.lap_waypoint_index += 1
-
         if self.lap_waypoint_index == 0 and self.made_at_least_one_lap:
             lap_end_time = self.get_clock().now()
             lap_duration = (lap_end_time - self.lap_start_time).nanoseconds / 1e9
             self.get_logger().info(f"Lap {self.current_lap} completed in {lap_duration:.2f} seconds")
             self.lap_start_time = lap_end_time
             self.lap_time_pub.publish(Int32(data=int(lap_duration)))
+        
+        self.lap_waypoint_index += 1
 
         if len(self.waypoints_raw) == self.lap_waypoint_index:
 
