@@ -314,14 +314,19 @@ end
 -- perform any require initialisation
 function init()
   -- check parameter settings
-  if CAN_D1_PROTOCOL:get() ~= 10 and CAN_D2_PROTOCOL:get() ~= 10 then
-    gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: set CAN_D1_PROTOCOL or CAN_D2_PROTOCOL=10")
-    do return end
+  local CAN_D2_PROTOCOL2 = Parameter("CAN_D2_PROTOCOL2")
+  local using_protocol2 = (CAN_D2_PROTOCOL2:get() == 10)
+
+  if CAN_D1_PROTOCOL:get() ~= 10 and CAN_D2_PROTOCOL:get() ~= 10 and not using_protocol2 then
+      gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: set CAN_D1_PROTOCOL or CAN_D2_PROTOCOL=10")
+      do return end
   end
+
   if CAN_D1_PROTOCOL:get() == 10 and CAN_D2_PROTOCOL:get() == 10 then
-    gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: set CAN_D1_PROTOCOL or CAN_D2_PROTOCOL=0")
-    do return end
+      gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: set CAN_D1_PROTOCOL or CAN_D2_PROTOCOL=0")
+      do return end
   end
+  
   if CAN_D1_PROTOCOL:get() == 10 then
     if CAN_P1_DRIVER:get() <= 0 then
       gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: set CAN_P1_DRIVER=1")
@@ -347,15 +352,18 @@ function init()
     do return end
   end
 
-  -- get CAN device
-  driver = CAN:get_device(25)
-  if driver then
-    initialised = true
-    gcs:send_text(MAV_SEVERITY.INFO, "DJIR: mount driver started")   
+  -- get CAN device (use get_device2 if using PROTOCOL2 on a shared bus)
+  if using_protocol2 then
+      driver = CAN:get_device2(25)
   else
-    gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: failed to connect to CAN bus")   
+      driver = CAN:get_device(25)
   end
-end
+  if driver then
+      initialised = true
+      gcs:send_text(MAV_SEVERITY.INFO, "DJIR: mount driver started")
+  else
+      gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: failed to connect to CAN bus")
+  end
 
 -- send serial message over CAN bus
 -- returns true on success, false on failure
