@@ -354,8 +354,6 @@ function init()
 
   -- get CAN device (use get_device2 if using PROTOCOL2 on a shared bus)
   if using_protocol2 then
-      driver = CAN:get_device2(25)
-  else
       driver = CAN:get_device(25)
   end
   if driver then
