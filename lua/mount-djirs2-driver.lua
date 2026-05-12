@@ -354,8 +354,6 @@ function init()
 
   -- get CAN device (use get_device2 if using PROTOCOL2 on a shared bus)
   if using_protocol2 then
-      driver = CAN:get_device2(25)
-  else
       driver = CAN:get_device(25)
   end
   if driver then
@@ -364,7 +362,7 @@ function init()
   else
       gcs:send_text(MAV_SEVERITY.CRITICAL, "DJIR: failed to connect to CAN bus")
   end
-
+end
 -- send serial message over CAN bus
 -- returns true on success, false on failure
 function send_msg(serial_msg)

@@ -12,6 +12,7 @@ frames*
 approach_log_polar.csv
 
 .vscode/
+debug_overlay/
 
 data*/
 *.zip

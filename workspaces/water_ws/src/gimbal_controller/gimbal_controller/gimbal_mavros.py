@@ -279,10 +279,10 @@ class GremsyMavros(Node):
             target_vel_pitch = 0.0   
             target_vel_yaw = 0.0
             in_sight_msg.data = True
-            self.target_in_aim_pub(in_sight_msg)
+            self.target_in_aim_pub.publish(in_sight_msg)
         else:
             in_sight_msg.data = False
-            self.target_in_aim_pub(in_sight_msg)
+            self.target_in_aim_pub.publish(in_sight_msg)
 
         target_vel_pitch, target_vel_yaw = self.check_angle_limit(target_vel_pitch, target_vel_yaw)
         self.send_speed_cmd(target_vel_pitch, target_vel_yaw)
