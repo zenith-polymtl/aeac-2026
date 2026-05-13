@@ -75,6 +75,7 @@ void WaterWebServerNode::initialize_publisher()
     shoot_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/shoot", 10);
     take_picutre_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/take_picture", 10);
     target_image_publisher_ = create_publisher<TargetImage>("/aeac/internal/mission/target_image", 10);
+    target_picuture_ack_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/target_picture/ack", 10);
 }
 
 void WaterWebServerNode::initalize_parameters()
@@ -234,6 +235,9 @@ void WaterWebServerNode::picture_callback(const Image msg)
 {
     try {
         RCLCPP_INFO(this->get_logger(), "Recived picture");
+        std_msgs::msg::Bool confirmation_msg;
+        confirmation_msg.data = true;
+        target_picuture_ack_publisher_->publish(confirmation_msg);
 
         cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
 

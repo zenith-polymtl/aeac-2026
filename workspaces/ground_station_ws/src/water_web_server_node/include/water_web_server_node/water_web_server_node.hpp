@@ -136,6 +136,7 @@ private:
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr shoot_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr take_picutre_publisher_;
     rclcpp::Publisher<TargetImage>::SharedPtr target_image_publisher_;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr target_picuture_ack_publisher_;
 
 
     rclcpp::Subscription<DroneHealth>::SharedPtr drone_heartbeat_subsciber_;
