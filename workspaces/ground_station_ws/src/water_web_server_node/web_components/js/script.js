@@ -7,6 +7,7 @@ const TAKE_PICTURE = "/api/mission/take_picture";
 const API_ABORT_ALL = "/api/mission/abort_all";
 const API_GIMBAL_FOLLOW = "/api/gimbal_follow";
 const API_GIMBAL_LOCK = "/api/gimbal_lock";
+const API_CONFIRM_TARGET = "/api/confirm_target";
 
 
 function appendToLog(msg, type = 'info') {
@@ -20,13 +21,14 @@ function appendToLog(msg, type = 'info') {
     logsContainer.scrollTop = logsContainer.scrollHeight;
 }
 
-async function sendCommand(endpoint) {
+async function sendCommand(endpoint, payload = {}) {
     try {
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
+            body: JSON.stringify(payload)
         });
         if (response.ok) {
             const data = await response.json();
@@ -50,6 +52,23 @@ function initaliseButtons() {
     document.getElementById('abort-button').addEventListener('click', () => sendCommand(API_ABORT_ALL));
     document.getElementById('btn-follow').addEventListener('click', () => sendCommand(API_GIMBAL_FOLLOW));
     document.getElementById('btn-lock').addEventListener('click', () => sendCommand(API_GIMBAL_LOCK));
+    document.getElementById('accept-image-button').addEventListener('click', () => {
+        sendCommand(API_CONFIRM_TARGET, {confirmed: true});
+        clear_picture();
+    });
+    document.getElementById('deny-image-deny').addEventListener('click', () => {
+        sendCommand(API_CONFIRM_TARGET, {confirmed: false});
+        clear_picture();
+    });
+}
+
+function clear_picture() {
+    document.getElementById("target-image").style.display = "none";
+    const noPictureReceived = document.getElementById("no-picture-received");
+    noPictureReceived.style.display = "block";
+    noPictureReceived.textContent = "No more targets to confirm. Waiting for new targets...";
+    document.getElementById('accept-image-button').classList.add('disabled');
+    document.getElementById('deny-image-deny').classList.add('disabled');
 }
 
 function loadTheme() {
@@ -112,7 +131,17 @@ function initaliseSocket() {
                     break;
                 case "new_picture":
                     console.log("New picture: ", data.url);
-                    document.getElementById("target-image").src = data.url;
+                    document.getElementById("no-picture-received").style.display = "none";
+                    const imageElement = document.getElementById("target-image");
+                    imageElement.style.display = "block";
+                    imageElement.src = data.url;
+                    document.getElementById('accept-image-button').classList.remove('disabled');
+                    document.getElementById('deny-image-deny').classList.remove('disabled');
+                    break;
+                case "target_number":
+                    const targetNumberElement = document.getElementById("target-shot-span");
+                    targetNumberElement.textContent = `Target Shot: ${data.number}`;
+                    break;
                 default:
                     console.warn("Unknown message type:", data.type);
             }

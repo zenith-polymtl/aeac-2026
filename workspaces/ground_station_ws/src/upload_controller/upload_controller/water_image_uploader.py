@@ -3,7 +3,7 @@
 import os
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String, Int32
+import json
 
 # Google API imports
 from google.oauth2.credentials import Credentials
@@ -13,8 +13,6 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from custom_interfaces.msg import TargetImage
 import mimetypes
-
-from workspaces.ground_station_ws.build.custom_interfaces.rosidl_generator_py.custom_interfaces import msg
 
 # Scopes required for uploading files
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]
@@ -39,47 +37,40 @@ class WaterImageUploader(Node):
         self.drive_folder_id = self.get_parameter(
             "drive_folder_id").get_parameter_value().string_value
 
+        # ── Eagerly authenticate at startup ───────────────────────────────────
+        try:
+            self._drive_service = self._init_drive_service()
+        except Exception as exc:
+            self.get_logger().fatal(f"Failed to authenticate with Google Drive: {exc}")
+            raise
+
         # ── Subscriptions ─────────────────────────────────────────────────────
         self.create_subscription(
             TargetImage,
-            "/aeac/internal/mission/water_image",
+            "/aeac/internal/mission/target_image",
             self._image_callback,
             10,
         )
 
-        # ── Google Drive service (lazy init on first upload) ──────────────────
-        self._drive_service = None
-
         self.get_logger().info("WaterImageUploader ready.")
-        self.get_logger().info(
-            f"  credentials : {self.credentials_path}")
-        self.get_logger().info(
-            f"  token       : {self.token_path}")
-        self.get_logger().info(
-            f"  folder id   : {self.drive_folder_id}")
 
     # ── Subscription callbacks ────────────────────────────────────────────────
 
     def _image_callback(self, msg: TargetImage) -> None:
         image_path = msg.image_path
-        target_num = msg.target_number
+        target_num = msg.target_num
         self._upload(image_path, target_num)
 
     def _upload(self, image_path: str, target_num: int) -> None:
         """Validate the file and upload it to Google Drive."""
         if not os.path.isfile(image_path):
-            self.get_logger().error(
-                f"File not found: {image_path}")
+            self.get_logger().error(f"File not found: {image_path}")
             return
 
-        # Build the destination filename while keeping the original extension
         drive_name = f"Task_2_zenith_target_{target_num}{IMAGE_EXTENSION}"
-
-        self.get_logger().info(
-            f"Uploading '{image_path}' → '{drive_name}' …")
+        self.get_logger().info(f"Uploading '{image_path}' → '{drive_name}' …")
 
         try:
-            service = self._get_drive_service()
             mime_type, _ = mimetypes.guess_type(image_path)
             if mime_type is None:
                 mime_type = "application/octet-stream"
@@ -88,18 +79,17 @@ class WaterImageUploader(Node):
                 "name": drive_name,
                 "parents": [self.drive_folder_id],
             }
-            media = MediaFileUpload(image_path, mimetype=mime_type,
-                                    resumable=True)
+            media = MediaFileUpload(image_path, mimetype=mime_type, resumable=True)
 
             uploaded = (
-                service.files()
+                self._drive_service.files()
                 .create(body=file_metadata, media_body=media, fields="id,name")
                 .execute()
             )
 
             self.get_logger().info(
                 f"Upload complete. Drive file: '{uploaded['name']}' "
-                f"(id={uploaded['id']})"
+                f"(url=https://drive.google.com/file/d/{uploaded['id']})"
             )
 
         except Exception as exc:  # noqa: BLE001
@@ -107,40 +97,47 @@ class WaterImageUploader(Node):
 
     # ── Google Drive authentication ───────────────────────────────────────────
 
-    def _get_drive_service(self):
-        """Return (and cache) an authenticated Drive v3 service object."""
-        if self._drive_service is not None:
-            return self._drive_service
+    def _init_drive_service(self):
+        """Authenticate once at startup and return a Drive v3 service object."""
+        self.get_logger().info("Authenticating with Google Drive API…")
+        self.get_logger().info(f"  token path : {self.token_path}")
 
         creds = None
 
-        # Load cached token if it exists
         if os.path.exists(self.token_path):
-            creds = Credentials.from_authorized_user_file(
-                self.token_path, SCOPES)
-
-        # Refresh or run the OAuth flow if needed
+            self.get_logger().info("Found cached token, loading credentials…")
+            creds = Credentials.from_authorized_user_file(self.token_path, SCOPES)
+            self.get_logger().info(f"  valid        : {creds.valid}")
+            self.get_logger().info(f"  expired      : {creds.expired}")
+            self.get_logger().info(f"  has_refresh  : {creds.refresh_token is not None}")
+            self.get_logger().info(f"  scopes       : {creds.scopes}")
+        else:
+            self.get_logger().info("No cached token found.")
+    
         if not creds or not creds.valid:
-            if creds and creds.expired and creds.refresh_token:
+            if creds and creds.refresh_token:
+                self.get_logger().info("Refreshing expired credentials…")
                 creds.refresh(Request())
             else:
-                if not os.path.exists(self.credentials_path):
-                    raise FileNotFoundError(
-                        f"credentials.json not found at: {self.credentials_path}\n"
-                        "Download it from Google Cloud Console → APIs & Services "
-                        "→ Credentials."
-                    )
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    self.credentials_path, SCOPES
-                )
-                creds = flow.run_local_server(port=0)
+                self.get_logger().info("Token not valid. The upload node needs to be re-authenticated.")
+                self.get_logger().info("Stopping the upload node.")
+                raise Exception("No valid credentials available. Please re-authenticate.")
 
-            # Save the token for future runs
+
             with open(self.token_path, "w") as token_file:
-                token_file.write(creds.to_json())
+                token_data = {
+                    "token": creds.token,
+                    "refresh_token": creds.refresh_token,
+                    "token_uri": creds.token_uri,
+                    "client_id": creds.client_id,
+                    "client_secret": creds.client_secret,
+                    "scopes": list(creds.scopes) if creds.scopes else [],
+                }
+                token_file.write(json.dumps(token_data))
+            self.get_logger().info(f"Token saved to {self.token_path}")
 
-        self._drive_service = build("drive", "v3", credentials=creds)
-        return self._drive_service
+        self.get_logger().info("Authentication successful.")
+        return build("drive", "v3", credentials=creds)
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────
