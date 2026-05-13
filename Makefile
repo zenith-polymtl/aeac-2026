@@ -7,11 +7,11 @@ COMPOSE_FILE := compose/$(C).yml
 CONTAINER    ?= aeac-$(C)
 
 # Workspace path RELATIVE to repo root (e.g., workspaces/dev_ws)
-WS_REL := workspaces/$(C)_ws
+WS_REL := worksWS_RELpaces/$(C)_ws
 
 # In-container paths
 REPO_IN := /aeac
-WS_IN   := $(REPO_IN)/$(WS_REL)
+WS_IN   := $(REPO_IN)/$()
 
 #Relay settings
 DEVICE ?= /dev/ttyUSB0
@@ -266,7 +266,7 @@ gcs-water: up
 	    source /opt/ros/humble/setup.bash; \
 	    source install/setup.bash; \
 		ros2 daemon start; \
-	    ros2 run water_web_server_node water_web_server_node'
+	    ros2 launch bringup gcs_water.launch.py'
 
 gcs-water-build: up
 	docker compose -f compose/zenoh-ground.yml up -d
@@ -274,10 +274,9 @@ gcs-water-build: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \
-		colcon build --packages-select water_web_server_node custom_interfaces tools; \
-	    source install/setup.bash; \
+		colcon build --packages-select water_web_server_node bringup custom_interfaces tools upload_controller; \
 		ros2 daemon start; \
-	    ros2 run water_web_server_node water_web_server_node'
+		source ./install/setup.bash'
 
 rviz: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \

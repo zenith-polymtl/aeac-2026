@@ -267,10 +267,13 @@ body {
 }
 
 .target-image {
-    margin: auto;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain; /* Ensures image aspect ratio is preserved */
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
 }
 
 /* --- Middle Bottom Section --- */
@@ -287,6 +290,7 @@ body {
     margin: var(--top-middle-container-child-margin);
     height: calc(100% - 2 * var(--top-middle-container-child-margin));
     width: calc(var(--left-column-width) - 2 * var(--top-middle-container-child-margin));
+
 }
 
 .confirm-deny-container {
@@ -294,6 +298,7 @@ body {
     flex-grow: 1;
     margin: var(--top-middle-container-child-margin);
     height: calc(100% - 2 * var(--top-middle-container-child-margin));
+    width: calc(100% - var(--left-column-width) - 2 * var(--top-middle-container-child-margin));;
     width: calc(100% - var(--left-column-width) - 2 * var(--top-middle-container-child-margin));
 }
 
@@ -331,6 +336,14 @@ body {
 
 .deny-image-button:active { background-color: #7e0707; }
 
+
+.accept-image-button.disabled,
+.deny-image-button.disabled {
+    background-color: var(--border-color);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+    box-shadow: none;
+}
 
 /* --- Bottom Section (Slider) --- */
 
@@ -417,4 +430,11 @@ input:checked + .slider:before { transform: translateX(22px); }
     font-family: 'Courier New', Courier, monospace;
     padding: 5px;
     margin-top: 10px;
+}
+
+.no-picture-received {
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    font-style: italic;
+    margin: auto;
 }

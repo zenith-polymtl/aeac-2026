@@ -1,4 +1,6 @@
 from setuptools import find_packages, setup
+import os
+from glob import glob
 
 package_name = 'upload_controller'
 
@@ -10,6 +12,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name, 'images'), glob('images/*.jpg')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -24,6 +27,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'upload_controller = upload_controller.water_image_uploader:main',
+            'send_photo_mock = upload_controller.send_photo_mock:main',
         ],
     },
 )
