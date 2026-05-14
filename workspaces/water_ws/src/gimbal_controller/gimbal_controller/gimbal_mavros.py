@@ -11,6 +11,8 @@ from std_srvs.srv import SetBool
 from tf_transformations import euler_from_quaternion
 from mavros_msgs.msg import GimbalManagerSetPitchyaw, GimbalDeviceAttitudeStatus
 from tf2_ros import TransformBroadcaster
+from mavros_msgs.srv import MessageInterval
+import numpy as np
 
 class GIMBAL_MANAGER_FLAGS:
     GIMBAL_MANAGER_FLAGS_RETRACT = 1
@@ -34,8 +36,8 @@ SPEED_FLAGS = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_LOCK + GIMBAL_MANAGE
 # MAX_ANGLE_YAW = 325.0
 
 # safe limits
-MAX_ANGLE_PITCH = 60.0
-MAX_ANGLE_YAW =90.0
+MAX_ANGLE_PITCH = 50.0
+MAX_ANGLE_YAW =60.0
 
 AIM_ERROR_ACCEPTANCE = 10.0
 
@@ -43,6 +45,185 @@ class GimbalMode:
     LOCK = 0
     FOLLOW = 1
     AUTO_AIM = 2
+
+
+class AimingState:
+    def __init__(self, gimbal):
+        self.gimbal = gimbal
+
+        self.in_aim = False
+        self.detecting = False
+        self.recovery_active = False
+
+        self.last_error = None
+        self.aim_start_time = None
+        self.last_detection_time = None
+
+        self.angle_lost_increment = 20.0
+        self.first_recovery = True
+
+        self.search_increment = 10.0
+        self.search_index = 0
+
+        s = self.search_increment
+        self.search_patterns = [
+            (0.0, 0.0),
+            (0.0, s),
+            (s, s),
+            (s, 0.0),
+            (s, -s),
+            (0.0, -s),
+            (-s, -s),
+            (-s, 0.0),
+            (-s, s),
+            (0.0, 0.0),
+        ]
+
+        self.control_timer = self.gimbal.create_timer(0.1, self.control_loop)
+        self.recovery_timer = None
+
+    def _log_debug(self, message):
+        self.gimbal.get_logger().info(f"[recovery] {message}")
+
+    def _log_info(self, message):
+        self.gimbal.get_logger().info(f"[recovery] {message}")
+
+    def _log_warn(self, message):
+        self.gimbal.get_logger().warn(f"[recovery] {message}")
+
+    def reset(self):
+        self._log_debug("reset requested; clearing recovery state")
+        self.in_aim = False
+        self.detecting = False
+        self.recovery_active = False
+
+        self.last_error = None
+        self.aim_start_time = None
+        self.last_detection_time = None
+
+        self.first_recovery = True
+        self.search_index = 0
+
+        if self.recovery_timer is not None:
+            self._log_debug("canceling recovery timer")
+            self.recovery_timer.cancel()
+            self.recovery_timer = None
+
+    def control_loop(self):
+        if self.in_aim:
+            self._log_debug("control_loop skipped because in_aim is true")
+            return
+
+        if self.last_detection_time is None:
+            self._log_debug("control_loop waiting for first detection")
+            return
+
+        elapsed = (
+            self.gimbal.get_clock().now() - self.last_detection_time
+        ).nanoseconds / 1e9
+
+        self._log_debug(
+            f"control_loop elapsed since last detection: {elapsed:.3f}s, "
+            f"detecting={self.detecting}, recovery_active={self.recovery_active}"
+        )
+
+        if elapsed > 1.0 and not self.recovery_active:
+            self._log_info("target lost for more than 1 second; beginning recovery")
+
+            self.detecting = False
+            self.recovery_active = True
+            self.first_recovery = True
+
+            self.recovery_timer = self.gimbal.create_timer(
+                2.0,
+                self.recovery_loop
+            )
+            self._log_debug("recovery timer started at 2.0s")
+
+    def recovery_loop(self):
+        self._log_debug(
+            f"recovery_loop entered: detecting={self.detecting}, "
+            f"recovery_active={self.recovery_active}, first_recovery={self.first_recovery}, "
+            f"last_error={self.last_error}, last_detection_time={self.last_detection_time}"
+        )
+
+        recent_detection = False
+        if self.last_detection_time is not None:
+            recent_detection = (
+                self.gimbal.get_clock().now() - self.last_detection_time
+            ).nanoseconds / 1e9 < 0.5
+
+        self._log_debug(f"recent_detection={recent_detection}")
+
+        if self.detecting and recent_detection:
+            self._log_info("target reacquired during recovery; stopping recovery mode")
+
+            if self.recovery_timer is not None:
+                self._log_debug("canceling recovery timer after reacquisition")
+                self.recovery_timer.cancel()
+                self.recovery_timer = None
+
+            self.reset()
+            self.gimbal.gimbal_mode = GimbalMode.AUTO_AIM
+            self._log_debug("gimbal_mode restored to AUTO_AIM")
+            return
+
+        self.gimbal.gimbal_mode = GimbalMode.FOLLOW
+        self._log_debug("gimbal_mode set to FOLLOW for recovery")
+
+        if self.first_recovery and self.last_error is not None:
+            transform_error = self.transform_error_to_angle(self.last_error)
+
+            pitch = self.gimbal.current_pitch
+            yaw = self.gimbal.current_yaw
+
+            pitch_cmd = pitch + transform_error[0]
+            yaw_cmd = yaw + transform_error[1]
+
+            self._log_info(
+                f"first recovery command from current angles pitch={pitch:.2f}, yaw={yaw:.2f}, "
+                f"error={self.last_error.tolist()}, transform_error={transform_error.tolist()}, "
+                f"cmd=({pitch_cmd:.2f}, {yaw_cmd:.2f})"
+            )
+
+            self.gimbal.send_position_cmd(pitch_cmd, yaw_cmd)
+
+            self.first_recovery = False
+            self._log_debug("first_recovery flag cleared")
+            return
+
+        pitch_cmd, yaw_cmd = self.search_patterns[self.search_index]
+        self._log_info(
+            f"search recovery step index={self.search_index}, cmd=({pitch_cmd:.2f}, {yaw_cmd:.2f})"
+        )
+        self.gimbal.send_position_cmd(pitch_cmd, yaw_cmd)
+
+        self.search_index = (self.search_index + 1) % len(self.search_patterns)
+        self._log_debug(f"next search_index={self.search_index}")
+
+    def transform_error_to_angle(self, error):
+        error = np.array(error, dtype=float)
+        norm = np.linalg.norm(error)
+
+        if norm < 1e-6:
+            return np.array([0.0, 0.0])
+
+        unit_vector = error / norm
+        return self.angle_lost_increment * unit_vector
+
+    def update(self, error):
+        self.last_error = np.array(error, dtype=float)
+        self.last_detection_time = self.gimbal.get_clock().now()
+        self.detecting = True
+        self._log_debug(
+            f"detection update received: error={self.last_error.tolist()}, "
+            f"timestamp={self.last_detection_time.nanoseconds}"
+        )
+
+    def lost(self):
+        self.detecting = False
+        self._log_debug("lost() called; detecting set to False")
+
 
 class PIDController():
     def __init__(self, kp, ki, kd, max_output=0.5, max_i=1.0,
@@ -133,7 +314,7 @@ class GremsyMavros(Node):
         self.create_subscription(AimError, '/aeac/external/gimbal/move', self.gimbal_move_callback, 10)
 
         self.create_subscription(AimError, '/aeac/internal/gimbal/target_error', self.aiming_callback, 10)
-        self.finished_aiming_sub = self.create_subscription(Bool, '/aeac/internal/auto_shoot/start_hr_aiming', self.finished_aiming_callback, 10)
+        self.create_subscription(Bool, '/aeac/internal/auto_shoot/start_hr_aiming', self.finished_aiming_callback, 10)
 
 
         self.sub_orientation = self.create_subscription(
@@ -141,6 +322,11 @@ class GremsyMavros(Node):
             '/mavros/gimbal_control/device/attitude_status',
             self.gimbal_attitude_callback,
             10)
+ 
+        self.msg_interval_client = self.create_client(
+            MessageInterval,
+            '/mavros/set_message_interval'
+        )
         
         # TF broadcaster
         self.tf_br = TransformBroadcaster(self)
@@ -166,7 +352,33 @@ class GremsyMavros(Node):
 
         self.send_position_cmd(0.0,0.0)
 
+        self.recovery_state = AimingState(self)
+
+        self.request_message_interval()
+
         self.get_logger().info("Gimbal MAVROS controller initialized.")
+
+    def request_message_interval(self):
+        if not self.msg_interval_client.wait_for_service(timeout_sec=3.0):
+            self.get_logger().warn('Message interval service not available')
+            return  
+
+        req = MessageInterval.Request()
+        req.message_id = 285
+        req.message_rate = 20.0
+
+        future = self.msg_interval_client.call_async(req)
+        future.add_done_callback(self.message_interval_callback)
+
+    def message_interval_callback(self, future):
+        try:
+            response = future.result()
+            if response.success:
+                self.get_logger().info('Message interval set successfully')
+            else:
+                self.get_logger().error('Failed to set message interval')
+        except Exception as e:
+            self.get_logger().error(f'Service call failed: {e}')
 
     def publish_state(self):
         state_msg = GimbalState()
@@ -260,9 +472,11 @@ class GremsyMavros(Node):
             self.reset_gimbal_position()
             self.gimbal_mode = GimbalMode.FOLLOW
             self.publish_state()
+            self.recovery_state.reset()
 
     def set_mode_callback(self, msg):
         self.reset_pid_memory()
+        self.recovery_state.reset()
 
         new_mode = msg.data
 
@@ -311,10 +525,12 @@ class GremsyMavros(Node):
         self.log_debug(f"Received move command: pitch_error={msg.pitch_error}, yaw_error={msg.yaw_error}. Sent speeds: pitch_vel={target_vel_pitch}, yaw_vel={target_vel_yaw}")
 
     def aiming_callback(self, msg):
-        if self.gimbal_mode != GimbalMode.AUTO_AIM:
+        if self.gimbal_mode != GimbalMode.AUTO_AIM and not self.recovery_state.recovery_active:
             return
 
         
+
+    
     
         current_time = self.get_clock().now()
         dt = (current_time - self.last_update_time).nanoseconds / 1e9
@@ -325,8 +541,12 @@ class GremsyMavros(Node):
 
         if math.sqrt(msg.pitch_error**2 + msg.yaw_error**2) < 1.0:
             self.log_info("NOT SENDING COMMANDS - ERROR NONE")
-            self.send_speed_cmd(0.0, 0.0)
+            if not self.recovery_state.recovery_active:
+                self.send_speed_cmd(0.0, 0.0)
+                self.recovery_state.lost()
             return
+
+        self.recovery_state.update((msg.pitch_error, msg.yaw_error))
 
         target_vel_pitch = self.pid_pitch.compute(msg.pitch_error, dt)
         target_vel_yaw = self.pid_yaw.compute(msg.yaw_error, dt)

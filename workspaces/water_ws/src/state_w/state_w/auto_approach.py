@@ -24,6 +24,7 @@ class ApproachState:
     IN_POSITION     = "IN_POSITION"
     AIMING          = "AIMING"
     SHOOTING        = "SHOOTING"
+    TALKING_PICTURE = "TALKING_PICTURE"
     # ABORTED         = "ABORTED"
 
 class AutonomousApproach(Node):
@@ -48,14 +49,17 @@ class AutonomousApproach(Node):
             depth=10
         )
     
-    def _transition(self, new_state: str, reason: str = ""):
+    def _transition(self, new_state: str):
         """Central state-transition method — every change goes through here."""
         old = self._state
         if old == new_state:
             self.get_logger().debug(f"[STATE] Already in {new_state}, no transition needed.")
             return
-        self.get_logger().info(f"[STATE] {old} → {new_state}" + (f"  ({reason})" if reason else ""))
         self._state = new_state
+        
+        msg = String()
+        msg.data = new_state
+        self.state_pub.publish(msg)
         
     def _assert_state(self, expected, context: str) -> bool:
         """
@@ -127,6 +131,10 @@ class AutonomousApproach(Node):
  
         self.message_to_ui_pub = self.create_publisher(
             UiMessage, 'aeac/external/send_to_ui', qos_reliable)
+        
+        self.state_pub = self.create_publisher(
+            String, '/aeac/external/mission/state', qos_reliable
+        )
  
         self.abort_publisher = self.create_subscription(
             Bool, '/aeac/external/mission/abort_all',
@@ -202,7 +210,7 @@ class AutonomousApproach(Node):
                     f"[GUARD] auto_approach/start: already running (state={self._state}). Ignoring.")
                 return
  
-            self._transition(ApproachState.DETECTING, "approach activation received")
+            self._transition(ApproachState.DETECTING)
  
             if not self.sim:
                 self.get_logger().info("[DETECT] Publishing trigger to detection node")
@@ -342,7 +350,7 @@ class AutonomousApproach(Node):
             f"[APPROACH] Polar target published: r={request.r}  theta={request.theta}  z={request.z}  relative={request.relative}"
         )
         self.send_message_to_ui(f"Starting auto approach — target distance: {request.r} m")
-        self._transition(ApproachState.APPROACHING, "polar target sent")        
+        self._transition(ApproachState.APPROACHING)        
     
     def in_position_callback(self, msg: Bool):
         self.get_logger().info(f"[TOPIC] in_position received: {msg.data}")
@@ -355,7 +363,7 @@ class AutonomousApproach(Node):
             return
         
         self.in_position = True
-        self._transition(ApproachState.IN_POSITION, "drone reported in position")
+        self._transition(ApproachState.IN_POSITION)
         self.send_message_to_ui("Target reached — ready to shoot")
  
         stop_msg      = String()
@@ -370,13 +378,13 @@ class AutonomousApproach(Node):
         )
         
         if self._state == ApproachState.AIMING:
-            self._state = ApproachState.IDLE
+            self._transition(ApproachState.IDLE)
             self.stop_auto_aim()
         else:
             self.start_auto_aim()
         
     def start_auto_aim(self):
-        self._state = ApproachState.AIMING
+        self._transition(ApproachState.AIMING)
  
         det_msg      = Bool()
         det_msg.data = True
@@ -397,6 +405,7 @@ class AutonomousApproach(Node):
     def finished_shoot_callback(self, msg):
         self.get_logger().info(f"Received shoot finish message. Taking picture in {self.shoot_picture_delais} seconds")
         self.shoot_timer = self.create_timer(self.shoot_picture_delais, self.finished_shoot_timer_callback)  
+        self._transition(ApproachState.TALKING_PICTURE)
     
     def finished_shoot_timer_callback(self):
         self.get_logger().info(f"Taking picture")
@@ -459,7 +468,7 @@ class AutonomousApproach(Node):
             return
  
         self.get_logger().info("[SHOOT] Initiating shoot sequence")
-        self._transition(ApproachState.SHOOTING, "shoot triggered")
+        self._transition(ApproachState.SHOOTING)
  
         request      = Bool()
         request.data = True
@@ -469,6 +478,7 @@ class AutonomousApproach(Node):
     def take_picture(self):
         self.get_logger().info("[PICTURE] Publishing take_picture trigger")
         self.take_picture_pub.publish(Empty())
+        self._transition(ApproachState.IDLE)
     
     # ------------------------------------------------------------------
     # UI helper
