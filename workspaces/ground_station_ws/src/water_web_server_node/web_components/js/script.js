@@ -8,7 +8,7 @@ const API_ABORT_ALL = "/api/mission/abort_all";
 const API_GIMBAL_FOLLOW = "/api/gimbal_follow";
 const API_GIMBAL_LOCK = "/api/gimbal_lock";
 const API_CONFIRM_TARGET = "/api/confirm_target";
-
+const API_SET_GIMBAL_OFFSET = "/api/mission/set_gimbal_offset";
 
 function appendToLog(msg, type = 'info') {
     const logsContainer = document.querySelector('.logs-container');
@@ -50,8 +50,17 @@ function initaliseButtons() {
     document.getElementById('take-picture-button').addEventListener('click', () => sendCommand(TAKE_PICTURE));
     document.getElementById('shoot-button').addEventListener('click', () => sendCommand(API_SHOOT));
     document.getElementById('abort-button').addEventListener('click', () => sendCommand(API_ABORT_ALL));
-    document.getElementById('btn-follow').addEventListener('click', () => sendCommand(API_GIMBAL_FOLLOW));
-    document.getElementById('btn-lock').addEventListener('click', () => sendCommand(API_GIMBAL_LOCK));
+    document.getElementById('btn-follow').addEventListener('click', () => {
+        sendCommand(API_GIMBAL_FOLLOW);
+        document.getElementById('btn-lock').classList.remove("active")
+        document.getElementById('btn-follow').classList.add("active")
+    });
+    document.getElementById('btn-lock').addEventListener('click', () => {
+        sendCommand(API_GIMBAL_LOCK);
+        document.getElementById('btn-lock').classList.add("active")
+        document.getElementById('btn-follow').classList.remove("active")
+
+    });
     document.getElementById('accept-image-button').addEventListener('click', () => {
         sendCommand(API_CONFIRM_TARGET, {confirmed: true});
         clear_picture();
@@ -59,6 +68,12 @@ function initaliseButtons() {
     document.getElementById('deny-image-deny').addEventListener('click', () => {
         sendCommand(API_CONFIRM_TARGET, {confirmed: false});
         clear_picture();
+    });
+    document.getElementById('apply-offset-button').addEventListener('click', () => {
+        sendCommand(API_SET_GIMBAL_OFFSET, { x: offsetX, y: offsetY });
+    });
+    document.getElementById('reset-offset-button').addEventListener('click', () => {
+        updateOffset(0, 0, 'reset');
     });
 }
 
@@ -142,6 +157,8 @@ function initaliseSocket() {
                     const targetNumberElement = document.getElementById("target-shot-span");
                     targetNumberElement.textContent = `Target Shot: ${data.number}`;
                     break;
+                case "state_change":
+                    document.getElementById('mission-status-span').innerText = `Mission Status: ${data.state}`
                 default:
                     console.warn("Unknown message type:", data.type);
             }
@@ -159,8 +176,50 @@ function initaliseSocket() {
     };
 }
 
+let offsetX = 0, offsetY = 0;
+
+function updateOffset(x, y, source) {
+    offsetX = Math.max(-100, Math.min(100, Math.round(x)));
+    offsetY = Math.max(-100, Math.min(100, Math.round(y)));
+    const px = ((offsetX + 100) / 200) * 100;
+    const py = ((offsetY + 100) / 200) * 100;
+    document.getElementById('pad-dot').style.left = px + '%';
+    document.getElementById('pad-dot').style.top = py + '%';
+    if (source !== 'x-slider') document.getElementById('x-slider').value = offsetX;
+    if (source !== 'y-slider') document.getElementById('y-slider').value = offsetY;
+    if (source !== 'x-num') document.getElementById('x-num').value = offsetX;
+    if (source !== 'y-num') document.getElementById('y-num').value = offsetY;
+}
+
+function initialiseOffset() {
+    const pad = document.getElementById('offset-pad');
+    let dragging = false;
+
+    function padEvent(e) {
+        e.preventDefault();
+        const rect = pad.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const rx = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        const ry = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+        updateOffset(rx * 200 - 100, ry * 200 - 100, 'pad');
+    }
+
+    pad.addEventListener('mousedown', e => { dragging = true; padEvent(e); });
+    document.addEventListener('mousemove', e => { if (dragging) padEvent(e); });
+    document.addEventListener('mouseup', () => { dragging = false; });
+    pad.addEventListener('touchstart', padEvent, { passive: false });
+    pad.addEventListener('touchmove', padEvent, { passive: false });
+
+    document.getElementById('x-slider').addEventListener('input', () => updateOffset(+document.getElementById('x-slider').value, offsetY, 'x-slider'));
+    document.getElementById('y-slider').addEventListener('input', () => updateOffset(offsetX, +document.getElementById('y-slider').value, 'y-slider'));
+    document.getElementById('x-num').addEventListener('change', () => updateOffset(+document.getElementById('x-num').value, offsetY, 'x-num'));
+    document.getElementById('y-num').addEventListener('change', () => updateOffset(offsetX, +document.getElementById('y-num').value, 'y-num'));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initaliseButtons();
     loadTheme();
     initaliseSocket();
+    initialiseOffset();
 })
