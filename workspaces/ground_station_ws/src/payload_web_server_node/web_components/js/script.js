@@ -50,7 +50,7 @@ function initaliseButtons() {
     document.getElementById('servo-1-toggle').addEventListener('change', (e) => {
         let pwm = e.target.checked ? 1700 : 2050;
         sendCommand(API_SERVO, {servo_num: 9, pwm});
-        pwm = e.target.checked ? 2050 : 1700;
+        pwm = e.target.checked ? 2050 : 1600;
         sendCommand(API_SERVO, {servo_num: 10, pwm});
     });
     document.getElementById('servo-2-toggle').addEventListener('change', (e) => {

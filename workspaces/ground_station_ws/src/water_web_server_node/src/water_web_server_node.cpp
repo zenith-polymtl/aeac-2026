@@ -108,26 +108,47 @@ void WaterWebServerNode::initialize_subscriber()
 
 
     message_to_ui_subsciber_ = create_subscription<UiMessage>(
-		"/aeac/external/send_to_ui", 10, std::bind(&WaterWebServerNode::broadcast_message, this, std::placeholders::_1));
+		"/aeac/external/send_to_ui", reliable_qos, 
+        std::bind(&WaterWebServerNode::broadcast_message, this, std::placeholders::_1));
 
-    drone_heartbeat_subsciber_ = create_subscription<DroneHealth>(drone_heartbeat_topic_, reliable_qos, std::bind(&WaterWebServerNode::drone_heartbeat_callback, this, std::placeholders::_1));
+    drone_heartbeat_subsciber_ = create_subscription<DroneHealth>(
+        drone_heartbeat_topic_, reliable_qos, 
+        std::bind(&WaterWebServerNode::drone_heartbeat_callback, this, std::placeholders::_1));
 
     gimbal_state_subscriber_ = create_subscription<GimbalState>(
-        "/aeac/external/gimbal/state", 10, [this](const GimbalState::SharedPtr msg)
-        {
-            nlohmann::json gimbal_json = {
-                {"type", "gimbal_state"},
-                {"mode", msg->mode},
-                {"pitch", msg->pitch},
-                {"yaw", msg->yaw}
-            };
-            send_notification(gimbal_json);
-        }
+        "/aeac/external/gimbal/state", reliable_qos, 
+        std::bind(&WaterWebServerNode::gimbal_callback, this, std::placeholders::_1)
     );
 
     picture_subscriber_ = create_subscription<Image>(
         "/aeac/external/target_picture", reliable_qos,
-        std::bind(&WaterWebServerNode::picture_callback, this, std::placeholders::_1));
+        std::bind(&WaterWebServerNode::picture_callback, this, std::placeholders::_1)
+    );
+
+    state_subscriber_ = create_subscription<std_msgs::msg::String>(
+        "/aeac/external/mission/state", reliable_qos,
+        std::bind(&WaterWebServerNode::state_callback, this, std::placeholders::_1)
+    );
+}
+
+void WaterWebServerNode::gimbal_callback(const GimbalState msg)
+{
+    nlohmann::json gimbal_json = {
+        {"type", "gimbal_state"},
+        {"mode", msg.mode},
+        {"pitch", msg.pitch},
+        {"yaw", msg.yaw}
+    };
+    send_notification(gimbal_json);
+}
+
+void WaterWebServerNode::state_callback(const std_msgs::msg::String msg)
+{
+    nlohmann::json state_json = {
+        {"type", "state_change"},
+        {"state", msg.data},
+    };
+    send_notification(state_json);
 }
 
 void WaterWebServerNode::heartbeat_timer_callback()
@@ -506,6 +527,14 @@ WaterWebServerNode::try_handle_api(
         broadcast_target_number();
 
         return generate_responce("Request Confirm Target received", req);
+    }
+    if (target == API_SET_GIMBAL_OFFSET)
+    {
+        auto j = nlohmann::json::parse(req.body());
+        int x = j.at("x").get<int>();
+        int y = j.at("y").get<int>();
+        RCLCPP_INFO_STREAM(get_logger(), "Gimbal offset received! X: " << x << ", Y: " << y);
+        return generate_responce("Set gimbal offset received", req);
     }
     if (target == API_ABORT_ALL)
     {

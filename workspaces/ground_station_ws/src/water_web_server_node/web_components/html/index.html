@@ -45,27 +45,26 @@
             </div>
             <div class="middle-bottom-container">
                 <div class="toggle-gimbal-control-container">
-                    <div style="display: flex; align-items: center; gap: 2px;">
+                    <div class="gimbal-mode-row">
                         <span>Gimbal Mode</span>
-                        <div style="display: flex; justify-content: center;">
-                            <button type="button" id="btn-follow" class="mode-btn"
-                                style="padding: 8px 20px; font-weight: bold; transition: 0.2s;
-                                    background-color: #007bff; color: white;">
-                                Follow
-                            </button>
-
-                            <button type="button" id="btn-lock" class="mode-btn"
-                                style="padding: 8px 20px; font-weight: bold; transition: 0.2s;
-                                    background-color: #007bff; color: white; ">
-                                Lock
-                            </button>
+                        <div class="mode-btn-group">
+                            <button type="button" id="btn-follow" class="mode-btn active">Follow</button>
+                            <button type="button" id="btn-lock" class="mode-btn">Lock</button>
                         </div>
                     </div>
-                    
                     <div class="orientation-display">
-                        <div><strong>Mode:</strong> <span id="gimbal-mode-val"></span></div>
-                        <div><strong>Pitch:</strong> <span id="pitch-val"></span>°</div>
-                        <div><strong>Yaw:</strong> <span id="yaw-val"></span>°</div>
+                        <div class="orient-item">
+                            <span class="orient-label">Mode</span>
+                            <span class="orient-value" id="gimbal-mode-val" style="font-size: 0.78rem; color: var(--text-primary);">—</span>
+                        </div>
+                        <div class="orient-item">
+                            <span class="orient-label">Pitch</span>
+                            <span class="orient-value"><span id="pitch-val">—</span>°</span>
+                        </div>
+                        <div class="orient-item">
+                            <span class="orient-label">Yaw</span>
+                            <span class="orient-value"><span id="yaw-val">—</span>°</span>
+                        </div>
                     </div>
                 </div>
 
@@ -75,7 +74,32 @@
                 </div>
             </div>
             <div class="bottom-container">
-                <div class="gimbal-slider"></div>                
+                <div class="aim-offset-container">
+                    <div class="offset-pad-wrap">
+                        <span class="offset-pad-label">Offset pad</span>
+                        <div id="offset-pad">
+                            <div class="pad-axis-line pad-axis-h"></div>
+                            <div class="pad-axis-line pad-axis-v"></div>
+                            <div id="pad-dot"></div>
+                        </div>
+                    </div>
+                    <div class="offset-sliders-wrap">
+                        <div class="offset-axis-row">
+                            <span class="offset-axis-label">X</span>
+                            <input type="range" id="x-slider" min="-100" max="100" step="1" value="0">
+                            <input type="number" id="x-num" class="offset-num" min="-100" max="100" step="1" value="0">
+                        </div>
+                        <div class="offset-axis-row">
+                            <span class="offset-axis-label">Y</span>
+                            <input type="range" id="y-slider" min="-100" max="100" step="1" value="0">
+                            <input type="number" id="y-num" class="offset-num" min="-100" max="100" step="1" value="0">
+                        </div>
+                    </div>
+                    <div class="offset-actions">
+                        <button id="apply-offset-button">Apply</button>
+                        <button id="reset-offset-button">Reset</button>
+                    </div>
+                </div>         
             </div>
         </div>
         <div class="logs-container"></div>
