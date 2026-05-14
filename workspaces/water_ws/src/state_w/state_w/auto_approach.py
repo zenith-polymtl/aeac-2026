@@ -93,6 +93,8 @@ class AutonomousApproach(Node):
         self.in_position          = False
         self.target_aimed         = False
         
+        self.continues_target_in_sight = 0
+        
         self.get_logger().info("[STATE] State machine reset to IDLE")
 
     # ------------------------------------------------------------------
@@ -103,11 +105,15 @@ class AutonomousApproach(Node):
         self.declare_parameter('approach_height', 1.0)
         self.declare_parameter('sim', False)
         self.declare_parameter('ignore_state_check', False)
+        self.declare_parameter('continues_in_sight_threshold', 5)
+        self.declare_parameter('shoot_picture_delais', 1.0)
         
         self.approach_radius    = self.get_parameter('approach_radius').value
         self.approach_height    = self.get_parameter('approach_height').value
         self.sim                = self.get_parameter('sim').value
         self.ignore_state_check = self.get_parameter('ignore_state_check').value
+        self.continues_in_sight_threshold = self.get_parameter('continues_in_sight_threshold').value
+        self.shoot_picture_delais = self.get_parameter('shoot_picture_delais').value
 
     
     # ------------------------------------------------------------------
@@ -174,10 +180,14 @@ class AutonomousApproach(Node):
         self.take_picture_sub = self.create_subscription(
             Bool, '/aeac/external/take_picture',
             self.take_picture_callback, qos_reliable)
+        
+        self.finished_shoot_sub = self.create_subscription(
+            Bool, '/aeac/internal/shot_finished',
+            self.finished_shoot_callback, qos_reliable)
  
         self.shoot_pub = self.create_publisher(
             Bool, '/aeac/internal/shoot', qos_reliable)
- 
+         
         self.take_picture_pub = self.create_publisher(
             Empty, '/aeac/internal/take_picture', qos_reliable)
       
@@ -358,52 +368,60 @@ class AutonomousApproach(Node):
             f"[TOPIC] auto_shoot/start received: {msg.data}  "
             f"(auto_aim currently={self.auto_aim_enable})"
         )
-        if msg.data != self.auto_aim_enable:
-            self.get_logger().info("[SHOOT] Toggling auto aim")
-            self.toggle_auto_aim()
+        
+        if self._state == ApproachState.AIMING:
+            self._state = ApproachState.IDLE
+            self.stop_auto_aim()
         else:
-            self.get_logger().debug("[SHOOT] auto_aim already matches requested state — no toggle needed")
-
-    def toggle_auto_aim(self):
-        self.auto_aim_enable = not self.auto_aim_enable
-        self.get_logger().info(f"[SHOOT] auto_aim_enable → {self.auto_aim_enable}")
+            self.start_auto_aim()
+        
+    def start_auto_aim(self):
+        self._state = ApproachState.AIMING
  
         det_msg      = Bool()
-        det_msg.data = self.auto_aim_enable
+        det_msg.data = True
         self.start_target_detection_pub.publish(det_msg)
  
         gimbal_msg      = UInt8()
-        gimbal_msg.data = GimbalMode.AUTO_AIM if self.auto_aim_enable else GimbalMode.FOLLOW
+        gimbal_msg.data = GimbalMode.AUTO_AIM
         self.start_auto_shoot_pub.publish(gimbal_msg)
         self.get_logger().info(
-            f"[SHOOT] Gimbal mode set to "
-            f"{'AUTO_AIM' if self.auto_aim_enable else 'FOLLOW'} ({gimbal_msg.data})"
+            f"[SHOOT] Gimbal mode set to AUTO_AIM"
         )
     
-    def target_aimed_callback(self, msg: Bool):
-        self.get_logger().info(f"[TOPIC] target_in_aim received: {msg.data}")
- 
-        # This callback is valid from IN_POSITION or AIMING states
-        if self._state not in (ApproachState.IN_POSITION, ApproachState.AIMING,
-                                ApproachState.APPROACHING):
-            self.get_logger().debug(
-                f"[GUARD] target_aimed_callback: state={self._state}, ignoring.")
+    def stop_auto_aim(self):
+        msg = Bool()
+        msg.data = False
+        self.start_target_detection_pub.publish(msg)
+    
+    def finished_shoot_callback(self, msg):
+        self.get_logger().info(f"Received shoot finish message. Taking picture in {self.shoot_picture_delais} seconds")
+        self.shoot_timer = self.create_timer(self.shoot_picture_delais, self.finished_shoot_timer_callback)  
+    
+    def finished_shoot_timer_callback(self):
+        self.get_logger().info(f"Taking picture")
+
+        self.shoot_timer.destroy()
+        self.take_picture()
+        self.stop_auto_aim()
+        
+    def target_aimed_callback(self, msg: Bool): 
+        if self._state != ApproachState.AIMING:
             return
- 
-        prev = self.target_aimed
+        
+        if msg.data != self.target_aimed:
+            self.get_logger().info(f"[AIM] target_aimed changed: {self.target_aimed}")
+
         self.target_aimed = msg.data
- 
-        if prev != self.target_aimed:
-            self.get_logger().info(f"[AIM] target_aimed changed: {prev} → {self.target_aimed}")
- 
-        if self.target_aimed and self.in_position:
-            if self._state != ApproachState.SHOOTING:
-                self.get_logger().info("[AIM] In position AND aimed — triggering shoot")
-                self.shoot()
-        elif self.target_aimed:
-            self.get_logger().info("[AIM] Aimed but not yet in position — waiting")
+        
+        if msg.data:
+            self.continues_target_in_sight += 1
         else:
-            self.get_logger().debug("[AIM] Target not aimed")
+            self.continues_target_in_sight = 0
+                
+        if self.continues_target_in_sight >= self.continues_in_sight_threshold:
+            self.shoot()
+            self.continues_target_in_sight = 0
     
     def shoot_target_callback(self, msg: Bool):
         self.get_logger().info(f"[TOPIC] external shoot received: {msg.data}")
@@ -414,6 +432,7 @@ class AutonomousApproach(Node):
         self.get_logger().info(f"[TOPIC] take_picture received: {msg.data}")
         if msg.data:
             self.take_picture()
+            
             
     def abort_callback(self, msg: Bool):
         self.get_logger().info(f"[TOPIC] abort_all received: {msg.data}")
@@ -446,10 +465,7 @@ class AutonomousApproach(Node):
         request.data = True
         self.shoot_pub.publish(request)
         self.get_logger().info("[SHOOT] Shoot command published")
- 
-        self.take_picture()
-        self.get_logger().info("[SHOOT] Shoot + picture sequence complete")
- 
+  
     def take_picture(self):
         self.get_logger().info("[PICTURE] Publishing take_picture trigger")
         self.take_picture_pub.publish(Empty())

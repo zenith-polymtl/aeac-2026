@@ -10,9 +10,9 @@ from custom_interfaces.msg import TargetPosePolar
 from std_msgs.msg import Bool, String
 from custom_interfaces.srv import ServoState
 
-class AutonomousApproach(Node):
+class Valve(Node):
     def __init__(self):
-        super().__init__('autonomous_approach')
+        super().__init__('valve')
 
         self.define_initial_state()
         self.set_up_parameters()
@@ -20,7 +20,7 @@ class AutonomousApproach(Node):
 
         self.closed_pwm = 1000
         self.open_pwm = 2000
-        self.servo_channel = 10
+        self.servo_channel = 9
         self.close_timer = None
 
 
@@ -42,6 +42,7 @@ class AutonomousApproach(Node):
 
     def shoot_callback(self, msg):
         if self.close_timer is not None:
+            self.get_logger().info("Timer already set. Canceling")
             self.close_timer.cancel()
         self.close_timer = self.create_timer(self.burst_time, self.close_valve)
         self.open_valve()
@@ -58,8 +59,8 @@ class AutonomousApproach(Node):
             
 
     def close_valve(self):
-        
         if self.open:
+            self.get_logger().info("Closing valve after burst time.")
             self.send_servo(self.closed_pwm)
             if self.close_timer is not None:
                 self.close_timer.cancel()
@@ -79,31 +80,30 @@ class AutonomousApproach(Node):
             self.valve_opened_at = None
             self.open = False  
             self.valve_state_pub.publish(Bool(data=self.open))
-            self.request_picture_pub.publish(Bool(data=True))
-
-            
+            self.finished_shot_pub.publish(Bool(data=True))
+            self.get_logger().info("Shot finished message published.")
 
 
     def set_up_topics(self):
         qos_reliable = self._create_qos_profile(QoSReliabilityPolicy.RELIABLE)
   
 
-        self.shoot_pub = self.create_subscription(
+        self.shoot_sub = self.create_subscription(
             Bool,
-            '/shoot_topic',
+            '/aeac/internal/shoot',
             self.shoot_callback,
             qos_reliable
         )
 
         self.valve_state_pub = self.create_publisher(
             Bool,
-            '/valve_state',
+            '/aeac/internal/valve_state',
             qos_reliable
         )
 
-        self.request_picture_pub = self.create_publisher(
+        self.finished_shot_pub = self.create_publisher(
             Bool,
-            '/request_picture',
+            '/aeac/internal/shot_finished',
             qos_reliable
         )
 
@@ -137,7 +137,7 @@ class AutonomousApproach(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = AutonomousApproach()
+    node = Valve()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:

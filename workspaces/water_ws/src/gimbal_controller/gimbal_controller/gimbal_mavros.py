@@ -34,8 +34,8 @@ SPEED_FLAGS = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_LOCK + GIMBAL_MANAGE
 # MAX_ANGLE_YAW = 325.0
 
 # safe limits
-MAX_ANGLE_PITCH = 40.0
-MAX_ANGLE_YAW =70.0
+MAX_ANGLE_PITCH = 60.0
+MAX_ANGLE_YAW =90.0
 
 AIM_ERROR_ACCEPTANCE = 10.0
 
@@ -104,13 +104,14 @@ class GremsyMavros(Node):
         super().__init__('gremsy_mavros_ctrl')
 
         # talk=True keeps logs enabled; talk=False silences logs for faster runtime.
-        self.declare_parameter('talk', False)
+        self.declare_parameter('talk', True)
         self.talk = bool(self.get_parameter('talk').value)
         if not self.talk:
             self.get_logger().set_level(rclpy.logging.LoggingSeverity.FATAL)
 
-        self.pid_pitch = PIDController(kp=0.001, ki=0.0001, kd=0.0002, max_output=0.7, max_i=0.5, deriv_tau=0.15)
-        self.pid_yaw = PIDController(kp=0.001, ki=0.0001, kd=0.0002, max_output=0.7, max_i=0.5, deriv_tau=0.15)
+        self.pid_pitch = PIDController(kp=0.008, ki=0.0001, kd=0.0004, max_output=1.5, max_i=0.05, deriv_tau=0.12)
+        self.pid_yaw = PIDController(kp=0.008, ki=0.0001, kd=0.0004, max_output=1.5, max_i=0.05, deriv_tau=0.12)
+        #self.pid_yaw = PIDController(kp=0.01, ki=0.001, kd=0.0001, max_output=1.5, max_i=0.3, deriv_tau=0.12)
 
         self.last_sent_pitch_vel = 0.0
         self.last_sent_yaw_vel = 0.0
@@ -123,7 +124,6 @@ class GremsyMavros(Node):
         self.state_timer = self.create_timer(0.5, self.publish_state)
         self.state_pub = self.create_publisher(GimbalState, '/aeac/external/gimbal/state', 10)
         self.target_in_aim_pub = self.create_publisher(Bool, '/aeac/internal/auto_shoot/target_in_aim', 10)
-
         # self.shoot_pub = self.create_publisher(Bool, '', 10)
 
         # --- Subscribers ---
@@ -133,6 +133,8 @@ class GremsyMavros(Node):
         self.create_subscription(AimError, '/aeac/external/gimbal/move', self.gimbal_move_callback, 10)
 
         self.create_subscription(AimError, '/aeac/internal/gimbal/target_error', self.aiming_callback, 10)
+        self.finished_aiming_sub = self.create_subscription(Bool, '/aeac/internal/auto_shoot/start_hr_aiming', self.finished_aiming_callback, 10)
+
 
         self.sub_orientation = self.create_subscription(
             GimbalDeviceAttitudeStatus,
@@ -162,6 +164,8 @@ class GremsyMavros(Node):
         self.last_sent_yaw_vel = 0.0
         self.last_update_time = self.get_clock().now()
 
+        self.send_position_cmd(0.0,0.0)
+
         self.get_logger().info("Gimbal MAVROS controller initialized.")
 
     def publish_state(self):
@@ -180,7 +184,29 @@ class GremsyMavros(Node):
         state_msg.pitch = self.current_pitch
         state_msg.yaw = self.current_yaw
         self.state_pub.publish(state_msg)
-        self.get_logger().debug(f"Published gimbal state: mode={mode_str}, pitch={self.current_pitch:.2f}, yaw={self.current_yaw:.2f}")
+        self.log_debug(f"Published gimbal state: mode={mode_str}, pitch={self.current_pitch:.2f}, yaw={self.current_yaw:.2f}")
+
+    # --- Rate-limited logging helpers (log 1 out of `self._log_mod` calls) ---
+    def _should_log(self):
+        self._log_tick = getattr(self, '_log_tick', 0) + 1
+        if self._log_tick >= getattr(self, '_log_mod', 10):
+            self._log_tick = 0
+            setattr(self, '_log_tick', self._log_tick)
+            return True
+        setattr(self, '_log_tick', self._log_tick)
+        return False
+
+    def log_debug(self, msg):
+        if self._should_log():
+            self.get_logger().debug(msg)
+
+    def log_warn(self, msg):
+        if self._should_log():
+            self.get_logger().warn(msg)
+
+    def log_info(self, msg):
+        if self._should_log():
+            self.get_logger().info(msg)
 
     def gimbal_attitude_callback(self, msg):
         q = msg.q
@@ -212,7 +238,8 @@ class GremsyMavros(Node):
         self.current_pitch = math.degrees(angles[1])
         self.current_yaw = math.degrees(angles[2])
 
-        self.get_logger().debug(f"Current pitch: {self.current_pitch}, Current yaw: {self.current_yaw}")
+        
+        self.log_debug(f"Current pitch: {self.current_pitch}, Current yaw: {self.current_yaw}")
         target_pitch, target_yaw = self.check_angle_limit(self.last_sent_pitch_vel, self.last_sent_yaw_vel)
         
         if target_pitch != self.last_sent_pitch_vel or target_yaw != self.last_sent_yaw_vel:
@@ -221,6 +248,18 @@ class GremsyMavros(Node):
     def reset_pid_memory(self):
         self.pid_pitch.reset()
         self.pid_yaw.reset()
+
+    def reset_gimbal_position(self):
+        self.send_position_cmd(0.0, 0.0)
+        self.get_logger().info("Gimbal position reset to neutral (0,0).")
+
+    def finished_aiming_callback(self, msg):
+        if not msg.data:
+            self.get_logger().info("Finished aiming received. Resetting gimbal position and PID memory.")
+            self.reset_pid_memory()
+            self.reset_gimbal_position()
+            self.gimbal_mode = GimbalMode.FOLLOW
+            self.publish_state()
 
     def set_mode_callback(self, msg):
         self.reset_pid_memory()
@@ -247,18 +286,18 @@ class GremsyMavros(Node):
     def check_angle_limit(self, target_vel_pitch, target_vel_yaw):
         # --- SECURITY PITCH ---
         if self.current_pitch >= MAX_ANGLE_PITCH and target_vel_pitch > 0:
-            self.get_logger().warn("MAX PITCH reached!")
+            self.log_warn("MAX PITCH reached!")
             target_vel_pitch = 0.0
         elif self.current_pitch <= -MAX_ANGLE_PITCH and target_vel_pitch < 0:
-            self.get_logger().warn("MIN PITCH reached!")
+            self.log_warn("MIN PITCH reached!")
             target_vel_pitch = 0.0
 
         # --- SECURITY YAW---
         if self.current_yaw >= MAX_ANGLE_YAW and target_vel_yaw > 0:
-            self.get_logger().warn("MAX YAW reached!")
+            self.log_warn("MAX YAW reached!")
             target_vel_yaw = 0.0
         elif self.current_yaw <= -MAX_ANGLE_YAW and target_vel_yaw < 0:
-            self.get_logger().warn("MIN YAW reached!")
+            self.log_warn("MIN YAW reached!")
             target_vel_yaw = 0.0
         
         return target_vel_pitch, target_vel_yaw
@@ -269,18 +308,13 @@ class GremsyMavros(Node):
         
         target_vel_pitch, target_vel_yaw = self.check_angle_limit(msg.pitch_error, msg.yaw_error)
         self.send_speed_cmd(target_vel_pitch, target_vel_yaw)
-        self.get_logger().debug(f"Received move command: pitch_error={msg.pitch_error}, yaw_error={msg.yaw_error}. Sent speeds: pitch_vel={target_vel_pitch}, yaw_vel={target_vel_yaw}")
+        self.log_debug(f"Received move command: pitch_error={msg.pitch_error}, yaw_error={msg.yaw_error}. Sent speeds: pitch_vel={target_vel_pitch}, yaw_vel={target_vel_yaw}")
 
     def aiming_callback(self, msg):
         if self.gimbal_mode != GimbalMode.AUTO_AIM:
             return
 
-        if math.sqrt(msg.pitch_error**2 + msg.yaw_error**2) < 1.0:
-            self.get_logger().info("NOT SENDING COMMANDS - ERROR NONE")
-            self.send_speed_cmd(0.0, 0.0)
-            return
-
-        target_vel_yaw = msg.yaw_error
+        
     
         current_time = self.get_clock().now()
         dt = (current_time - self.last_update_time).nanoseconds / 1e9
@@ -289,18 +323,18 @@ class GremsyMavros(Node):
         if dt <= 0.0 or dt > 0.1:
             dt = 0.01
 
+        if math.sqrt(msg.pitch_error**2 + msg.yaw_error**2) < 1.0:
+            self.log_info("NOT SENDING COMMANDS - ERROR NONE")
+            self.send_speed_cmd(0.0, 0.0)
+            return
+
         target_vel_pitch = self.pid_pitch.compute(msg.pitch_error, dt)
         target_vel_yaw = self.pid_yaw.compute(msg.yaw_error, dt)
         
         in_sight_msg = Bool()        
-        if abs(msg.pitch_error) < AIM_ERROR_ACCEPTANCE and abs(msg.yaw_error) < AIM_ERROR_ACCEPTANCE:
-            target_vel_pitch = 0.0   
-            target_vel_yaw = 0.0
-            in_sight_msg.data = True
-            self.target_in_aim_pub.publish(in_sight_msg)
-        else:
-            in_sight_msg.data = False
-            self.target_in_aim_pub.publish(in_sight_msg)
+        in_sight_msg.data = (abs(msg.pitch_error) < AIM_ERROR_ACCEPTANCE and abs(msg.yaw_error) < AIM_ERROR_ACCEPTANCE)
+
+        self.target_in_aim_pub.publish(in_sight_msg)
 
         target_vel_pitch, target_vel_yaw = self.check_angle_limit(target_vel_pitch, target_vel_yaw)
         self.send_speed_cmd(target_vel_pitch, target_vel_yaw)
@@ -318,7 +352,7 @@ class GremsyMavros(Node):
         msg.pitch_rate = float('nan')
         msg.yaw_rate = float('nan')
         self.mavros_pub.publish(msg)
-        self.get_logger().debug(f"Sent position command: pitch={pitch}, yaw={yaw}")
+        self.log_debug(f"Sent position command: pitch={pitch}, yaw={yaw}")
 
     def send_speed_cmd(self, pitch_rate, yaw_rate):
         self.last_sent_pitch_vel = pitch_rate
@@ -333,7 +367,7 @@ class GremsyMavros(Node):
         msg.pitch_rate = float(pitch_rate)
         msg.yaw_rate = float(yaw_rate)
         self.mavros_pub.publish(msg)
-        self.get_logger().debug(f"Sent speed command: pitch_rate={pitch_rate}, yaw_rate={yaw_rate}")
+        self.log_debug(f"Sent speed command: pitch_rate={pitch_rate}, yaw_rate={yaw_rate}")
 
 def main(args=None):
     rclpy.init(args=args)
@@ -343,6 +377,8 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
+        node.reset_gimbal_position()
+        node.send_speed_cmd(0.0, 0.0)
         node.destroy_node()
         rclpy.shutdown()
 
