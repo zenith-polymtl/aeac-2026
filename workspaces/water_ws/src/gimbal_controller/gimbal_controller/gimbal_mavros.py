@@ -368,8 +368,9 @@ class GremsyMavros(Node):
     def __init__(self):
         super().__init__('gremsy_mavros_ctrl')
         self.define_params()
-        self.define_variable()
         self.define_topics()
+        self.define_variable()
+        
         
         self.state_timer = self.create_timer(self.state_update_rate, self.publish_state)
 
@@ -444,9 +445,9 @@ class GremsyMavros(Node):
         )
         
         # --- Publishers ---
-        self.mavros_pub = self.create_publisher(GimbalManagerSetPitchyaw, '/mavros/gimbal_control/manager/set_pitchyaw', best_effort_qos)
+        self.mavros_pub = self.create_publisher(GimbalManagerSetPitchyaw, '/mavros/gimbal_control/manager/set_pitchyaw', reliable_qos)
         self.state_pub = self.create_publisher(GimbalState, '/aeac/external/gimbal/state', reliable_qos)
-        self.target_in_aim_pub = self.create_publisher(Bool, '/aeac/internal/auto_shoot/target_in_aim', best_effort_qos)
+        self.target_in_aim_pub = self.create_publisher(Bool, '/aeac/internal/auto_shoot/target_in_aim', reliable_qos)
 
         # --- Subscribers ---
         self.create_subscription(UInt8, '/aeac/external/gimbal/set_mode', self.set_mode_callback, reliable_qos)
@@ -625,8 +626,10 @@ class GremsyMavros(Node):
         self.log_debug(f"Received move command: pitch_error={msg.pitch_error}, yaw_error={msg.yaw_error}. Sent speeds: pitch_vel={target_vel_pitch}, yaw_vel={target_vel_yaw}")
 
     def aiming_callback(self, msg):
-        yaw_error = msg.yaw_error + self.default_x_aim_offset + self.additial_x_aim_offset
-        pitch_error = msg.pitch_error + self.default_y_aim_offset + self.additial_y_aim_offset
+        # yaw_error = msg.yaw_error + self.default_x_aim_offset + self.additial_x_aim_offset
+        # pitch_error = msg.pitch_error + self.default_y_aim_offset + self.additial_y_aim_offset
+        yaw_error = msg.yaw_error
+        pitch_error = msg.pitch_error
         
         err_norm = math.sqrt(pitch_error**2 + yaw_error**2);
 
