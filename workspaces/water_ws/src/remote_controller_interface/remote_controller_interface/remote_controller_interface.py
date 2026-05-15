@@ -33,7 +33,7 @@ class RemoteControlInterface(Node):
         
         self.auto_approach_pub = self.create_publisher(Bool, '/aeac/external/auto_approach/start', qos_re)
         self.auto_shoot_pub = self.create_publisher(Bool, '/aeac/external/auto_shoot/start', qos_re)
-        self.shoot_pub = self.create_publisher(Bool, '/aeac/external/shoot', qos_re)
+        self.shoot_pub = self.create_publisher(Bool, '/aeac/internal/shoot', qos_re)
         self.take_picture_pub = self.create_publisher(Bool, '/aeac/external/take_picture', qos_re)
 
         self.servo_cli = self.create_client(ServoState, '/aeac/external/payload/set_state')
