@@ -6,11 +6,15 @@ from mavros_msgs.msg import MountControl
 from mavros_msgs.srv import MountConfigure
 from std_msgs.msg import Bool, UInt8
 from custom_interfaces.msg import AimError, GimbalState
-from geometry_msgs.msg import Quaternion, TransformStamped
+from geometry_msgs.msg import Quaternion, TransformStamped, Vector3
 from std_srvs.srv import SetBool
 from tf_transformations import euler_from_quaternion
 from mavros_msgs.msg import GimbalManagerSetPitchyaw, GimbalDeviceAttitudeStatus
 from tf2_ros import TransformBroadcaster
+from mavros_msgs.srv import MessageInterval
+import numpy as np
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
+
 
 class GIMBAL_MANAGER_FLAGS:
     GIMBAL_MANAGER_FLAGS_RETRACT = 1
@@ -25,7 +29,7 @@ class GIMBAL_MANAGER_FLAGS:
     GIMBAL_MANAGER_FLAGS_RC_MIXED = 512
 
 POSITION_FLAG = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_IN_VEHICLE_FRAME + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_PITCH_LOCK + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_ROLL_LOCK
-SPEED_FLAGS = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_LOCK + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_PITCH_LOCK + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_ROLL_LOCK
+SPEED_FLAGS = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_IN_VEHICLE_FRAME + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_PITCH_LOCK + GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_ROLL_LOCK
 
 #Keep YAW_IN_VEHICLE_FRAME to ensure proper dynamic transform rotation 
 
@@ -34,18 +38,279 @@ SPEED_FLAGS = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_LOCK + GIMBAL_MANAGE
 # MAX_ANGLE_YAW = 325.0
 
 # safe limits
-MAX_ANGLE_PITCH = 110.0
-MAX_ANGLE_YAW = 130.0
+MAX_ANGLE_PITCH = 45.0
+MAX_ANGLE_YAW =60.0
 
-AIM_ERROR_ACCEPTANCE = 10.0
+# AIM_ERROR_ACCEPTANCE = 10.0
 
 class GimbalMode:
     LOCK = 0
     FOLLOW = 1
     AUTO_AIM = 2
+class AimingState:
+    def __init__(self, gimbal):
+        self.gimbal = gimbal
+
+        self.in_aim = False
+        self.detecting = False
+        self.recovery_active = False
+
+        self.last_error = None
+        self.aim_start_time = None
+        self.last_detection_time = None
+
+        self.angle_lost_increment = 20.0
+        self.first_recovery = True
+
+        self.search_increment = 40.0
+        self.search_index = 0
+
+        self.lost_pitch = 0.0
+        self.lost_yaw = 0.0
+
+        # Sweep target tracking
+        self.current_sweep_target = None          # (pitch_deg, yaw_deg)
+        self.current_sweep_target_time = None
+        self.sweep_tolerance_deg = 3.0
+        self.sweep_target_timeout = 2.5       # safety timeout in seconds
+
+        self.final_aim = None
+
+        s = self.search_increment
+        self.search_patterns = [
+            (s, 0.0),
+            (-s, 0.0),
+            (0.0, s),
+            (0.0, -s),
+        ]
+
+        self.control_timer = self.gimbal.create_timer(0.1, self.control_loop)
+        self.recovery_timer = None
+
+    def _log_event(self, message):
+        self.gimbal.get_logger().info(f"[recovery] {message}")
+
+    def _log_warn(self, message):
+        self.gimbal.get_logger().warn(f"[recovery] {message}")
+
+    def reset(self):
+        self.in_aim = False
+        self.detecting = False
+        self.recovery_active = False
+
+        self.last_error = None
+        self.aim_start_time = None
+        self.last_detection_time = None
+
+        self.first_recovery = True
+        self.search_index = 0
+
+        self.current_sweep_target = None
+        self.current_sweep_target_time = None
+
+        if self.recovery_timer is not None:
+            self.recovery_timer.cancel()
+            self.recovery_timer = None
+
+    def control_loop(self):
+        if self.in_aim:
+            return
+
+        if self.gimbal.gimbal_mode != GimbalMode.AUTO_AIM:
+            return
+
+        if self.last_detection_time is None:
+            return
+
+        elapsed = (
+            self.gimbal.get_clock().now() - self.last_detection_time
+        ).nanoseconds / 1e9
+
+        if elapsed > 0.5 and not self.recovery_active:
+            self.detecting = False
+            self.recovery_active = True
+            self.first_recovery = True
+            self.search_index = 0
+            self.current_sweep_target = None
+            self.current_sweep_target_time = None
+
+            self._log_event(
+                f"target lost for {elapsed:.2f}s; starting recovery"
+            )
+
+            self.gimbal.gimbal_mode = GimbalMode.FOLLOW
+            self.gimbal.reset_pid_memory()
+            self.gimbal.send_speed_cmd(0.0, 0.0)
+
+            self.lost_pitch = self.gimbal.current_pitch
+            self.lost_yaw = self.gimbal.current_yaw
+
+            if self.first_recovery and self.last_error is not None:
+                transform_error = self.transform_error_to_angle(self.last_error)
+
+                pitch_cmd = self.lost_pitch + transform_error[0]
+                yaw_cmd = self.lost_yaw + transform_error[1]
+
+                pitch_cmd = max(-MAX_ANGLE_PITCH, min(MAX_ANGLE_PITCH, pitch_cmd))
+                yaw_cmd = max(-MAX_ANGLE_YAW, min(MAX_ANGLE_YAW, yaw_cmd))
+
+                self._log_event(
+                    f"first recovery target: pitch={pitch_cmd:.2f} deg, "
+                    f"yaw={yaw_cmd:.2f} deg, "
+                    f"last_error=({self.last_error[0]:.2f}, {self.last_error[1]:.2f}), "
+                    f"position when lost=({self.lost_pitch:.2f}, {self.lost_yaw:.2f})"
+                )
+
+            self.recovery_timer = self.gimbal.create_timer(
+                0.1,
+                self.recovery_loop
+            )
+
+            self.recovery_loop()
+
+    def _is_at_sweep_target(self):
+        if self.current_sweep_target is None:
+            return False
+
+        target_pitch, target_yaw = self.current_sweep_target
+
+        pitch_error = abs(self.gimbal.current_pitch - target_pitch)
+        yaw_error = abs(self.gimbal.current_yaw - target_yaw)
+
+        return (
+            pitch_error < self.sweep_tolerance_deg and
+            yaw_error < self.sweep_tolerance_deg
+        )
+
+    def _sweep_target_timed_out(self):
+        if self.current_sweep_target_time is None:
+            return False
+
+        elapsed = (
+            self.gimbal.get_clock().now() - self.current_sweep_target_time
+        ).nanoseconds / 1e9
+
+        return elapsed > self.sweep_target_timeout
+
+    def _send_sweep_target(self):
+        pitch_offset, yaw_offset = self.search_patterns[self.search_index]
+
+        pitch_cmd = self.lost_pitch + pitch_offset
+        yaw_cmd = self.lost_yaw + yaw_offset
+
+        pitch_cmd = max(-MAX_ANGLE_PITCH, min(MAX_ANGLE_PITCH, pitch_cmd))
+        yaw_cmd = max(-MAX_ANGLE_YAW, min(MAX_ANGLE_YAW, yaw_cmd))
+
+        self.current_sweep_target = (pitch_cmd, yaw_cmd)
+        self.current_sweep_target_time = self.gimbal.get_clock().now()
+
+        self._log_event(
+            f"search target {self.search_index + 1}/{len(self.search_patterns)}: "
+            f"pitch={pitch_cmd:.2f} deg, yaw={yaw_cmd:.2f} deg"
+        )
+
+        self.gimbal.send_position_cmd(
+            math.radians(pitch_cmd),
+            math.radians(yaw_cmd)
+        )
+
+    def recovery_loop(self):
+        recent_detection = False
+
+        if self.last_detection_time is not None:
+            recent_detection = (
+                self.gimbal.get_clock().now() - self.last_detection_time
+            ).nanoseconds / 1e9 < 0.5
+
+        if self.detecting and recent_detection:
+            self._log_event("target reacquired; stopping recovery")
+
+            self.reset()
+            self.gimbal.gimbal_mode = GimbalMode.AUTO_AIM
+            return
+
+        # If a sweep target was already sent, wait until the gimbal reaches it.
+        if self.current_sweep_target is not None:
+            if self._is_at_sweep_target():
+                target_pitch, target_yaw = self.current_sweep_target
+
+                self._log_event(
+                    f"target reached: pitch={target_pitch:.2f} deg, "
+                    f"yaw={target_yaw:.2f} deg"
+                )
+
+                self.current_sweep_target = None
+                self.current_sweep_target_time = None
+                self.search_index += 1
+
+            elif self._sweep_target_timed_out():
+                target_pitch, target_yaw = self.current_sweep_target
+
+                self._log_warn(
+                    f"target timeout: pitch={target_pitch:.2f} deg, "
+                    f"yaw={target_yaw:.2f} deg; moving to next sweep target"
+                )
+
+                self.current_sweep_target = None
+                self.current_sweep_target_time = None
+                self.search_index += 1
+
+            else:
+                # Still moving toward current target. Do not send another command yet.
+                return
+
+        # All sweep targets completed.
+        if self.search_index >= len(self.search_patterns):
+            self._log_event("search pattern finished; returning to neutral")
+
+            self.gimbal.reset_pid_memory()
+            self.gimbal.send_speed_cmd(0.0, 0.0)
+            self.gimbal.send_position_cmd(0.0, 0.0)
+
+            self.gimbal.gimbal_mode = GimbalMode.FOLLOW
+
+            self.final_aim = self.gimbal.create_timer(
+                0.1,
+                self.final_aim_callback
+            )
+
+            self.reset()
+            return
+
+        # Send next sweep target only after the previous one was reached or timed out.
+        self._send_sweep_target()
+
+    def final_aim_callback(self):
+        if math.sqrt(self.gimbal.current_pitch**2 + self.gimbal.current_yaw**2) < 3.0:
+            if self.final_aim is not None:
+                self.final_aim.cancel()
+                self.final_aim = None
+
+            self.gimbal.gimbal_mode = GimbalMode.AUTO_AIM
+            self._log_event("neutral reached; returning to AUTO_AIM")
+
+    def transform_error_to_angle(self, error):
+        error = np.array(error, dtype=float)
+        norm = np.linalg.norm(error)
+
+        if norm < 1e-6:
+            return np.array([0.0, 0.0])
+
+        unit_vector = error / norm
+        return self.angle_lost_increment * unit_vector
+
+    def update(self, error):
+        self.last_error = np.array(error, dtype=float)
+        self.last_detection_time = self.gimbal.get_clock().now()
+        self.detecting = True
+
+    def lost(self):
+        self.detecting = False
+        
+
 
 class PIDController():
-    def __init__(self, kp, ki, kd, max_output=3.0, max_i=1.0,
+    def __init__(self, kp, ki, kd, max_output=0.5, max_i=1.0,
                  deriv_tau=0.0, d_clip=None):
         self.kp, self.ki, self.kd = kp, ki, kd
         self.max_output, self.max_i = max_output, max_i
@@ -102,38 +367,34 @@ class PIDController():
 class GremsyMavros(Node):
     def __init__(self):
         super().__init__('gremsy_mavros_ctrl')
+        self.define_params()
+        self.define_topics()
+        self.define_variable()
+        
+        
+        self.state_timer = self.create_timer(self.state_update_rate, self.publish_state)
 
-        self.pid_pitch = PIDController(kp=0.001, ki=0.0001, kd=0.002, max_output=0.7, max_i=0.5, deriv_tau=0.15)
-        self.pid_yaw = PIDController(kp=0.001, ki=0.0001, kd=0.002, max_output=0.7, max_i=0.5, deriv_tau=0.15)
+        if not self.talk:
+            self.get_logger().set_level(rclpy.logging.LoggingSeverity.FATAL)
 
+        self.request_message_interval()
+
+        self.get_logger().info("Gimbal MAVROS controller initialized.")
+    
+    def define_variable(self):
+        # PID
+        self.pid_pitch = PIDController(kp=0.008, ki=0.0001, kd=0.0004, max_output=1.5, max_i=0.05, deriv_tau=0.12)
+        self.pid_yaw = PIDController(kp=0.008, ki=0.0001, kd=0.0004, max_output=1.5, max_i=0.05, deriv_tau=0.12)
+        #self.pid_yaw = PIDController(kp=0.01, ki=0.001, kd=0.0001, max_output=1.5, max_i=0.3, deriv_tau=0.12)
+
+        # Variables for recovery
         self.last_sent_pitch_vel = 0.0
         self.last_sent_yaw_vel = 0.0
+        self.recovery_state = AimingState(self)
+        self.last_update_time = self.get_clock().now()
 
         self.gimbal_mode = GimbalMode.FOLLOW
-        
-        # --- Publishers ---
-        self.mavros_pub = self.create_publisher(GimbalManagerSetPitchyaw, '/mavros/gimbal_control/manager/set_pitchyaw', 10)
-
-        self.state_timer = self.create_timer(0.5, self.publish_state)
-        self.state_pub = self.create_publisher(GimbalState, '/aeac/external/gimbal/state', 10)
-        self.target_in_aim_pub = self.create_publisher(Bool, '/aeac/internal/auto_shoot/target_in_aim', 10)
-
-        # self.shoot_pub = self.create_publisher(Bool, '', 10)
-
-        # --- Subscribers ---
-
-        self.create_subscription(UInt8, '/aeac/external/gimbal/set_mode', self.set_mode_callback, 10)
-
-        self.create_subscription(AimError, '/aeac/external/gimbal/move', self.gimbal_move_callback, 10)
-
-        self.create_subscription(AimError, '/aeac/internal/gimbal/target_error', self.aiming_callback, 10)
-
-        self.sub_orientation = self.create_subscription(
-            GimbalDeviceAttitudeStatus,
-            '/mavros/gimbal_control/device/attitude_status',
-            self.gimbal_attitude_callback,
-            10)
-        
+                
         # TF broadcaster
         self.tf_br = TransformBroadcaster(self)
 
@@ -147,13 +408,82 @@ class GremsyMavros(Node):
         self.gimbal_y = 0.0
         self.gimbal_z = -0.10
         
-
         self.current_pitch = 0.0
         self.current_yaw = 0.0
         self.current_roll = 0.0
+        
+        self.additial_x_aim_offset = 0
+        self.additial_y_aim_offset = 0
 
-        self.last_sent_pitch_vel = 0.0
-        self.last_sent_yaw_vel = 0.0
+        self.send_position_cmd(0.0,0.0)
+    
+    def define_params(self):
+        # talk=True keeps logs enabled; talk=False silences logs for faster runtime.
+        self.declare_parameter('talk', True)
+        self.declare_parameter('ui_state_update_rate', 0.5)
+        self.declare_parameter('default_x_aim_offset', 0)
+        self.declare_parameter('default_y_aim_offset', 0)
+        self.declare_parameter('aim_error_acceptance', 10)
+
+        self.talk = bool(self.get_parameter('talk').value)
+        self.state_update_rate = self.get_parameter('talk').value
+        self.default_x_aim_offset = self.get_parameter('default_x_aim_offset').value
+        self.default_y_aim_offset = self.get_parameter('default_y_aim_offset').value
+        self.aim_error_acceptance = self.get_parameter('aim_error_acceptance').value
+
+    def define_topics(self):
+        reliable_qos = QoSProfile(
+            reliability = ReliabilityPolicy.RELIABLE,
+            history     = HistoryPolicy.KEEP_LAST,
+            depth       = 10,
+        )
+        best_effort_qos = QoSProfile(
+            reliability  = ReliabilityPolicy.BEST_EFFORT,
+            history      = HistoryPolicy.KEEP_LAST,
+            depth        = 1,
+            durability   = DurabilityPolicy.VOLATILE,
+        )
+        
+        # --- Publishers ---
+        self.mavros_pub = self.create_publisher(GimbalManagerSetPitchyaw, '/mavros/gimbal_control/manager/set_pitchyaw', reliable_qos)
+        self.state_pub = self.create_publisher(GimbalState, '/aeac/external/gimbal/state', reliable_qos)
+        self.target_in_aim_pub = self.create_publisher(Bool, '/aeac/internal/auto_shoot/target_in_aim', reliable_qos)
+
+        # --- Subscribers ---
+        self.create_subscription(UInt8, '/aeac/external/gimbal/set_mode', self.set_mode_callback, reliable_qos)
+        self.create_subscription(AimError, '/aeac/external/gimbal/move', self.gimbal_move_callback, reliable_qos)
+        self.create_subscription(AimError, '/aeac/internal/gimbal/target_error', self.aiming_callback, best_effort_qos)
+        self.create_subscription(Bool, '/aeac/internal/auto_shoot/start_hr_aiming', self.finished_aiming_callback, reliable_qos)
+        self.create_subscription(Vector3, '/aeac/external/gimbal_offset', self.gimbal_offset_callback, reliable_qos)
+
+        # --- Clients ---
+        self.msg_interval_client = self.create_client(MessageInterval,'/mavros/set_message_interval')
+
+    def gimbal_offset_callback(self, msg):
+        self.additial_x_aim_offset = msg.x
+        self.additial_y_aim_offset = msg.y
+        
+    def request_message_interval(self):
+        if not self.msg_interval_client.wait_for_service(timeout_sec=3.0):
+            self.get_logger().warn('Message interval service not available')
+            return  
+
+        req = MessageInterval.Request()
+        req.message_id = 285
+        req.message_rate = 20.0
+
+        future = self.msg_interval_client.call_async(req)
+        future.add_done_callback(self.message_interval_callback)
+
+    def message_interval_callback(self, future):
+        try:
+            response = future.result()
+            if response.success:
+                self.get_logger().info('Message interval set successfully')
+            else:
+                self.get_logger().error('Failed to set message interval')
+        except Exception as e:
+            self.get_logger().error(f'Service call failed: {e}')
 
     def publish_state(self):
         state_msg = GimbalState()
@@ -171,6 +501,29 @@ class GremsyMavros(Node):
         state_msg.pitch = self.current_pitch
         state_msg.yaw = self.current_yaw
         self.state_pub.publish(state_msg)
+        self.log_debug(f"Published gimbal state: mode={mode_str}, pitch={self.current_pitch:.2f}, yaw={self.current_yaw:.2f}")
+
+    # --- Rate-limited logging helpers (log 1 out of `self._log_mod` calls) ---
+    def _should_log(self):
+        self._log_tick = getattr(self, '_log_tick', 0) + 1
+        if self._log_tick >= getattr(self, '_log_mod', 10):
+            self._log_tick = 0
+            setattr(self, '_log_tick', self._log_tick)
+            return True
+        setattr(self, '_log_tick', self._log_tick)
+        return False
+
+    def log_debug(self, msg):
+        if self._should_log():
+            self.get_logger().debug(msg)
+
+    def log_warn(self, msg):
+        if self._should_log():
+            self.get_logger().warn(msg)
+
+    def log_info(self, msg):
+        if self._should_log():
+            self.get_logger().info(msg)
 
     def gimbal_attitude_callback(self, msg):
         q = msg.q
@@ -202,18 +555,30 @@ class GremsyMavros(Node):
         self.current_pitch = math.degrees(angles[1])
         self.current_yaw = math.degrees(angles[2])
 
-        # self.get_logger().info(f"Current pitch: {self.current_pitch}, Current yaw: {self.current_yaw}")
-        target_pitch, target_yaw = self.check_angle_limit(self.last_sent_pitch_vel, self.last_sent_yaw_vel)
         
-        if target_pitch != self.last_sent_pitch_vel or target_yaw != self.last_sent_yaw_vel:
-            self.send_speed_cmd(target_pitch, target_yaw)
+        self.log_debug(f"Current pitch: {self.current_pitch}, Current yaw: {self.current_yaw}")
+        target_pitch, target_yaw = self.check_angle_limit(self.last_sent_pitch_vel, self.last_sent_yaw_vel)
 
     def reset_pid_memory(self):
         self.pid_pitch.reset()
         self.pid_yaw.reset()
 
+    def reset_gimbal_position(self):
+        self.send_position_cmd(0.0, 0.0)
+        self.get_logger().info("Gimbal position reset to neutral (0,0).")
+
+    def finished_aiming_callback(self, msg):
+        if not msg.data:
+            self.get_logger().info("Finished aiming received. Resetting gimbal position and PID memory.")
+            self.reset_pid_memory()
+            self.reset_gimbal_position()
+            self.gimbal_mode = GimbalMode.FOLLOW
+            self.publish_state()
+            self.recovery_state.reset()
+
     def set_mode_callback(self, msg):
         self.reset_pid_memory()
+        self.recovery_state.reset()
 
         new_mode = msg.data
 
@@ -227,6 +592,7 @@ class GremsyMavros(Node):
         
         elif new_mode == GimbalMode.AUTO_AIM:
             self.send_speed_cmd(0.0, 0.0)
+            self.recovery_state.last_detection_time = self.get_clock().now() + rclpy.duration.Duration(seconds=1.0)  
             self.get_logger().info("Changed mode to AUTO_AIM.")
 
         self.gimbal_mode = new_mode
@@ -235,18 +601,18 @@ class GremsyMavros(Node):
     def check_angle_limit(self, target_vel_pitch, target_vel_yaw):
         # --- SECURITY PITCH ---
         if self.current_pitch >= MAX_ANGLE_PITCH and target_vel_pitch > 0:
-            self.get_logger().warn("MAX PITCH reached!")
+            self.log_warn("MAX PITCH reached!")
             target_vel_pitch = 0.0
         elif self.current_pitch <= -MAX_ANGLE_PITCH and target_vel_pitch < 0:
-            self.get_logger().warn("MIN PITCH reached!")
+            self.log_warn("MIN PITCH reached!")
             target_vel_pitch = 0.0
 
         # --- SECURITY YAW---
         if self.current_yaw >= MAX_ANGLE_YAW and target_vel_yaw > 0:
-            self.get_logger().warn("MAX YAW reached!")
+            self.log_warn("MAX YAW reached!")
             target_vel_yaw = 0.0
         elif self.current_yaw <= -MAX_ANGLE_YAW and target_vel_yaw < 0:
-            self.get_logger().warn("MIN YAW reached!")
+            self.log_warn("MIN YAW reached!")
             target_vel_yaw = 0.0
         
         return target_vel_pitch, target_vel_yaw
@@ -257,13 +623,26 @@ class GremsyMavros(Node):
         
         target_vel_pitch, target_vel_yaw = self.check_angle_limit(msg.pitch_error, msg.yaw_error)
         self.send_speed_cmd(target_vel_pitch, target_vel_yaw)
+        self.log_debug(f"Received move command: pitch_error={msg.pitch_error}, yaw_error={msg.yaw_error}. Sent speeds: pitch_vel={target_vel_pitch}, yaw_vel={target_vel_yaw}")
 
     def aiming_callback(self, msg):
+        # yaw_error = msg.yaw_error + self.default_x_aim_offset + self.additial_x_aim_offset
+        # pitch_error = msg.pitch_error + self.default_y_aim_offset + self.additial_y_aim_offset
+        yaw_error = msg.yaw_error
+        pitch_error = msg.pitch_error
+        
+        err_norm = math.sqrt(pitch_error**2 + yaw_error**2);
+
+        # During recovery, only use target_error to detect reacquisition.
+        # Do not send PID speed commands.
+        if self.recovery_state.recovery_active:
+            if err_norm >= 1.0:
+                self.recovery_state.update((pitch_error, yaw_error))
+            return
+
         if self.gimbal_mode != GimbalMode.AUTO_AIM:
             return
 
-        target_vel_yaw = msg.yaw_error
-    
         current_time = self.get_clock().now()
         dt = (current_time - self.last_update_time).nanoseconds / 1e9
         self.last_update_time = current_time
@@ -271,20 +650,29 @@ class GremsyMavros(Node):
         if dt <= 0.0 or dt > 0.1:
             dt = 0.01
 
-        target_vel_pitch = self.pid_pitch.compute(msg.pitch_error, dt)
-        target_vel_yaw = self.pid_yaw.compute(msg.yaw_error, dt)
-        
-        in_sight_msg = Bool()        
-        if abs(msg.pitch_error) < AIM_ERROR_ACCEPTANCE and abs(msg.yaw_error) < AIM_ERROR_ACCEPTANCE:
-            target_vel_pitch = 0.0   
-            target_vel_yaw = 0.0
-            in_sight_msg.data = True
-            self.target_in_aim_pub(in_sight_msg)
-        else:
-            in_sight_msg.data = False
-            self.target_in_aim_pub(in_sight_msg)
+        if err_norm < 1.0:
+            self.log_info("NOT SENDING COMMANDS - ERROR NONE")
+            self.send_speed_cmd(0.0, 0.0)
+            self.recovery_state.lost()
+            return
 
-        target_vel_pitch, target_vel_yaw = self.check_angle_limit(target_vel_pitch, target_vel_yaw)
+        self.recovery_state.update((pitch_error, yaw_error))
+
+        target_vel_pitch = self.pid_pitch.compute(pitch_error, dt)
+        target_vel_yaw = self.pid_yaw.compute(yaw_error, dt)
+
+        in_sight_msg = Bool()
+        in_sight_msg.data = (
+            abs(pitch_error) < self.aim_error_acceptance and
+            abs(yaw_error) < self.aim_error_acceptance
+        )
+        self.target_in_aim_pub.publish(in_sight_msg)
+
+        target_vel_pitch, target_vel_yaw = self.check_angle_limit(
+            target_vel_pitch,
+            target_vel_yaw
+        )
+
         self.send_speed_cmd(target_vel_pitch, target_vel_yaw)
 
     def send_position_cmd(self, pitch, yaw):
@@ -300,6 +688,7 @@ class GremsyMavros(Node):
         msg.pitch_rate = float('nan')
         msg.yaw_rate = float('nan')
         self.mavros_pub.publish(msg)
+        self.log_debug(f"Sent position command: pitch={pitch}, yaw={yaw}")
 
     def send_speed_cmd(self, pitch_rate, yaw_rate):
         self.last_sent_pitch_vel = pitch_rate
@@ -314,6 +703,7 @@ class GremsyMavros(Node):
         msg.pitch_rate = float(pitch_rate)
         msg.yaw_rate = float(yaw_rate)
         self.mavros_pub.publish(msg)
+        self.log_debug(f"Sent speed command: pitch_rate={pitch_rate}, yaw_rate={yaw_rate}")
 
 def main(args=None):
     rclpy.init(args=args)
@@ -323,6 +713,8 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
+        node.reset_gimbal_position()
+        node.send_speed_cmd(0.0, 0.0)
         node.destroy_node()
         rclpy.shutdown()
 

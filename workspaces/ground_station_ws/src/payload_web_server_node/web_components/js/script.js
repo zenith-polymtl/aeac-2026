@@ -7,6 +7,8 @@ const API_SERVO = "/api/mission/servo";
 const TAKE_PICTURE = "/api/mission/take_picture";
 const API_ABORT_ALL = "/api/mission/abort_all";
 
+let mean_lap_time = 0;
+
 function appendToLog(msg, type = 'info') {
     const logsContainer = document.querySelector('.logs-container');
     const newLog = document.createElement('span');
@@ -46,12 +48,14 @@ function initaliseButtons() {
     document.getElementById('stop-lap-button').addEventListener('click', () => sendCommand(API_STOP_LAP));
     document.getElementById('go-to-site-button').addEventListener('click', () => sendCommand(API_MOVE_TO_SCENE));
     document.getElementById('servo-1-toggle').addEventListener('change', (e) => {
-        const pwm = e.target.checked ? 1700 : 2050;
+        let pwm = e.target.checked ? 1700 : 2050;
         sendCommand(API_SERVO, {servo_num: 9, pwm});
+        pwm = e.target.checked ? 2050 : 1600;
+        sendCommand(API_SERVO, {servo_num: 10, pwm});
     });
     document.getElementById('servo-2-toggle').addEventListener('change', (e) => {
         const pwm = e.target.checked ? 2000 : 1000;
-        sendCommand(API_SERVO, {servo_num: 10, pwm});
+        // sendCommand(API_SERVO, {servo_num: 10, pwm});
     });
     document.getElementById('take-picture-button').addEventListener('click', () => sendCommand(TAKE_PICTURE));
     document.getElementById('abort-button').addEventListener('click', () => sendCommand(API_ABORT_ALL));
@@ -103,6 +107,42 @@ function initaliseSocket() {
                     break;
                 case "connection":
                     connection_logique(data);
+                    break;
+                case "lap_time":
+                    const lap_time_element = document.getElementById("lap-time-span");
+                    lap_time_element.innerHTML = "Last Lap time: " + data.lap_timer + "s";
+                    const lapMinutes = Math.floor(data.lap_timer / 60);
+                    const lapSeconds = Math.floor(data.lap_timer % 60)
+                        .toString()
+                        .padStart(2, "0");
+                    lap_time_element.innerHTML =
+                        `Lap Time: ${lapMinutes}:${lapSeconds}`;
+
+                    mean_lap_time = data.mean_lap_time;
+                    const lap_mean_time_element = document.getElementById("lap-mean-time");
+                    const meanLapMinutes = Math.floor(data.mean_lap_time / 60);
+                    const meanLapSeconds = Math.floor(data.mean_lap_time % 60)
+                        .toString()
+                        .padStart(2, "0");
+
+                    console.log("Mean lap time:", data.mean_lap_time, "Formatted:", `${meanLapMinutes}:${meanLapSeconds}`);
+
+                    lap_mean_time_element.innerHTML = `Mean Lap Time: ${meanLapMinutes}:${meanLapSeconds}`;
+                    break;
+                case "time_left":
+                    const time_left_element = document.getElementById("time-left-span");
+                    const timeLeftMinutes = Math.floor(data.time_left / 60);
+                    const timeLeftSeconds = Math.floor(data.time_left % 60)
+                        .toString()
+                        .padStart(2, "0");
+
+                    console.log("Time left:", data.time_left, "Formatted:", `${timeLeftMinutes}:${timeLeftSeconds}`);
+                    time_left_element.innerHTML = `Time Left: ${timeLeftMinutes}:${timeLeftSeconds}`;
+                    if (mean_lap_time > 0) {
+                        const estimated_laps_left = Math.ceil(data.time_left / mean_lap_time);
+                        const estimated_laps_element = document.getElementById("estimated-laps-left");
+                        estimated_laps_element.innerHTML = `Estimated Laps Left: ${estimated_laps_left}`;
+                    }
                     break;
                 default:
                     console.warn("Unknown message type:", data.type);

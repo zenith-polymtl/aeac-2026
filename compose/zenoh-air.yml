@@ -9,3 +9,4 @@ services:
       - ROS_DOMAIN_ID=2  
       - RUST_LOG=debug
       - ROS_DISTRO=humble
+      - ROS_LOCALHOST_ONLY=1 

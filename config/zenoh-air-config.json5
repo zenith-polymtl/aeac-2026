@@ -2,26 +2,29 @@
   plugins: {  
     ros2dds: {  
       domain: 2, 
+      ros_localhost_only: true,
       allow: {  
-        publishers: [  
+        publishers: [
           "/tf",  
-          "/tf_static",  
+          "/tf_static",
           "/chatter",  
           "/aeac/external.*"  
         ],  
         subscribers: [  
           "/tf",  
           "/tf_static",
-          "/zed/zed_node/status/heartbeat",
-          "/zed/zed_node/obj_det/objects",
           "/chatter",  
           "/aeac/external.*"   
         ]  
       } 
     }  
-  },  
-  mode: "peer",  
-  listen: {  
-    endpoints: ["tcp/0.0.0.0:7447"]  
-  }  
+  },
+  mode: "router",
+  listen: {
+    endpoints: ["tcp/0.0.0.0:7447"]
+  },
+  scouting: {
+    multicast: { enabled: false },
+    gossip: { enabled: false }
+  }
 }

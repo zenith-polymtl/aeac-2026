@@ -7,7 +7,8 @@ const TAKE_PICTURE = "/api/mission/take_picture";
 const API_ABORT_ALL = "/api/mission/abort_all";
 const API_GIMBAL_FOLLOW = "/api/gimbal_follow";
 const API_GIMBAL_LOCK = "/api/gimbal_lock";
-
+const API_CONFIRM_TARGET = "/api/confirm_target";
+const API_SET_GIMBAL_OFFSET = "/api/mission/set_gimbal_offset";
 
 function appendToLog(msg, type = 'info') {
     const logsContainer = document.querySelector('.logs-container');
@@ -20,13 +21,14 @@ function appendToLog(msg, type = 'info') {
     logsContainer.scrollTop = logsContainer.scrollHeight;
 }
 
-async function sendCommand(endpoint) {
+async function sendCommand(endpoint, payload = {}) {
     try {
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
+            body: JSON.stringify(payload)
         });
         if (response.ok) {
             const data = await response.json();
@@ -48,8 +50,40 @@ function initaliseButtons() {
     document.getElementById('take-picture-button').addEventListener('click', () => sendCommand(TAKE_PICTURE));
     document.getElementById('shoot-button').addEventListener('click', () => sendCommand(API_SHOOT));
     document.getElementById('abort-button').addEventListener('click', () => sendCommand(API_ABORT_ALL));
-    document.getElementById('btn-follow').addEventListener('click', () => sendCommand(API_GIMBAL_FOLLOW));
-    document.getElementById('btn-lock').addEventListener('click', () => sendCommand(API_GIMBAL_LOCK));
+    document.getElementById('btn-follow').addEventListener('click', () => {
+        sendCommand(API_GIMBAL_FOLLOW);
+        document.getElementById('btn-lock').classList.remove("active")
+        document.getElementById('btn-follow').classList.add("active")
+    });
+    document.getElementById('btn-lock').addEventListener('click', () => {
+        sendCommand(API_GIMBAL_LOCK);
+        document.getElementById('btn-lock').classList.add("active")
+        document.getElementById('btn-follow').classList.remove("active")
+
+    });
+    document.getElementById('accept-image-button').addEventListener('click', () => {
+        sendCommand(API_CONFIRM_TARGET, {confirmed: true});
+        clear_picture();
+    });
+    document.getElementById('deny-image-deny').addEventListener('click', () => {
+        sendCommand(API_CONFIRM_TARGET, {confirmed: false});
+        clear_picture();
+    });
+    document.getElementById('apply-offset-button').addEventListener('click', () => {
+        sendCommand(API_SET_GIMBAL_OFFSET, { x: offsetX, y: offsetY });
+    });
+    document.getElementById('reset-offset-button').addEventListener('click', () => {
+        updateOffset(0, 0, 'reset');
+    });
+}
+
+function clear_picture() {
+    document.getElementById("target-image").style.display = "none";
+    const noPictureReceived = document.getElementById("no-picture-received");
+    noPictureReceived.style.display = "block";
+    noPictureReceived.textContent = "No more targets to confirm. Waiting for new targets...";
+    document.getElementById('accept-image-button').classList.add('disabled');
+    document.getElementById('deny-image-deny').classList.add('disabled');
 }
 
 function loadTheme() {
@@ -112,7 +146,19 @@ function initaliseSocket() {
                     break;
                 case "new_picture":
                     console.log("New picture: ", data.url);
-                    document.getElementById("target-image").src = data.url;
+                    document.getElementById("no-picture-received").style.display = "none";
+                    const imageElement = document.getElementById("target-image");
+                    imageElement.style.display = "block";
+                    imageElement.src = data.url;
+                    document.getElementById('accept-image-button').classList.remove('disabled');
+                    document.getElementById('deny-image-deny').classList.remove('disabled');
+                    break;
+                case "target_number":
+                    const targetNumberElement = document.getElementById("target-shot-span");
+                    targetNumberElement.textContent = `Target Shot: ${data.number}`;
+                    break;
+                case "state_change":
+                    document.getElementById('mission-status-span').innerText = `Mission Status: ${data.state}`
                 default:
                     console.warn("Unknown message type:", data.type);
             }
@@ -130,8 +176,72 @@ function initaliseSocket() {
     };
 }
 
+let offsetX = 0, offsetY = 0;
+const X_MAX = 200
+const X_MIN = -200
+const Y_MAX = 200
+const Y_MIN = -200
+
+const X_OFFSET_WIDTH = Math.abs(X_MAX) + Math.abs(X_MIN)
+const Y_OFFSET_WIDTH = Math.abs(Y_MAX) + Math.abs(Y_MIN)
+
+function updateOffset(x, y, source) {
+    offsetX = Math.max(X_MIN, Math.min(X_MAX, Math.round(x)));
+    offsetY = Math.max(Y_MIN, Math.min(Y_MAX, Math.round(y)));
+    const px = ((offsetX + X_OFFSET_WIDTH/2) / X_OFFSET_WIDTH) * 100;
+    const py = ((offsetY + X_OFFSET_WIDTH/2) / X_OFFSET_WIDTH) * 100;
+    document.getElementById('pad-dot').style.left = px + '%';
+    document.getElementById('pad-dot').style.top = py + '%';
+    if (source !== 'x-slider') document.getElementById('x-slider').value = offsetX;
+    if (source !== 'y-slider') document.getElementById('y-slider').value = offsetY;
+    if (source !== 'x-num') document.getElementById('x-num').value = offsetX;
+    if (source !== 'y-num') document.getElementById('y-num').value = offsetY;
+}
+
+function initialiseOffset() {
+    const pad = document.getElementById('offset-pad');
+    let dragging = false;
+
+    function padEvent(e) {
+        e.preventDefault();
+        const rect = pad.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const rx = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        const ry = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+        updateOffset(rx * X_OFFSET_WIDTH - X_OFFSET_WIDTH/2, ry * Y_OFFSET_WIDTH - Y_OFFSET_WIDTH/2, 'pad');
+    }
+
+    pad.addEventListener('mousedown', e => { dragging = true; padEvent(e); });
+    document.addEventListener('mousemove', e => { if (dragging) padEvent(e); });
+    document.addEventListener('mouseup', () => { dragging = false; });
+    pad.addEventListener('touchstart', padEvent, { passive: false });
+    pad.addEventListener('touchmove', padEvent, { passive: false });
+
+    const x_slider = document.getElementById('x-slider');
+    x_slider.addEventListener('input', () => updateOffset(+document.getElementById('x-slider').value, offsetY, 'x-slider'));
+    x_slider.min = X_MIN;
+    x_slider.max = X_MAX;
+
+    const y_slider = document.getElementById('y-slider');
+    y_slider.addEventListener('input', () => updateOffset(offsetX, +document.getElementById('y-slider').value, 'y-slider'));
+    y_slider.min = Y_MIN;
+    y_slider.max = Y_MAX;
+
+    const x_num = document.getElementById('x-num');
+    x_num.addEventListener('change', () => updateOffset(+document.getElementById('x-num').value, offsetY, 'x-num'));
+    x_num.min = X_MIN;
+    x_num.max = X_MAX;
+
+    const y_num = document.getElementById('y-num')
+    y_num.addEventListener('change', () => updateOffset(offsetX, +document.getElementById('y-num').value, 'y-num'));
+    y_num.min = Y_MIN;
+    y_num.max = Y_MAX;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initaliseButtons();
     loadTheme();
     initaliseSocket();
+    initialiseOffset();
 })

@@ -24,6 +24,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'servo_control = water_payload.PayloadController:main',
+            'valve_control = water_payload.valve:main',
         ],
     },
 )

@@ -3,6 +3,9 @@
 workspaces/*/build/
 workspaces/*/install/
 workspaces/*/log/
+workspaces/*/*/build/
+workspaces/*/*/install/
+workspaces/*/*/log/
 workspaces/*/.colcon/
 workspaces/build/
 workspaces/install/
@@ -10,9 +13,14 @@ workspaces/log/
 workspaces/.colcon/
 frames*
 approach_log_polar.csv
+*.jpg
 
 .vscode/
+debug_overlay/
 
 data*/
 *.zip
 rosbag*
+
+credentials.json
+token.json

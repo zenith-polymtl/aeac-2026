@@ -7,11 +7,11 @@ COMPOSE_FILE := compose/$(C).yml
 CONTAINER    ?= aeac-$(C)
 
 # Workspace path RELATIVE to repo root (e.g., workspaces/dev_ws)
-WS_REL := workspaces/$(C)_ws
+WS_REL := worksWS_RELpaces/$(C)_ws
 
 # In-container paths
 REPO_IN := /aeac
-WS_IN   := $(REPO_IN)/$(WS_REL)
+WS_IN   := $(REPO_IN)/$()
 
 #Relay settings
 DEVICE ?= /dev/ttyUSB0
@@ -26,7 +26,7 @@ export UID GID
 ENV_INJECT := C=$(C) WS=$(WS_REL)
 
 # All compose files for the *-all targets
-COMPOSES := compose/dev.yml compose/payload.yml compose/water.yml compose/mavros.yml compose/zed.yml compose/zenoh-air.yml compose/zenoh-ground.yml
+COMPOSES := compose/dev.yml compose/payload.yml compose/water.yml compose/mavros.yml compose/zed.yml compose/zenoh-air.yml compose/zenoh-ground.yml compose/vision.yml compose/zed_mini.yml
 
 # ===== Pretty help =====
 help: ## Show help
@@ -112,50 +112,6 @@ launch: up
 	    ros2 daemon start; \
 	    exec bash -i'
 
-payload:
-	docker compose -f compose/payload.yml up -d --build
-	# Launch ZED inside the already-running zed-ros2 service (detached)
-	docker compose -f compose/payload.yml exec -T zed-ros2 bash -lc " \
-		source /root/ros2_ws/install/setup.bash && \
-		nohup ros2 launch zed_wrapper zed_camera.launch.py \
-			camera_model:=zed2i \
-			ros_params_override_path:=config/zenith_stereo.yaml \
-			> /tmp/zed_launch.log 2>&1 & \
-	"
-
-
-	# Enter payload dev shell (your original behavior)
-	WS=$(WS_IN) docker compose -f compose/payload.yml exec -it payload \
-	  bash -lc '\
-	    cd "$$WS"; \
-	    source /opt/ros/humble/setup.bash; \
-	    colcon build; \
-	    source install/setup.bash; \
-	    ros2 daemon start; \
-	    exec bash -i'
-
-water-stack:
-	docker compose -f compose/water.yml up -d
-	
-	docker compose -f compose/water.yml exec -T zed-ros2 bash -lc " \
-		source /root/ros2_ws/install/setup.bash && \
-		nohup ros2 launch zed_wrapper zed_camera.launch.py \
-			camera_model:=zed2i \
-			ros_params_override_path:=config/zenith_stereo.yaml \
-			publish_tf:=false \
-			publish_map_tf:=false \
-			> /tmp/zed_launch.log 2>&1 & \
-	"
-
-	# Enter water dev shell (your original behavior)
-	WS=$(WS_IN) docker compose -f compose/water.yml exec -it water \
-	  bash -lc '\
-	    cd "$$WS"; \
-	    source /opt/ros/humble/setup.bash; \
-	    colcon build; \
-	    source install/setup.bash; \
-	    ros2 daemon start; \
-	    exec bash -i'
 
 mavros-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
@@ -239,6 +195,28 @@ water-build:
 	    source /opt/ros/humble/setup.bash; \
 	    colcon build'
 
+vision:
+	docker compose -f compose/vision.yml up -d
+
+	# Launch vision mission in the container session
+	WS=$(WS_IN) docker compose -f compose/vision.yml exec -it vision \
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    source install/setup.bash; \
+	    ros2 daemon start; \
+	    ros2 launch bringup vision_test.launch.py'
+
+vision-build:
+	docker compose -f compose/vision.yml up -d
+
+	# Launch vision mission in the container session
+	WS=$(WS_IN) docker compose -f compose/vision.yml exec -it vision \
+	  bash -lc '\
+	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    colcon build'
+
 payload:
 	docker compose -f compose/payload.yml up -d
 
@@ -275,32 +253,30 @@ gcs-payload-build: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \
-		colcon build --packages-select payload_web_server_node custom_interfaces; \
+		colcon build --packages-select payload_web_server_node custom_interfaces tools; \
 	    ros2 daemon start; \
 		source install/setup.bash; \
 	    ros2 run payload_web_server_node payload_web_server_node'
 
 gcs-water: up
-	docker compose -f compose/zenoh-ground.yml up -d
+	docker compose -f compose/zenoh-ground-os.yml up -d
 	
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \
-		colcon build --packages-select water_web_server_node custom_interfaces; \
 	    source install/setup.bash; \
 		ros2 daemon start; \
-	    ros2 run water_web_server_node water_web_server_node'
+	    ros2 launch bringup gcs_water.launch.py'
 
 gcs-water-build: up
-	docker compose -f compose/zenoh-ground.yml up -d
+	docker compose -f compose/zenoh-ground-os.yml up -d
 	
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \
-		colcon build --packages-select water_web_server_node custom_interfaces; \
-	    source install/setup.bash; \
+		colcon build --packages-select water_web_server_node bringup custom_interfaces tools upload_controller; \
 		ros2 daemon start; \
-	    ros2 run water_web_server_node water_web_server_node'
+		source ./install/setup.bash'
 
 rviz: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \

@@ -16,10 +16,10 @@ class RemoteControlInterface(Node):
         self._declare_parameters()
 
         self.controls = {
-            'camera':    {'ch': 5, 'last_state': None},
-            'mission_action_state':   {'ch': 7, 'last_state': None},
-            'mode_triggre' : {'ch': 8, 'last_state': None},
-            'flight_mode_switch' : {'ch': 9, 'last_state': None},
+            'camera':    {'rc_ch': 13, 'servo_ch' : 13, 'last_state': None,  "LOW" : 1850, "MIDDLE" : 1000 ,"HIGH" : 700},
+            'mission_action_state':   {'rc_ch': 7, 'last_state': None},
+            'mode_trigger' : {'rc_ch': 8, 'last_state': None},
+            'flight_mode_switch' : {'rc_ch': 9, 'last_state': None},
         }
         
         self.inital_state()
@@ -33,15 +33,15 @@ class RemoteControlInterface(Node):
         
         self.auto_approach_pub = self.create_publisher(Bool, '/aeac/external/auto_approach/start', qos_re)
         self.auto_shoot_pub = self.create_publisher(Bool, '/aeac/external/auto_shoot/start', qos_re)
-        self.shoot_pub = self.create_publisher(Bool, '/aeac/external/shoot', qos_re)
+        self.shoot_pub = self.create_publisher(Bool, '/aeac/internal/shoot', qos_re)
         self.take_picture_pub = self.create_publisher(Bool, '/aeac/external/take_picture', qos_re)
 
+        self.servo_cli = self.create_client(ServoState, '/aeac/external/payload/set_state')
+
+        while not self.servo_cli.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Service not available, waiting...')
+
         self.get_logger().info("Remote Controller Interface Initialized")
-        
-        # self.servo_cli = self.create_client(ServoState, '/aeac/external/payload/set_state')
-        
-        # while not self.servo_cli.wait_for_service(timeout_sec=1.0):
-        #     self.get_logger().info('Service not available, waiting...')
 
     def inital_state(self):
         self.mode_triggered = False
@@ -58,7 +58,7 @@ class RemoteControlInterface(Node):
             return
 
         for name, data in self.controls.items():
-            val = msg.channels[data['ch']]
+            val = msg.channels[data['rc_ch']]
             current_state = self.get_switch_state(val)
 
             if current_state != data['last_state']:
@@ -84,7 +84,7 @@ class RemoteControlInterface(Node):
                 # No action are needed because we simply store the mode requested
                 pass
                 
-            case 'mode_triggre':
+            case 'mode_trigger':
                 if state == "HIGH":
                     self.tigger_pipline_action()
             case 'flight_mode_switch':
@@ -99,6 +99,29 @@ class RemoteControlInterface(Node):
                 self.get_logger().info("Camera: Setting MIDDLE angle (e.g., 45°)")
             case "HIGH":
                 self.get_logger().info("Camera: Setting HIGH angle (e.g., 90°)")        
+
+        self.send_servo("camera", state)
+
+    def send_servo(self, name, state):
+        request = ServoState.Request()
+        request.servo_num = self.controls[name]["servo_ch"]
+        request.pwm = self.controls[name][state]
+
+        self.get_logger().info(
+            f"Sending {name} command: servo_num={request.servo_num}, pwm={request.pwm}"
+        )
+
+        future = self.servo_cli.call_async(request)
+        future.add_done_callback(lambda fut: self.servo_response_callback(fut, name))
+
+    def servo_response_callback(self, future, name):
+        try:
+            response = future.result()
+            self.get_logger().info(
+                f"{name} response: success={response.success}, message='{response.message}'"
+            )
+        except Exception as e:
+            self.get_logger().error(f"Servo service call failed for {name}: {e}")
 
     def tigger_pipline_action(self):
         req = Bool()
