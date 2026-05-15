@@ -177,12 +177,19 @@ function initaliseSocket() {
 }
 
 let offsetX = 0, offsetY = 0;
+const X_MAX = 200
+const X_MIN = -200
+const Y_MAX = 200
+const Y_MIN = -200
+
+const X_OFFSET_WIDTH = Math.abs(X_MAX) + Math.abs(X_MIN)
+const Y_OFFSET_WIDTH = Math.abs(Y_MAX) + Math.abs(Y_MIN)
 
 function updateOffset(x, y, source) {
-    offsetX = Math.max(-100, Math.min(100, Math.round(x)));
-    offsetY = Math.max(-100, Math.min(100, Math.round(y)));
-    const px = ((offsetX + 100) / 200) * 100;
-    const py = ((offsetY + 100) / 200) * 100;
+    offsetX = Math.max(X_MIN, Math.min(X_MAX, Math.round(x)));
+    offsetY = Math.max(Y_MIN, Math.min(Y_MAX, Math.round(y)));
+    const px = ((offsetX + X_OFFSET_WIDTH/2) / X_OFFSET_WIDTH) * 100;
+    const py = ((offsetY + X_OFFSET_WIDTH/2) / X_OFFSET_WIDTH) * 100;
     document.getElementById('pad-dot').style.left = px + '%';
     document.getElementById('pad-dot').style.top = py + '%';
     if (source !== 'x-slider') document.getElementById('x-slider').value = offsetX;
@@ -202,7 +209,7 @@ function initialiseOffset() {
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         const rx = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
         const ry = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
-        updateOffset(rx * 200 - 100, ry * 200 - 100, 'pad');
+        updateOffset(rx * X_OFFSET_WIDTH - X_OFFSET_WIDTH/2, ry * Y_OFFSET_WIDTH - Y_OFFSET_WIDTH/2, 'pad');
     }
 
     pad.addEventListener('mousedown', e => { dragging = true; padEvent(e); });
@@ -211,10 +218,25 @@ function initialiseOffset() {
     pad.addEventListener('touchstart', padEvent, { passive: false });
     pad.addEventListener('touchmove', padEvent, { passive: false });
 
-    document.getElementById('x-slider').addEventListener('input', () => updateOffset(+document.getElementById('x-slider').value, offsetY, 'x-slider'));
-    document.getElementById('y-slider').addEventListener('input', () => updateOffset(offsetX, +document.getElementById('y-slider').value, 'y-slider'));
-    document.getElementById('x-num').addEventListener('change', () => updateOffset(+document.getElementById('x-num').value, offsetY, 'x-num'));
-    document.getElementById('y-num').addEventListener('change', () => updateOffset(offsetX, +document.getElementById('y-num').value, 'y-num'));
+    const x_slider = document.getElementById('x-slider');
+    x_slider.addEventListener('input', () => updateOffset(+document.getElementById('x-slider').value, offsetY, 'x-slider'));
+    x_slider.min = X_MIN;
+    x_slider.max = X_MAX;
+
+    const y_slider = document.getElementById('y-slider');
+    y_slider.addEventListener('input', () => updateOffset(offsetX, +document.getElementById('y-slider').value, 'y-slider'));
+    y_slider.min = Y_MIN;
+    y_slider.max = Y_MAX;
+
+    const x_num = document.getElementById('x-num');
+    x_num.addEventListener('change', () => updateOffset(+document.getElementById('x-num').value, offsetY, 'x-num'));
+    x_num.min = X_MIN;
+    x_num.max = X_MAX;
+
+    const y_num = document.getElementById('y-num')
+    y_num.addEventListener('change', () => updateOffset(offsetX, +document.getElementById('y-num').value, 'y-num'));
+    y_num.min = Y_MIN;
+    y_num.max = Y_MAX;
 }
 
 document.addEventListener('DOMContentLoaded', () => {

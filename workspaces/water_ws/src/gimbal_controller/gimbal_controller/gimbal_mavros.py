@@ -6,13 +6,15 @@ from mavros_msgs.msg import MountControl
 from mavros_msgs.srv import MountConfigure
 from std_msgs.msg import Bool, UInt8
 from custom_interfaces.msg import AimError, GimbalState
-from geometry_msgs.msg import Quaternion, TransformStamped
+from geometry_msgs.msg import Quaternion, TransformStamped, Vector3
 from std_srvs.srv import SetBool
 from tf_transformations import euler_from_quaternion
 from mavros_msgs.msg import GimbalManagerSetPitchyaw, GimbalDeviceAttitudeStatus
 from tf2_ros import TransformBroadcaster
 from mavros_msgs.srv import MessageInterval
 import numpy as np
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
+
 
 class GIMBAL_MANAGER_FLAGS:
     GIMBAL_MANAGER_FLAGS_RETRACT = 1
@@ -39,7 +41,7 @@ SPEED_FLAGS = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_IN_VEHICLE_FRAME + G
 MAX_ANGLE_PITCH = 45.0
 MAX_ANGLE_YAW =60.0
 
-AIM_ERROR_ACCEPTANCE = 10.0
+# AIM_ERROR_ACCEPTANCE = 10.0
 
 class GimbalMode:
     LOCK = 0
@@ -365,51 +367,33 @@ class PIDController():
 class GremsyMavros(Node):
     def __init__(self):
         super().__init__('gremsy_mavros_ctrl')
+        self.define_params()
+        self.define_variable()
+        self.define_topics()
+        
+        self.state_timer = self.create_timer(self.state_update_rate, self.publish_state)
 
-        # talk=True keeps logs enabled; talk=False silences logs for faster runtime.
-        self.declare_parameter('talk', True)
-        self.talk = bool(self.get_parameter('talk').value)
         if not self.talk:
             self.get_logger().set_level(rclpy.logging.LoggingSeverity.FATAL)
 
+        self.request_message_interval()
+
+        self.get_logger().info("Gimbal MAVROS controller initialized.")
+    
+    def define_variable(self):
+        # PID
         self.pid_pitch = PIDController(kp=0.008, ki=0.0001, kd=0.0004, max_output=1.5, max_i=0.05, deriv_tau=0.12)
         self.pid_yaw = PIDController(kp=0.008, ki=0.0001, kd=0.0004, max_output=1.5, max_i=0.05, deriv_tau=0.12)
         #self.pid_yaw = PIDController(kp=0.01, ki=0.001, kd=0.0001, max_output=1.5, max_i=0.3, deriv_tau=0.12)
 
+        # Variables for recovery
         self.last_sent_pitch_vel = 0.0
         self.last_sent_yaw_vel = 0.0
+        self.recovery_state = AimingState(self)
+        self.last_update_time = self.get_clock().now()
 
         self.gimbal_mode = GimbalMode.FOLLOW
-        
-        # --- Publishers ---
-        self.mavros_pub = self.create_publisher(GimbalManagerSetPitchyaw, '/mavros/gimbal_control/manager/set_pitchyaw', 10)
-
-        self.state_timer = self.create_timer(0.5, self.publish_state)
-        self.state_pub = self.create_publisher(GimbalState, '/aeac/external/gimbal/state', 10)
-        self.target_in_aim_pub = self.create_publisher(Bool, '/aeac/internal/auto_shoot/target_in_aim', 10)
-        # self.shoot_pub = self.create_publisher(Bool, '', 10)
-
-        # --- Subscribers ---
-
-        self.create_subscription(UInt8, '/aeac/external/gimbal/set_mode', self.set_mode_callback, 10)
-
-        self.create_subscription(AimError, '/aeac/external/gimbal/move', self.gimbal_move_callback, 10)
-
-        self.create_subscription(AimError, '/aeac/internal/gimbal/target_error', self.aiming_callback, 10)
-        self.create_subscription(Bool, '/aeac/internal/auto_shoot/start_hr_aiming', self.finished_aiming_callback, 10)
-
-
-        self.sub_orientation = self.create_subscription(
-            GimbalDeviceAttitudeStatus,
-            '/mavros/gimbal_control/device/attitude_status',
-            self.gimbal_attitude_callback,
-            10)
- 
-        self.msg_interval_client = self.create_client(
-            MessageInterval,
-            '/mavros/set_message_interval'
-        )
-        
+                
         # TF broadcaster
         self.tf_br = TransformBroadcaster(self)
 
@@ -423,23 +407,61 @@ class GremsyMavros(Node):
         self.gimbal_y = 0.0
         self.gimbal_z = -0.10
         
-
         self.current_pitch = 0.0
         self.current_yaw = 0.0
         self.current_roll = 0.0
-
-        self.last_sent_pitch_vel = 0.0
-        self.last_sent_yaw_vel = 0.0
-        self.last_update_time = self.get_clock().now()
+        
+        self.additial_x_aim_offset = 0
+        self.additial_y_aim_offset = 0
 
         self.send_position_cmd(0.0,0.0)
+    
+    def define_params(self):
+        # talk=True keeps logs enabled; talk=False silences logs for faster runtime.
+        self.declare_parameter('talk', True)
+        self.declare_parameter('ui_state_update_rate', 0.5)
+        self.declare_parameter('default_x_aim_offset', 0)
+        self.declare_parameter('default_y_aim_offset', 0)
+        self.declare_parameter('aim_error_acceptance', 10)
 
-        self.recovery_state = AimingState(self)
+        self.talk = bool(self.get_parameter('talk').value)
+        self.state_update_rate = self.get_parameter('talk').value
+        self.default_x_aim_offset = self.get_parameter('default_x_aim_offset').value
+        self.default_y_aim_offset = self.get_parameter('default_y_aim_offset').value
+        self.aim_error_acceptance = self.get_parameter('aim_error_acceptance').value
 
-        self.request_message_interval()
+    def define_topics(self):
+        reliable_qos = QoSProfile(
+            reliability = ReliabilityPolicy.RELIABLE,
+            history     = HistoryPolicy.KEEP_LAST,
+            depth       = 10,
+        )
+        best_effort_qos = QoSProfile(
+            reliability  = ReliabilityPolicy.BEST_EFFORT,
+            history      = HistoryPolicy.KEEP_LAST,
+            depth        = 1,
+            durability   = DurabilityPolicy.VOLATILE,
+        )
+        
+        # --- Publishers ---
+        self.mavros_pub = self.create_publisher(GimbalManagerSetPitchyaw, '/mavros/gimbal_control/manager/set_pitchyaw', best_effort_qos)
+        self.state_pub = self.create_publisher(GimbalState, '/aeac/external/gimbal/state', reliable_qos)
+        self.target_in_aim_pub = self.create_publisher(Bool, '/aeac/internal/auto_shoot/target_in_aim', best_effort_qos)
 
-        self.get_logger().info("Gimbal MAVROS controller initialized.")
+        # --- Subscribers ---
+        self.create_subscription(UInt8, '/aeac/external/gimbal/set_mode', self.set_mode_callback, reliable_qos)
+        self.create_subscription(AimError, '/aeac/external/gimbal/move', self.gimbal_move_callback, reliable_qos)
+        self.create_subscription(AimError, '/aeac/internal/gimbal/target_error', self.aiming_callback, best_effort_qos)
+        self.create_subscription(Bool, '/aeac/internal/auto_shoot/start_hr_aiming', self.finished_aiming_callback, reliable_qos)
+        self.create_subscription(Vector3, '/aeac/external/gimbal_offset', self.gimbal_offset_callback, reliable_qos)
 
+        # --- Clients ---
+        self.msg_interval_client = self.create_client(MessageInterval,'/mavros/set_message_interval')
+
+    def gimbal_offset_callback(self, msg):
+        self.additial_x_aim_offset = msg.x
+        self.additial_y_aim_offset = msg.y
+        
     def request_message_interval(self):
         if not self.msg_interval_client.wait_for_service(timeout_sec=3.0):
             self.get_logger().warn('Message interval service not available')
@@ -535,7 +557,6 @@ class GremsyMavros(Node):
         
         self.log_debug(f"Current pitch: {self.current_pitch}, Current yaw: {self.current_yaw}")
         target_pitch, target_yaw = self.check_angle_limit(self.last_sent_pitch_vel, self.last_sent_yaw_vel)
-    
 
     def reset_pid_memory(self):
         self.pid_pitch.reset()
@@ -576,8 +597,6 @@ class GremsyMavros(Node):
         self.gimbal_mode = new_mode
         self.publish_state()
 
-
-
     def check_angle_limit(self, target_vel_pitch, target_vel_yaw):
         # --- SECURITY PITCH ---
         if self.current_pitch >= MAX_ANGLE_PITCH and target_vel_pitch > 0:
@@ -606,13 +625,16 @@ class GremsyMavros(Node):
         self.log_debug(f"Received move command: pitch_error={msg.pitch_error}, yaw_error={msg.yaw_error}. Sent speeds: pitch_vel={target_vel_pitch}, yaw_vel={target_vel_yaw}")
 
     def aiming_callback(self, msg):
-        err_norm = math.sqrt(msg.pitch_error**2 + msg.yaw_error**2)
+        yaw_error = msg.yaw_error + self.default_x_aim_offset + self.additial_x_aim_offset
+        pitch_error = msg.pitch_error + self.default_y_aim_offset + self.additial_y_aim_offset
+        
+        err_norm = math.sqrt(pitch_error**2 + yaw_error**2);
 
         # During recovery, only use target_error to detect reacquisition.
         # Do not send PID speed commands.
         if self.recovery_state.recovery_active:
             if err_norm >= 1.0:
-                self.recovery_state.update((msg.pitch_error, msg.yaw_error))
+                self.recovery_state.update((pitch_error, yaw_error))
             return
 
         if self.gimbal_mode != GimbalMode.AUTO_AIM:
@@ -631,15 +653,15 @@ class GremsyMavros(Node):
             self.recovery_state.lost()
             return
 
-        self.recovery_state.update((msg.pitch_error, msg.yaw_error))
+        self.recovery_state.update((pitch_error, yaw_error))
 
-        target_vel_pitch = self.pid_pitch.compute(msg.pitch_error, dt)
-        target_vel_yaw = self.pid_yaw.compute(msg.yaw_error, dt)
+        target_vel_pitch = self.pid_pitch.compute(pitch_error, dt)
+        target_vel_yaw = self.pid_yaw.compute(yaw_error, dt)
 
         in_sight_msg = Bool()
         in_sight_msg.data = (
-            abs(msg.pitch_error) < AIM_ERROR_ACCEPTANCE and
-            abs(msg.yaw_error) < AIM_ERROR_ACCEPTANCE
+            abs(pitch_error) < self.aim_error_acceptance and
+            abs(yaw_error) < self.aim_error_acceptance
         )
         self.target_in_aim_pub.publish(in_sight_msg)
 

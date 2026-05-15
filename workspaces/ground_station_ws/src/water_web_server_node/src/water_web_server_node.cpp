@@ -76,6 +76,7 @@ void WaterWebServerNode::initialize_publisher()
     take_picutre_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/take_picture", 10);
     target_image_publisher_ = create_publisher<TargetImage>("/aeac/internal/mission/target_image", 10);
     target_picuture_ack_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/target_picture/ack", 10);
+    gimbal_offset_publisher_ = create_publisher<geometry_msgs::msg::Vector3>("/aeac/external/gimbal_offset",10);
 }
 
 void WaterWebServerNode::initalize_parameters()
@@ -534,6 +535,15 @@ WaterWebServerNode::try_handle_api(
         int x = j.at("x").get<int>();
         int y = j.at("y").get<int>();
         RCLCPP_INFO_STREAM(get_logger(), "Gimbal offset received! X: " << x << ", Y: " << y);
+
+        geometry_msgs::msg::Vector3 msg;
+
+        msg.x = x;
+        msg.y = y;
+        msg.z = 0.0;
+
+        gimbal_offset_publisher_->publish(msg);
+
         return generate_responce("Set gimbal offset received", req);
     }
     if (target == API_ABORT_ALL)

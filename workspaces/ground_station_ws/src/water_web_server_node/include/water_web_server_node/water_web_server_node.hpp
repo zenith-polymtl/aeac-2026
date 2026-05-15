@@ -6,6 +6,7 @@
 #include "std_msgs/msg/bool.hpp"
 #include "std_msgs/msg/u_int8.hpp"
 #include "std_msgs/msg/string.hpp"
+#include "geometry_msgs/msg/vector3.hpp"
 #include <thread>
 #include <fstream>
 #include <string>
@@ -142,6 +143,7 @@ private:
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr take_picutre_publisher_;
     rclcpp::Publisher<TargetImage>::SharedPtr target_image_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr target_picuture_ack_publisher_;
+    rclcpp::Publisher<geometry_msgs::msg::Vector3>::SharedPtr gimbal_offset_publisher_;
 
     rclcpp::Subscription<DroneHealth>::SharedPtr drone_heartbeat_subsciber_;
 
