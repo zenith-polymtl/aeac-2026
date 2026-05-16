@@ -140,6 +140,33 @@ mavros-status:
 mavros-logs:
 	journalctl -u mavros-jetson -f
 
+water-restart:
+	sudo systemctl restart water
+
+water-status:
+	systemctl status water --no-pager
+
+water-logs:
+	journalctl -u water -f
+
+payload-restart:
+	sudo systemctl restart payload
+
+payload-status:
+	systemctl status payload --no-pager
+
+payload-logs:
+	journalctl -u payload -f
+
+vision-restart:
+	sudo systemctl restart vision
+
+vision-status:
+	systemctl status vision --no-pager
+
+vision-logs:
+	journalctl -u vision -f
+
 zed-restart:
 	sudo systemctl restart zed
 
@@ -197,15 +224,6 @@ water-build:
 
 vision:
 	docker compose -f compose/vision.yml up -d
-
-	# Launch vision mission in the container session
-	WS=$(WS_IN) docker compose -f compose/vision.yml exec -it vision \
-	  bash -lc '\
-	    cd "$$WS"; \
-	    source /opt/ros/humble/setup.bash; \
-	    source install/setup.bash; \
-	    ros2 daemon start; \
-	    ros2 launch bringup vision_test.launch.py'
 
 vision-build:
 	docker compose -f compose/vision.yml up -d

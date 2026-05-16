@@ -505,6 +505,10 @@ WaterWebServerNode::try_handle_api(
     {
         RCLCPP_INFO(get_logger(), "Received Confirm Target!");
 
+        if (target_images_.empty()) {
+            RCLCPP_INFO(get_logger(), "No image to confirm!");
+        }
+
         std::string last_image_path = target_images_.front();
         
         auto j = nlohmann::json::parse(req.body());

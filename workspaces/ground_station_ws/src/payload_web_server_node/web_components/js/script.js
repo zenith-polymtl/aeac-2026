@@ -5,9 +5,12 @@ const API_STOP_LAP = "/api/mission/lap/stop";
 const API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
 const API_SERVO = "/api/mission/servo";
 const TAKE_PICTURE = "/api/mission/take_picture";
+const API_CONFIRM_DESCRIPTION = "/api/confirm_description";
 const API_ABORT_ALL = "/api/mission/abort_all";
 
 let mean_lap_time = 0;
+
+let are_confirm_buttons_active = false;
 
 function appendToLog(msg, type = 'info') {
     const logsContainer = document.querySelector('.logs-container');
@@ -58,7 +61,27 @@ function initaliseButtons() {
         // sendCommand(API_SERVO, {servo_num: 10, pwm});
     });
     document.getElementById('take-picture-button').addEventListener('click', () => sendCommand(TAKE_PICTURE));
+    document.getElementById('accept-image-button').addEventListener('click', () => {
+        if (!are_confirm_buttons_active) return
+        sendCommand(API_CONFIRM_DESCRIPTION, {confirmed: true});
+        clear_picture();
+    });
+    document.getElementById('deny-image-deny').addEventListener('click', () => {
+        if (!are_confirm_buttons_active) return
+        sendCommand(API_CONFIRM_DESCRIPTION, {confirmed: false});
+        clear_picture();
+    });
     document.getElementById('abort-button').addEventListener('click', () => sendCommand(API_ABORT_ALL));
+}
+
+function clear_picture() {
+    are_confirm_buttons_active = false;
+    document.getElementById("target-image").style.display = "none";
+    const noPictureReceived = document.getElementById("no-picture-received");
+    noPictureReceived.style.display = "block";
+    noPictureReceived.textContent = "No more scene to describe. Waiting for more...";
+    document.getElementById('accept-image-button').classList.add('disabled');
+    document.getElementById('deny-image-deny').classList.add('disabled');
 }
 
 function loadTheme() {
@@ -144,6 +167,15 @@ function initaliseSocket() {
                         estimated_laps_element.innerHTML = `Estimated Laps Left: ${estimated_laps_left}`;
                     }
                     break;
+                case "new_picture":
+                    console.log("New picture: ", data.url);
+                    document.getElementById("no-picture-received").style.display = "none";
+                    const imageElement = document.getElementById("target-image");
+                    imageElement.style.display = "block";
+                    imageElement.src = data.url;
+                    are_confirm_buttons_active = true;
+                    document.getElementById('accept-image-button').classList.remove('disabled');
+                    document.getElementById('deny-image-deny').classList.remove('disabled');
                 default:
                     console.warn("Unknown message type:", data.type);
             }

@@ -27,4 +27,10 @@ services:
       - NVIDIA_DRIVER_CAPABILITIES=all
       - ROS_LOCALHOST_ONLY=1
 
-    command: ["bash", "-lc", "while :; do sleep 86400; done"]
+    command: >
+      bash -lc "
+        source /opt/ros/humble/setup.bash; \
+        source install/setup.bash; \
+        ros2 daemon start; \
+        ros2 launch bringup vision.launch.py
+      "

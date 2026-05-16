@@ -16,10 +16,10 @@ class RemoteControlInterface(Node):
         self._declare_parameters()
 
         self.controls = {
-            'camera':    {'rc_ch': 13, 'servo_ch' : 13, 'last_state': None,  "LOW" : 1850, "MIDDLE" : 1000 ,"HIGH" : 700},
-            'mission_action_state':   {'rc_ch': 7, 'last_state': None},
-            'mode_trigger' : {'rc_ch': 8, 'last_state': None},
-            'flight_mode_switch' : {'rc_ch': 9, 'last_state': None},
+            'camera':    {'rc_ch': 11, 'servo_ch' : 13, 'last_state': None,  "LOW" : 1850, "MIDDLE" : 1000 ,"HIGH" : 700},
+            'mission_action_state':   {'rc_ch': 9, 'last_state': None},
+            'mode_trigger' : {'rc_ch': 10, 'last_state': None},
+            'flight_mode_switch' : {'rc_ch': 5, 'last_state': None},
         }
         
         self.inital_state()
@@ -86,10 +86,11 @@ class RemoteControlInterface(Node):
                 
             case 'mode_trigger':
                 if state == "HIGH":
-                    self.tigger_pipline_action()
+                    self.trigger_pipline_action()
             case 'flight_mode_switch':
                 if state == "MIDDLE":
                     self.trigger_auto_approach()
+                    
 
     def camera_change(self, state):
         match state:
@@ -123,27 +124,30 @@ class RemoteControlInterface(Node):
         except Exception as e:
             self.get_logger().error(f"Servo service call failed for {name}: {e}")
 
-    def tigger_pipline_action(self):
+    def trigger_pipline_action(self):
         req = Bool()
         req.data = True
         match self.controls['mission_action_state']['last_state']:
             case "LOW":
-                # Auto Aim
-                self.get_logger().info("Auto Aim")
-                self.auto_shoot_pub.publish(req)
-            case "MIDDLE":
                 # Shoot
-                self.get_logger().info("Shoot")
+                self.get_logger().info("TRIGGERED SHOOT STATE, SENDING MSG")
                 self.shoot_pub.publish(req)
+
+            case "MIDDLE":
+                # Auto Aim
+                self.get_logger().info("TRIGGERED AUTO AIM STATE, SENDING MSG")
+                self.auto_shoot_pub.publish(req)
+                
             case "HIGH":
                 # Take Picture
-                self.get_logger().info("Picture")
+                self.get_logger().info("TRIGGERED TAKE PICTURE STATE, SENDING MSG")
                 self.take_picture_pub.publish(req)
-
+    
     def trigger_auto_approach(self):
         req = Bool()
         req.data = True
         self.auto_approach_pub.publish(req)
+        self.get_logger().info("TRIGGERED AUTO APPROACH, SENDING MSG")
 
 def main(args=None):
     rclpy.init(args=args)
