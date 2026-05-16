@@ -27,7 +27,7 @@ class WaterImageUploader(Node):
         self.declare_parameter("credentials_path",
                                os.path.expanduser("/aeac/credentials.json"))
         self.declare_parameter("token_path",
-                               os.path.expanduser("/aeac/token.json"))
+                               os.path.expanduser("/aeac/config/token.json"))
         self.declare_parameter("drive_folder_id", "root")
 
         self.credentials_path = self.get_parameter(

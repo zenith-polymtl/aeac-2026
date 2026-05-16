@@ -21,7 +21,15 @@
 #include "custom_interfaces/msg/drone_health.hpp"
 #include "custom_interfaces/msg/servo_control.hpp"
 #include "custom_interfaces/srv/servo_state.hpp"
+#include <sensor_msgs/msg/compressed_image.hpp>
 #include <memory>
+#include <queue>
+#include <cv_bridge/cv_bridge.h>
+#include <opencv2/opencv.hpp>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
 
 const std::string WEB_COMPONENT_FOLDER = "/web_components/";
 const int SERVER_PORT = 8080;
@@ -34,6 +42,7 @@ const std::string API_STOP_LAP = "/api/mission/lap/stop";
 const std::string API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
 const std::string API_SERVO = "/api/mission/servo";
 const std::string API_TAKE_PICTURE = "/api/mission/take_picture";
+const std::string API_CONFIRM_DESCRIPTION = "/api/confirm_description";
 const std::string API_ABORT_ALL = "/api/mission/abort_all";
 
 
@@ -47,6 +56,8 @@ using DroneHealth = custom_interfaces::msg::DroneHealth;
 using ServoState = custom_interfaces::srv::ServoState;
 using json = nlohmann::json;
 using ServoControl = custom_interfaces::msg::ServoControl;
+using Image = sensor_msgs::msg::CompressedImage;
+
 
 struct ServoCommand
 {
@@ -91,6 +102,7 @@ private:
     void lap_time_callback(const std_msgs::msg::Int32 msg);
     void time_left_callback(const std_msgs::msg::Int32 msg);
     void time_left_timer_callback();
+    void picture_callback(const Image msg);
 
     // Socket functions
     void broadcast_status();
@@ -98,6 +110,7 @@ private:
     void on_client_connection();
     void send_connection_notification(const bool ignore_log=false);
     void send_log(bool is_success, std::string message);
+    void send_client_latest_picture();
 
 
     // Variables
@@ -124,7 +137,7 @@ private:
     double mean_lap_time_ = 0.0;
     int completed_laps_ = 0;
     int last_lap_time_ = 0;
-
+    std::queue<std::string> scene_images;
     
 	rclcpp::Subscription<UiMessage>::SharedPtr message_to_ui_subsciber_;
     rclcpp::Subscription<DroneHealth>::SharedPtr drone_heartbeat_subsciber_;
@@ -137,6 +150,8 @@ private:
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr finish_stop_now_publisher_;
     rclcpp::Publisher<ServoControl>::SharedPtr servo_control_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr move_to_scene_publisher_;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr describe_scene_publisher_;
+    rclcpp::Subscription<Image>::SharedPtr picture_subscriber_;
 
     // rclcpp::Client<ServoState>::SharedPtr servo_client_;
 

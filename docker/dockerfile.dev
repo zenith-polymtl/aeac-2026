@@ -46,16 +46,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     python3-numpy \
-    python3-googleapi \
-    python3-google-auth \
-    python3-google-auth-httplib2 \
-    python3-google-auth-oauthlib \
     python3-geopy \
     && python3 -m pip install --upgrade pip \
+    && python3 -m pip install --no-cache-dir \
+        google \
+        google-auth \
+        google-auth-httplib2 \
+        google-auth-oauthlib \
+        google-api-python-client \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install -y \
     ros-humble-rviz2 \
+    ros-${ROS_DISTRO}-rqt \
+    ros-${ROS_DISTRO}-rqt-common-plugins \
     x11-apps \
     ros-humble-image-transport \
     ros-humble-compressed-image-transport \
