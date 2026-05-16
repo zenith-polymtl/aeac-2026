@@ -248,8 +248,6 @@ gcs-payload: up
 	    ros2 run payload_web_server_node payload_web_server_node'
 
 gcs-payload-build: up
-	docker compose -f compose/zenoh-ground.yml up -d
-
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \
@@ -269,8 +267,6 @@ gcs-water: up
 	    ros2 launch bringup gcs_water.launch.py'
 
 gcs-water-build: up
-	docker compose -f compose/zenoh-ground-os.yml up -d
-	
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	  bash -lc 'cd "$$WS"; \
 	    source /opt/ros/humble/setup.bash; \
