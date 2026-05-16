@@ -5,7 +5,7 @@ import math
 from mavros_msgs.msg import MountControl
 from mavros_msgs.srv import MountConfigure
 from std_msgs.msg import Bool, UInt8
-from custom_interfaces.msg import AimError, GimbalState
+from custom_interfaces.msg import AimError, GimbalState, UiMessage
 from geometry_msgs.msg import Quaternion, TransformStamped, Vector3
 from std_srvs.srv import SetBool
 from tf_transformations import euler_from_quaternion
@@ -133,6 +133,11 @@ class AimingState:
             self.search_index = 0
             self.current_sweep_target = None
             self.current_sweep_target_time = None
+
+            UIMessage_msg = UiMessage()
+            UIMessage_msg.is_success = False
+            UIMessage_msg.message = "No target in sight. Starting recovery."
+            self.UI_msg_pub.publish(UIMessage_msg)
 
             self._log_event(
                 f"target lost for {elapsed:.2f}s; starting recovery"
@@ -275,6 +280,10 @@ class AimingState:
             )
 
             self.reset()
+            UIMessage_msg = UiMessage()
+            UIMessage_msg.is_success = False
+            UIMessage_msg.message = "Target search FAILED. Returning to neutral."
+            self.UI_msg_pub.publish(UIMessage_msg)
             return
 
         # Send next sweep target only after the previous one was reached or timed out.
@@ -448,6 +457,7 @@ class GremsyMavros(Node):
         self.mavros_pub = self.create_publisher(GimbalManagerSetPitchyaw, '/mavros/gimbal_control/manager/set_pitchyaw', reliable_qos)
         self.state_pub = self.create_publisher(GimbalState, '/aeac/external/gimbal/state', reliable_qos)
         self.target_in_aim_pub = self.create_publisher(Bool, '/aeac/internal/auto_shoot/target_in_aim', reliable_qos)
+        self.UI_msg_pub = self.create_publisher(UiMessage, '/aeac/external/UI/display', reliable_qos)
 
         # --- Subscribers ---
         self.create_subscription(UInt8, '/aeac/external/gimbal/set_mode', self.set_mode_callback, reliable_qos)
