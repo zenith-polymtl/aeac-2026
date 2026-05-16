@@ -11,8 +11,8 @@
             gpu_id: -1  
             enable_image_validity_check: 1  
             async_image_retrieval: false  
-            camera_timeout_sec: 5  
-            camera_max_reconnect: 5  
+            camera_timeout_sec: 10
+            camera_max_reconnect: 10  
             camera_flip: true  
             self_calib: true
           

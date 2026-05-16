@@ -650,9 +650,10 @@ class GremsyMavros(Node):
         if dt <= 0.0 or dt > 0.1:
             dt = 0.01
 
-        if err_norm < 1.0:
+        if err_norm < 0.1:
             self.log_info("NOT SENDING COMMANDS - ERROR NONE")
             self.send_speed_cmd(0.0, 0.0)
+            self.reset_pid_memory()
             self.recovery_state.lost()
             return
 
