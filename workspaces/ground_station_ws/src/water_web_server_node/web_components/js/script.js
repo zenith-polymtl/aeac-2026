@@ -10,6 +10,8 @@ const API_GIMBAL_LOCK = "/api/gimbal_lock";
 const API_CONFIRM_TARGET = "/api/confirm_target";
 const API_SET_GIMBAL_OFFSET = "/api/mission/set_gimbal_offset";
 
+let are_confirm_buttons_active = false;
+
 function appendToLog(msg, type = 'info') {
     const logsContainer = document.querySelector('.logs-container');
     const newLog = document.createElement('span');
@@ -62,10 +64,12 @@ function initaliseButtons() {
 
     });
     document.getElementById('accept-image-button').addEventListener('click', () => {
+        if (!are_confirm_buttons_active) return
         sendCommand(API_CONFIRM_TARGET, {confirmed: true});
         clear_picture();
     });
     document.getElementById('deny-image-deny').addEventListener('click', () => {
+        if (!are_confirm_buttons_active) return
         sendCommand(API_CONFIRM_TARGET, {confirmed: false});
         clear_picture();
     });
@@ -78,6 +82,7 @@ function initaliseButtons() {
 }
 
 function clear_picture() {
+    are_confirm_buttons_active = false
     document.getElementById("target-image").style.display = "none";
     const noPictureReceived = document.getElementById("no-picture-received");
     noPictureReceived.style.display = "block";
@@ -152,6 +157,7 @@ function initaliseSocket() {
                     imageElement.src = data.url;
                     document.getElementById('accept-image-button').classList.remove('disabled');
                     document.getElementById('deny-image-deny').classList.remove('disabled');
+                    are_confirm_buttons_active = true;
                     break;
                 case "target_number":
                     const targetNumberElement = document.getElementById("target-shot-span");

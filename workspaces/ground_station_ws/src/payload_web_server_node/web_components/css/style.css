@@ -279,10 +279,13 @@ body {
 }
 
 .target-image {
-    margin: auto;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain; /* Ensures image aspect ratio is preserved */
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
 }
 
 /* --- Middle Bottom Section --- */
@@ -448,4 +451,19 @@ input:checked + .slider:before { transform: translateX(22px); }
     font-family: 'Courier New', Courier, monospace;
     padding: 5px;
     margin-top: 10px;
+}
+
+.accept-image-button.disabled,
+.deny-image-button.disabled {
+    background-color: var(--border-color);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.no-picture-received {
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    font-style: italic;
+    margin: auto;
 }

@@ -13,6 +13,9 @@ find_package(std_msgs REQUIRED)
 find_package(Boost REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(custom_interfaces REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(OpenCV REQUIRED)
+
 
 
 set(DEPENDENCIES
@@ -22,13 +25,15 @@ set(DEPENDENCIES
   "Boost"
   "nlohmann_json"
   "custom_interfaces"
+  "cv_bridge"
+  "OpenCV"
 )
 
 add_library(${PROJECT_NAME}_lib
   src/payload_web_server_node.cpp
 )
 
-ament_target_dependencies(${PROJECT_NAME}_lib std_msgs nlohmann_json rclcpp custom_interfaces)
+ament_target_dependencies(${PROJECT_NAME}_lib std_msgs nlohmann_json rclcpp custom_interfaces cv_bridge OpenCV)
 
 add_executable(payload_web_server_node src/payload_web_server_node.cpp)
 install(TARGETS payload_web_server_node DESTINATION lib/${PROJECT_NAME})

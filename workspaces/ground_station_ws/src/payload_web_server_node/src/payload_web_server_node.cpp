@@ -102,25 +102,77 @@ void PayloadWebServerNode::initialize_publisher()
     finish_stop_now_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/lap/finish_now", reliable_qos);
     move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/move_to_scene", reliable_qos);
     servo_control_publisher_ = create_publisher<ServoControl>("/aeac/external/payload/toggle_servo", reliable_qos);
-
-    // servo_client_ = create_client<ServoState>("/aeac/external/payload/set_state");
+    describe_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/describe_scene", reliable_qos);
 
     abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/abort_all", reliable_qos);
-
-    // while (!servo_client_->wait_for_service(std::chrono::seconds(1))) {
-    //     RCLCPP_INFO(this->get_logger(), "Waiting for servo client...");
-    // }
 }
 
 void PayloadWebServerNode::initialize_subscriber() 
 {
     auto reliable_qos = rclcpp::QoS(rclcpp::KeepLast(10));
     reliable_qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
+
+    auto best_effort_qos = rclcpp::QoS(rclcpp::KeepLast(10));
+    best_effort_qos.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
     
     message_to_ui_subsciber_ = create_subscription<UiMessage>("/aeac/external/UI/display", reliable_qos, std::bind(&PayloadWebServerNode::ui_message_callback, this, std::placeholders::_1));
     drone_heartbeat_subsciber_ = create_subscription<DroneHealth>(drone_heartbeat_topic_, reliable_qos, std::bind(&PayloadWebServerNode::drone_heartbeat_callback, this, std::placeholders::_1));
     lap_time_subscriber_ = create_subscription<std_msgs::msg::Int32>("/aeac/external/mission/control_nav/lap/time", reliable_qos, std::bind(&PayloadWebServerNode::lap_time_callback, this, std::placeholders::_1));
     time_left_subscriber_ = create_subscription<std_msgs::msg::Int32>("/aeac/external/lap/time_left", reliable_qos, std::bind(&PayloadWebServerNode::time_left_callback, this, std::placeholders::_1));
+    
+    picture_subscriber_ = create_subscription<Image>(
+        "/aeac/external/detection_overlay", best_effort_qos,
+        std::bind(&PayloadWebServerNode::picture_callback, this, std::placeholders::_1)
+    );
+}
+
+void PayloadWebServerNode::picture_callback(const Image msg)
+{
+    try {
+        RCLCPP_INFO(this->get_logger(), "Recived picture");
+
+        cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+
+        std::string image_directory = "/images/targets";
+
+        std::string images_dir = package_share_dir_ + WEB_COMPONENT_FOLDER + image_directory;
+        if (!fs::exists(images_dir)) {
+            fs::create_directories(images_dir);
+        }
+
+        auto now = std::chrono::system_clock::now();
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+        std::string filename = "drone_pic_" + std::to_string(ms) + ".jpg";
+        std::string full_path = images_dir + "/" + filename;
+
+        cv::imwrite(full_path, cv_ptr->image);
+        RCLCPP_INFO(this->get_logger(), "Saved picture to: %s", full_path.c_str());
+        scene_images.push(full_path);
+        send_client_latest_picture();
+
+        send_log(true, "New target picture received");
+    } catch (cv_bridge::Exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
+    }
+}
+
+void PayloadWebServerNode::send_client_latest_picture()
+{
+    if (scene_images.empty()) {
+        return;
+    }
+    std::string last_image_path = scene_images.front();
+
+    std::string filename = fs::path(last_image_path).filename().string();
+
+    std::string image_url = "/images/targets/" + filename;
+
+    nlohmann::json img_json = {
+        {"type", "new_picture"},
+        {"url", image_url}
+    };
+
+    send_notification(img_json);
 }
 
 void PayloadWebServerNode::heartbeat_timer_callback()
@@ -431,7 +483,37 @@ PayloadWebServerNode::try_handle_api(
     {
         RCLCPP_INFO(get_logger(), "Take Picture Received!");
 
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        describe_scene_publisher_->publish(msg);
+
         return generate_responce("Take Picture received", req);
+    }
+    if (target == API_CONFIRM_DESCRIPTION)
+    {
+        RCLCPP_INFO(get_logger(), "Received Confirm Description!");
+
+        if (scene_images.empty()) {
+            RCLCPP_INFO(get_logger(), "No image to confirm!");
+        }
+
+        std::string last_image_path = scene_images.front();
+        
+        auto j = nlohmann::json::parse(req.body());
+        if (j.at("confirmed").get<bool>()) 
+        {
+            send_log(true, "Description confirmed and added"); 
+        }
+        else 
+        {
+            send_log(false, "Description denied");
+        }
+
+        scene_images.pop();
+
+        send_client_latest_picture();
+
+        return generate_responce("Request Confirm Description received", req);
     }
     if (target == API_ABORT_ALL)
     {
