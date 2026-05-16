@@ -1,0 +1,37 @@
+name: vision-hexa
+
+services:
+  vision-hexa:
+    build:
+      context: ..
+      dockerfile: docker/dockerfile.vision
+    container_name: aeac-vision-2
+    network_mode: host
+    runtime: nvidia
+    privileged: true
+    tty: true
+    stdin_open: true
+
+    volumes:
+      - ../workspaces/vision_ws:/vision_ws
+      - ../packages/vision:/vision_ws/src/vision
+      - ../packages/custom_interfaces:/vision_ws/src/custom_interfaces
+      - ../packages/bringup:/vision_ws/src/bringup
+
+    working_dir: /vision_ws
+
+    environment:
+      - ROS_DOMAIN_ID=2
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - ROS_LOCALHOST_ONLY=1  
+
+    command: >
+      bash -lc "
+        source /opt/ros/humble/setup.bash; \
+        source install/setup.bash; \
+        ros2 daemon start; \
+        ros2 launch bringup vision_mission1.launch.py
+      "
