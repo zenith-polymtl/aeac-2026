@@ -7,7 +7,7 @@ COMPOSE_FILE := compose/$(C).yml
 CONTAINER    ?= aeac-$(C)
 
 # Workspace path RELATIVE to repo root (e.g., workspaces/dev_ws)
-WS_REL := worksWS_RELpaces/$(C)_ws
+WS_REL := workspaces/$(C)_ws
 
 # In-container paths
 REPO_IN := /aeac
@@ -26,7 +26,7 @@ export UID GID
 ENV_INJECT := C=$(C) WS=$(WS_REL)
 
 # All compose files for the *-all targets
-COMPOSES := compose/dev.yml compose/payload.yml compose/water.yml compose/mavros.yml compose/zed.yml compose/zenoh-air.yml compose/zenoh-ground.yml compose/vision.yml compose/zed_mini.yml
+COMPOSES := compose/dev.yml compose/payload.yml compose/water.yml compose/mavros.yml compose/zed.yml compose/zenoh-air.yml compose/zenoh-ground.yml compose/vision.yml compose/vision-hexa.yml compose/zed_mini.yml
 
 # ===== Pretty help =====
 help: ## Show help
@@ -232,6 +232,17 @@ vision-build:
 	WS=$(WS_IN) docker compose -f compose/vision.yml exec -it vision \
 	  bash -lc '\
 	    cd "$$WS"; \
+	    source /opt/ros/humble/setup.bash; \
+	    colcon build'
+
+vision-hexa:
+	docker compose -f compose/vision-hexa.yml up -d
+
+vision-hexa-build:
+	docker compose -f compose/vision-hexa.yml up -d
+	docker compose -f compose/vision-hexa.yml exec -it vision \
+	  bash -lc '\
+	    cd /vision_ws; \
 	    source /opt/ros/humble/setup.bash; \
 	    colcon build'
 
