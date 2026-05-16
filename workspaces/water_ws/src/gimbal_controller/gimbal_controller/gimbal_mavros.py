@@ -38,7 +38,8 @@ SPEED_FLAGS = GIMBAL_MANAGER_FLAGS.GIMBAL_MANAGER_FLAGS_YAW_IN_VEHICLE_FRAME + G
 # MAX_ANGLE_YAW = 325.0
 
 # safe limits
-MAX_ANGLE_PITCH = 45.0
+MAX_ANGLE_PITCH_UP = 20.0
+MAX_ANGLE_PITCH_DOWN = 40.0
 MAX_ANGLE_YAW =60.0
 
 # AIM_ERROR_ACCEPTANCE = 10.0
@@ -156,7 +157,7 @@ class AimingState:
                 pitch_cmd = self.lost_pitch + transform_error[0]
                 yaw_cmd = self.lost_yaw + transform_error[1]
 
-                pitch_cmd = max(-MAX_ANGLE_PITCH, min(MAX_ANGLE_PITCH, pitch_cmd))
+                pitch_cmd = max(-MAX_ANGLE_PITCH_DOWN, min(MAX_ANGLE_PITCH_UP, pitch_cmd))
                 yaw_cmd = max(-MAX_ANGLE_YAW, min(MAX_ANGLE_YAW, yaw_cmd))
 
                 self._log_event(
@@ -203,7 +204,7 @@ class AimingState:
         pitch_cmd = self.lost_pitch + pitch_offset
         yaw_cmd = self.lost_yaw + yaw_offset
 
-        pitch_cmd = max(-MAX_ANGLE_PITCH, min(MAX_ANGLE_PITCH, pitch_cmd))
+        pitch_cmd = max(-MAX_ANGLE_PITCH_DOWN, min(MAX_ANGLE_PITCH_UP, pitch_cmd))
         yaw_cmd = max(-MAX_ANGLE_YAW, min(MAX_ANGLE_YAW, yaw_cmd))
 
         self.current_sweep_target = (pitch_cmd, yaw_cmd)
@@ -610,10 +611,10 @@ class GremsyMavros(Node):
 
     def check_angle_limit(self, target_vel_pitch, target_vel_yaw):
         # --- SECURITY PITCH ---
-        if self.current_pitch >= MAX_ANGLE_PITCH and target_vel_pitch > 0:
+        if self.current_pitch >= MAX_ANGLE_PITCH_UP and target_vel_pitch > 0:
             self.log_warn("MAX PITCH reached!")
             target_vel_pitch = 0.0
-        elif self.current_pitch <= -MAX_ANGLE_PITCH and target_vel_pitch < 0:
+        elif self.current_pitch <= MAX_ANGLE_PITCH_DOWN and target_vel_pitch < 0:
             self.log_warn("MIN PITCH reached!")
             target_vel_pitch = 0.0
 

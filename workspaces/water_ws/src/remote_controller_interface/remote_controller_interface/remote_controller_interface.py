@@ -129,14 +129,15 @@ class RemoteControlInterface(Node):
         req.data = True
         match self.controls['mission_action_state']['last_state']:
             case "LOW":
-                # Shoot
-                self.get_logger().info("TRIGGERED SHOOT STATE, SENDING MSG")
-                self.shoot_pub.publish(req)
-
-            case "MIDDLE":
                 # Auto Aim
+
                 self.get_logger().info("TRIGGERED AUTO AIM STATE, SENDING MSG")
                 self.auto_shoot_pub.publish(req)
+
+            case "MIDDLE":
+                # Auto shoot
+                self.get_logger().info("TRIGGERED SHOOT STATE, SENDING MSG")
+                self.shoot_pub.publish(req)
                 
             case "HIGH":
                 # Take Picture
