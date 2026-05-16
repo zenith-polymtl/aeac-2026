@@ -1,0 +1,29 @@
+{
+    "scene": {
+        "latitude": 45.081130,
+        "longitude": -73.574464,
+        "altitude": 10.0
+    },
+    "waypoints": [
+        {
+            "latitude": 45.082020,
+            "longitude": -73.576083,
+            "altitude": 20.0
+        },
+        {
+            "latitude": 45.082052,
+            "longitude": -73.572306,
+            "altitude": 20.0
+        },
+        {
+            "latitude": 45.080202,
+            "longitude": -73.572576,
+            "altitude": 20.0
+        },
+        {
+            "latitude": 45.080231,
+            "longitude": -73.576776,
+            "altitude": 20.0
+        }
+    ]
+}

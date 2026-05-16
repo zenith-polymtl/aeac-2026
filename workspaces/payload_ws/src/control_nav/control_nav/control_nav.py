@@ -85,7 +85,7 @@ class ControlNav(Node):
 
     def initialize_parameters(self):
         ## Param decalration
-        self.declare_parameter('json_filename', 'cimetiere_course.json')
+        self.declare_parameter('json_filename', 'lap_champs.json')
         self.declare_parameter('json_subfolder', 'config')
         self.declare_parameter('delais_for_position_check', 0.5)
         self.declare_parameter('distance_from_objectif_threashold', 3.5)
@@ -95,22 +95,12 @@ class ControlNav(Node):
         self.declare_parameter('initial_connection_estimated_time', 1)
 
         
-        #Pour julien
-        #self.declare_parameter('latitude_of_scene', -35.361450)
-        #self.declare_parameter('longitude_of_scene', 149.161448)
-
-        #Cimetière
-        self.declare_parameter('latitude_of_scene', 75.505881)
-        self.declare_parameter('longitude_of_scene', -73.607876)
-
-        self.declare_parameter('altitude_of_scene', 10.0)
+        # Scene GPS coordinates are now configured in the waypoints JSON file under the "scene" key.
         
         self.delais_for_position_check = self.get_parameter('delais_for_position_check').get_parameter_value().double_value
         self.distance_from_objectif_threashold = self.get_parameter('distance_from_objectif_threashold').get_parameter_value().double_value
         
-        self.latitude_of_scene = self.get_parameter('latitude_of_scene').get_parameter_value().double_value
-        self.longitude_of_scene = self.get_parameter('longitude_of_scene').get_parameter_value().double_value
-        self.altitude_of_scene = self.get_parameter('altitude_of_scene').get_parameter_value().double_value
+        # Scene point is loaded from JSON in read_json_waypoints().
 
         minutes = self.get_parameter('Mission_minutes').get_parameter_value().integer_value
         self.mission_seconds = minutes * 60
@@ -151,7 +141,22 @@ class ControlNav(Node):
                 raise FileNotFoundError(json_path)
 
             with open(json_path, 'r') as f:
-                self.waypoints_gps = json.load(f)
+                data = json.load(f)
+
+            scene = data.get('scene')
+            if scene is None:
+                self.get_logger().error('JSON file is missing the "scene" key!')
+                raise KeyError('"scene" key not found in JSON waypoints file')
+            self.scene_gps = scene
+            self.latitude_of_scene = scene['latitude']
+            self.longitude_of_scene = scene['longitude']
+            self.altitude_of_scene = scene['altitude']
+            self.get_logger().info(
+                f'Loaded scene point: lat={self.latitude_of_scene}, '
+                f'lon={self.longitude_of_scene}, alt={self.altitude_of_scene}'
+            )
+
+            self.waypoints_gps = data.get('waypoints', [])
             self.get_logger().info(f'Loaded {len(self.waypoints_gps)} waypoints from {json_path}')
         except Exception as e:
             self.get_logger().error(f'Failed to load JSON file: {e}')
