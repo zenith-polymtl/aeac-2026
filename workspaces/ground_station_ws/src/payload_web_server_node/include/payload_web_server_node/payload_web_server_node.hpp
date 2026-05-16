@@ -21,8 +21,10 @@
 #include "custom_interfaces/msg/drone_health.hpp"
 #include "custom_interfaces/msg/servo_control.hpp"
 #include "custom_interfaces/srv/servo_state.hpp"
+#include "custom_interfaces/msg/left_right_scene.hpp"
 #include <sensor_msgs/msg/compressed_image.hpp>
 #include <memory>
+#include <utility>
 #include <queue>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
@@ -57,6 +59,7 @@ using ServoState = custom_interfaces::srv::ServoState;
 using json = nlohmann::json;
 using ServoControl = custom_interfaces::msg::ServoControl;
 using Image = sensor_msgs::msg::CompressedImage;
+using LeftRightScene = custom_interfaces::msg::LeftRightScene;
 
 
 struct ServoCommand
@@ -102,7 +105,7 @@ private:
     void lap_time_callback(const std_msgs::msg::Int32 msg);
     void time_left_callback(const std_msgs::msg::Int32 msg);
     void time_left_timer_callback();
-    void picture_callback(const Image msg);
+    void scene_description_callback_(const LeftRightScene msg);
 
     // Socket functions
     void broadcast_status();
@@ -137,12 +140,13 @@ private:
     double mean_lap_time_ = 0.0;
     int completed_laps_ = 0;
     int last_lap_time_ = 0;
-    std::queue<std::string> scene_images;
+    std::queue<std::pair<std::string, std::string>> scene_images;
     
 	rclcpp::Subscription<UiMessage>::SharedPtr message_to_ui_subsciber_;
     rclcpp::Subscription<DroneHealth>::SharedPtr drone_heartbeat_subsciber_;
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr lap_time_subscriber_;
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr time_left_subscriber_;
+    rclcpp::Subscription<LeftRightScene>::SharedPtr scene_description_subscriber_;
 
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr mission_go_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr start_lap_publisher_;
@@ -151,7 +155,6 @@ private:
     rclcpp::Publisher<ServoControl>::SharedPtr servo_control_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr move_to_scene_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr describe_scene_publisher_;
-    rclcpp::Subscription<Image>::SharedPtr picture_subscriber_;
 
     // rclcpp::Client<ServoState>::SharedPtr servo_client_;
 

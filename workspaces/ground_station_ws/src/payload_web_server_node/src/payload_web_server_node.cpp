@@ -120,18 +120,20 @@ void PayloadWebServerNode::initialize_subscriber()
     lap_time_subscriber_ = create_subscription<std_msgs::msg::Int32>("/aeac/external/mission/control_nav/lap/time", reliable_qos, std::bind(&PayloadWebServerNode::lap_time_callback, this, std::placeholders::_1));
     time_left_subscriber_ = create_subscription<std_msgs::msg::Int32>("/aeac/external/lap/time_left", reliable_qos, std::bind(&PayloadWebServerNode::time_left_callback, this, std::placeholders::_1));
     
-    picture_subscriber_ = create_subscription<Image>(
+    scene_description_subscriber_ = create_subscription<LeftRightScene>(
         "/aeac/external/detection_overlay", best_effort_qos,
-        std::bind(&PayloadWebServerNode::picture_callback, this, std::placeholders::_1)
+        std::bind(&PayloadWebServerNode::scene_description_callback_, this, std::placeholders::_1)
     );
 }
 
-void PayloadWebServerNode::picture_callback(const Image msg)
+void PayloadWebServerNode::scene_description_callback_(const LeftRightScene msg)
 {
     try {
         RCLCPP_INFO(this->get_logger(), "Recived picture");
 
-        cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+        cv_bridge::CvImagePtr cv_ptr_left = cv_bridge::toCvCopy(msg.left_image, sensor_msgs::image_encodings::BGR8);
+        cv_bridge::CvImagePtr cv_ptr_right = cv_bridge::toCvCopy(msg.right_image, sensor_msgs::image_encodings::BGR8);
+
 
         std::string image_directory = "/images/targets";
 
@@ -142,12 +144,20 @@ void PayloadWebServerNode::picture_callback(const Image msg)
 
         auto now = std::chrono::system_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-        std::string filename = "drone_pic_" + std::to_string(ms) + ".jpg";
-        std::string full_path = images_dir + "/" + filename;
+        std::string left_filename = "drone_pic_" + std::to_string(ms) + "_left" + ".jpg";
+        std::string left_full_path = images_dir + "/" + left_filename;
 
-        cv::imwrite(full_path, cv_ptr->image);
-        RCLCPP_INFO(this->get_logger(), "Saved picture to: %s", full_path.c_str());
-        scene_images.push(full_path);
+        std::string right_filename = "drone_pic_" + std::to_string(ms) + "_left" + ".jpg";
+        std::string right_full_path = images_dir + "/" + right_filename;
+
+        cv::imwrite(left_full_path, cv_ptr_left->image);
+        cv::imwrite(right_full_path, cv_ptr_right->image);
+        RCLCPP_INFO(this->get_logger(), "Saved picture to: %s", left_full_path.c_str());
+
+        std::pair<std::string, std::string> left_right_image_pair;
+        left_right_image_pair.first = left_full_path;
+        left_right_image_pair.second = left_full_path;
+        scene_images.push(left_right_image_pair);
         send_client_latest_picture();
 
         send_log(true, "New target picture received");
@@ -161,7 +171,7 @@ void PayloadWebServerNode::send_client_latest_picture()
     if (scene_images.empty()) {
         return;
     }
-    std::string last_image_path = scene_images.front();
+    std::string last_image_path = scene_images.front().first;
 
     std::string filename = fs::path(last_image_path).filename().string();
 
@@ -497,7 +507,7 @@ PayloadWebServerNode::try_handle_api(
             RCLCPP_INFO(get_logger(), "No image to confirm!");
         }
 
-        std::string last_image_path = scene_images.front();
+        std::string last_image_path = scene_images.front().first;
         
         auto j = nlohmann::json::parse(req.body());
         if (j.at("confirmed").get<bool>()) 
