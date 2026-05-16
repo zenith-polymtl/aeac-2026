@@ -16,10 +16,10 @@ class RemoteControlInterface(Node):
         self._declare_parameters()
 
         self.controls = {
-            'camera':    {'rc_ch': 13, 'servo_ch' : 13, 'last_state': None,  "LOW" : 1850, "MIDDLE" : 1000 ,"HIGH" : 700},
-            'mission_action_state':   {'rc_ch': 7, 'last_state': None},
-            'mode_trigger' : {'rc_ch': 8, 'last_state': None},
-            'flight_mode_switch' : {'rc_ch': 9, 'last_state': None},
+            'camera':    {'rc_ch': 11, 'servo_ch' : 13, 'last_state': None,  "LOW" : 1850, "MIDDLE" : 1000 ,"HIGH" : 700},
+            'mission_action_state':   {'rc_ch': 9, 'last_state': None},
+            'mode_trigger' : {'rc_ch': 10, 'last_state': None},
+            'flight_mode_switch' : {'rc_ch': 5, 'last_state': None},
         }
         
         self.inital_state()
@@ -86,7 +86,7 @@ class RemoteControlInterface(Node):
                 
             case 'mode_trigger':
                 if state == "HIGH":
-                    self.tigger_pipline_action()
+                    self.trigger_pipline_action()
             case 'flight_mode_switch':
                 if state == "MIDDLE":
                     self.trigger_auto_approach()
@@ -130,16 +130,17 @@ class RemoteControlInterface(Node):
             case "LOW":
                 # Auto Aim
                 self.get_logger().info("Auto Aim")
-                self.auto_shoot_pub.publish(req)
+                self.shoot_pub.publish(req)
             case "MIDDLE":
                 # Shoot
                 self.get_logger().info("Shoot")
-                self.shoot_pub.publish(req)
+                self.auto_shoot_pub.publish(req)
+                
             case "HIGH":
                 # Take Picture
                 self.get_logger().info("Picture")
                 self.take_picture_pub.publish(req)
-
+    
     def trigger_auto_approach(self):
         req = Bool()
         req.data = True
