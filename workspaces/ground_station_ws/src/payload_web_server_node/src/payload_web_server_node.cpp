@@ -121,7 +121,7 @@ void PayloadWebServerNode::initialize_subscriber()
     time_left_subscriber_ = create_subscription<std_msgs::msg::Int32>("/aeac/external/lap/time_left", reliable_qos, std::bind(&PayloadWebServerNode::time_left_callback, this, std::placeholders::_1));
     
     picture_subscriber_ = create_subscription<Image>(
-        "/aeac/external/detection_overlay", best_effort_qos,
+        "/aeac/external/detection_overlay", reliable_qos,
         std::bind(&PayloadWebServerNode::picture_callback, this, std::placeholders::_1)
     );
 }
