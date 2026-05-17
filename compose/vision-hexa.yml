@@ -5,7 +5,7 @@ services:
     build:
       context: ..
       dockerfile: docker/dockerfile.vision
-    container_name: aeac-vision-2
+    container_name: aeac-vision-hexa
     network_mode: host
     runtime: nvidia
     privileged: true

@@ -46,13 +46,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip \
     python3-numpy \
     python3-geopy \
-    && python3 -m pip install --upgrade pip \
-    && pip install --no-cache-dir "numpy<2" ultralytics open3d \ 
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install -y \
     ros-${ROS_DISTRO}-zed-msgs \
-    ros-humble-cv-bridge \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

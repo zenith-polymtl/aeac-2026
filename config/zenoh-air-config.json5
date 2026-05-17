@@ -3,6 +3,7 @@
     ros2dds: {  
       domain: 2, 
       ros_localhost_only: true,
+      reliable_routes_blocking: false,  
       allow: {  
         publishers: [
           "/tf",  
