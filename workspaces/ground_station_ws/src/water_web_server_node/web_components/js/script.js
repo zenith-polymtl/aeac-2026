@@ -1,6 +1,5 @@
 const API_MISSION_GO = "/api/mission/go";
 const API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
-const API_AUTO_APPROACH = "/api/mission/auto_approach";
 const API_AUTO_SHOOT = "/api/mission/auto_shoot";
 const API_SHOOT = "/api/mission/shoot";
 const TAKE_PICTURE = "/api/mission/take_picture";
@@ -47,7 +46,6 @@ async function sendCommand(endpoint, payload = {}) {
 function initaliseButtons() {
     document.getElementById('start-button').addEventListener('click', () => sendCommand(API_MISSION_GO));
     document.getElementById('go-to-site-button').addEventListener('click', () => sendCommand(API_MOVE_TO_SCENE));
-    document.getElementById('auto-approach-button').addEventListener('click', () => sendCommand(API_AUTO_APPROACH));
     document.getElementById('auto-shoot-button').addEventListener('click', () => sendCommand(API_AUTO_SHOOT));
     document.getElementById('take-picture-button').addEventListener('click', () => sendCommand(TAKE_PICTURE));
     document.getElementById('shoot-button').addEventListener('click', () => sendCommand(API_SHOOT));

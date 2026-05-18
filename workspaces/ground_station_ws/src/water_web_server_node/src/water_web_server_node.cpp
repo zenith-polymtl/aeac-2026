@@ -70,7 +70,6 @@ void WaterWebServerNode::initialize_publisher()
     move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/move_to_scene", 10);
     abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/abort_all", 10);
     gimbal_mode_publisher_ = create_publisher<std_msgs::msg::UInt8>("/aeac/external/gimbal/set_mode", 10);
-    auto_approach_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/auto_approach/start", 10);
     auto_shoot_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/auto_shoot/start", 10);
     shoot_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/shoot", 10);
     take_picutre_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/take_picture", 10);
@@ -102,7 +101,7 @@ void WaterWebServerNode::initalize_variables()
     package_share_dir_ = ament_index_cpp::get_package_share_directory("water_web_server_node");
 }
 
-void WaterWebServerNode::initialize_subscriber() 
+void WaterWebServerNode::initialize_subscriber()
 {
     auto reliable_qos = rclcpp::QoS(rclcpp::KeepLast(10));
     reliable_qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
@@ -130,6 +129,16 @@ void WaterWebServerNode::initialize_subscriber()
         "/aeac/external/mission/state", reliable_qos,
         std::bind(&WaterWebServerNode::state_callback, this, std::placeholders::_1)
     );
+
+    auto_approach_subscriber_ = create_subscription<std_msgs::msg::Bool>(
+        "/aeac/external/auto_approach/start", reliable_qos,
+        std::bind(&WaterWebServerNode::auto_approach_callback, this, std::placeholders::_1)
+    );
+}
+
+void WaterWebServerNode::auto_approach_callback(const std_msgs::msg::Bool msg)
+{
+    is_auto_aiming = msg.data;
 }
 
 void WaterWebServerNode::gimbal_callback(const GimbalState msg)
@@ -277,10 +286,18 @@ void WaterWebServerNode::picture_callback(const Image msg)
 
         cv::imwrite(full_path, cv_ptr->image);
         RCLCPP_INFO(this->get_logger(), "Saved picture to: %s", full_path.c_str());
-        target_images_.push(full_path);
-
         send_log(true, "New target picture received");
-        send_client_latest_picture();
+
+        if (is_auto_aiming) 
+        {
+            confirm_target(full_path);
+            is_auto_aiming = false;
+        }
+        else 
+        {
+            target_images_.push(full_path);
+            send_client_latest_picture();
+        }
         broadcast_target_number();        
 
     } catch (cv_bridge::Exception& e) {
@@ -443,16 +460,6 @@ WaterWebServerNode::try_handle_api(
 
         return generate_responce("Request Scene movement received", req);
     }
-    if (target == API_AUTO_APPROACH)
-    {
-        RCLCPP_INFO(get_logger(), "Received Auto Approach!");
-
-        std_msgs::msg::Bool msg;
-        msg.data = true;
-        auto_approach_publisher_->publish(msg);
-
-        // return generate_responce("Request Auto Approach received", req);
-    }
     if (target == API_AUTO_SHOOT)
     {
         RCLCPP_INFO(get_logger(), "Received Auto Shoot!");
@@ -514,12 +521,7 @@ WaterWebServerNode::try_handle_api(
         auto j = nlohmann::json::parse(req.body());
         if (j.at("confirmed").get<bool>()) 
         {
-            target_number_++;
-            TargetImage target_msg;
-            target_msg.image_path = last_image_path;
-            target_msg.target_num = target_number_;
-            target_image_publisher_->publish(target_msg);  
-            send_log(true, "Target Picture confimed and uploaded to Drive as Target " + std::to_string(target_number_)); 
+            confirm_target(last_image_path);
         }
         else 
         {
@@ -560,6 +562,16 @@ WaterWebServerNode::try_handle_api(
         return generate_responce("Request Abort received", req);
     }
     return std::nullopt;
+}
+
+void WaterWebServerNode::confirm_target(std::string path)
+{
+    target_number_++;
+    TargetImage target_msg;
+    target_msg.image_path = path;
+    target_msg.target_num = target_number_;
+    target_image_publisher_->publish(target_msg);  
+    send_log(true, "Target Picture confimed and uploaded to Drive as Target " + std::to_string(target_number_)); 
 }
 
 http::response<http::string_body> WaterWebServerNode::generate_responce(std::string message, const http::request<http::string_body> &req) {
