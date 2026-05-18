@@ -89,8 +89,9 @@ class RemoteControlInterface(Node):
                     self.trigger_pipline_action()
             case 'flight_mode_switch':
                 if state == "MIDDLE":
-                    self.trigger_auto_approach()
-                    
+                    self.trigger_auto_approach(True)
+                else:
+                    self.trigger_auto_approach(False)
 
     def camera_change(self, state):
         match state:
@@ -144,9 +145,9 @@ class RemoteControlInterface(Node):
                 self.get_logger().info("TRIGGERED TAKE PICTURE STATE, SENDING MSG")
                 self.take_picture_pub.publish(req)
     
-    def trigger_auto_approach(self):
+    def trigger_auto_approach(self, data):
         req = Bool()
-        req.data = True
+        req.data = data
         self.auto_approach_pub.publish(req)
         self.get_logger().info("TRIGGERED AUTO APPROACH, SENDING MSG")
 
