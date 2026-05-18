@@ -92,7 +92,6 @@ class AutonomousApproach(Node):
     
     def define_initial_state(self):
         self._state          = ApproachState.IDLE
-        self.auto_aim_enable = False
         
         self.in_position          = False
         self.target_aimed         = False
@@ -376,12 +375,11 @@ class AutonomousApproach(Node):
         self.activate_polar_pub.publish(stop_msg)
         self.get_logger().info("[APPROACH] Published 'stop' to polar controller")
         
-        self.auto_shoot_callback(True)
+        self.auto_shoot_callback(msg)
     
     def auto_shoot_callback(self, msg: Bool):
         self.get_logger().info(
-            f"[TOPIC] auto_shoot/start received: {msg.data}  "
-            f"(auto_aim currently={self.auto_aim_enable})"
+            f"[TOPIC] auto_shoot/start received: {msg.data} "
         )
         
         if self._state == ApproachState.AIMING:
