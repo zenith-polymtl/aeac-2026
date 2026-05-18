@@ -336,8 +336,6 @@ class AutonomousApproach(Node):
         self.get_logger().info("[APPROACH] Published 'start' to polar controller")
         
         self.send_movement_command_timer = self.create_timer(self.polar_activation_delais, self.send_polar_target_pose)  
-         
-        self.send_polar_target_pose()
 
     def send_polar_target_pose(self):
         
