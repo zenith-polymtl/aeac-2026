@@ -156,9 +156,9 @@ class AutonomousApproach(Node):
             Bool, '/aeac/internal/auto_approach/in_position',
             self.in_position_callback, qos_reliable)
  
-        self.target_position_sub = self.create_subscription(
-            ObjectsStamped, '/aeac/internal/auto_approach/target_detected',
-            self.target_position_received_callback, qos_reliable)
+        # self.target_position_sub = self.create_subscription(
+        #     ObjectsStamped, '/aeac/internal/auto_approach/target_detected',
+        #     self.target_position_received_callback, qos_reliable)
  
         self.trigger_target_detection_pub = self.create_publisher(
             Empty, '/aeac/internal/auto_approach/detect_target', qos_reliable)
