@@ -16,7 +16,7 @@ class RemoteControlInterface(Node):
         self._declare_parameters()
 
         self.controls = {
-            'camera':    {'rc_ch': 11, 'servo_ch' : 13, 'last_state': None,  "LOW" : 1850, "MIDDLE" : 1000 ,"HIGH" : 700},
+            'camera':    {'rc_ch': 13, 'servo_ch' : 12, 'last_state': None,  "LOW" : 2100, "MIDDLE" : 1350 ,"HIGH" : 1068},
             'mission_action_state':   {'rc_ch': 9, 'last_state': None},
             'mode_trigger' : {'rc_ch': 10, 'last_state': None},
             'flight_mode_switch' : {'rc_ch': 5, 'last_state': None},

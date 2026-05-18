@@ -138,7 +138,7 @@ class AimingState:
             UIMessage_msg = UiMessage()
             UIMessage_msg.is_success = False
             UIMessage_msg.message = "No target in sight. Starting recovery."
-            self.UI_msg_pub.publish(UIMessage_msg)
+            self.gimbal.UI_msg_pub.publish(UIMessage_msg)
 
             self._log_event(
                 f"target lost for {elapsed:.2f}s; starting recovery"
@@ -284,7 +284,7 @@ class AimingState:
             UIMessage_msg = UiMessage()
             UIMessage_msg.is_success = False
             UIMessage_msg.message = "Target search FAILED. Returning to neutral."
-            self.UI_msg_pub.publish(UIMessage_msg)
+            self.gimbal.UI_msg_pub.publish(UIMessage_msg)
             return
 
         # Send next sweep target only after the previous one was reached or timed out.
@@ -467,6 +467,13 @@ class GremsyMavros(Node):
         self.create_subscription(Bool, '/aeac/internal/auto_shoot/start_hr_aiming', self.finished_aiming_callback, reliable_qos)
         self.create_subscription(Vector3, '/aeac/external/gimbal_offset', self.gimbal_offset_callback, reliable_qos)
 
+        self.create_subscription(
+            GimbalDeviceAttitudeStatus,
+            '/mavros/gimbal_control/device/attitude_status',
+            self.gimbal_attitude_callback,
+            reliable_qos
+        )
+        
         # --- Clients ---
         self.msg_interval_client = self.create_client(MessageInterval,'/mavros/set_message_interval')
 
@@ -614,7 +621,7 @@ class GremsyMavros(Node):
         if self.current_pitch >= MAX_ANGLE_PITCH_UP and target_vel_pitch > 0:
             self.log_warn("MAX PITCH reached!")
             target_vel_pitch = 0.0
-        elif self.current_pitch <= MAX_ANGLE_PITCH_DOWN and target_vel_pitch < 0:
+        elif self.current_pitch <= -MAX_ANGLE_PITCH_DOWN and target_vel_pitch < 0:
             self.log_warn("MIN PITCH reached!")
             target_vel_pitch = 0.0
 
