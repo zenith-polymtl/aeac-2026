@@ -43,6 +43,7 @@ const std::string API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
 const std::string API_SERVO = "/api/mission/servo";
 const std::string API_TAKE_PICTURE = "/api/mission/take_picture";
 const std::string API_CONFIRM_DESCRIPTION = "/api/confirm_description";
+const std::string API_SITE_DESCRIPTION = "/api/site_description";
 const std::string API_ABORT_ALL = "/api/mission/abort_all";
 
 
@@ -138,6 +139,8 @@ private:
     int completed_laps_ = 0;
     int last_lap_time_ = 0;
     std::queue<std::string> scene_images;
+    std::ofstream notes_file_;
+    std::mutex notes_mutex_;
     
 	rclcpp::Subscription<UiMessage>::SharedPtr message_to_ui_subsciber_;
     rclcpp::Subscription<DroneHealth>::SharedPtr drone_heartbeat_subsciber_;
