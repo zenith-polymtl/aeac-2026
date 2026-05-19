@@ -6,6 +6,7 @@ const API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
 const API_SERVO = "/api/mission/servo";
 const TAKE_PICTURE = "/api/mission/take_picture";
 const API_CONFIRM_DESCRIPTION = "/api/confirm_description";
+const API_SITE_DESCRIPTION = "/api/site_description"
 const API_ABORT_ALL = "/api/mission/abort_all";
 
 let mean_lap_time = 0;
@@ -66,12 +67,19 @@ function initaliseButtons() {
         sendCommand(API_CONFIRM_DESCRIPTION, {confirmed: true});
         clear_picture();
     });
-    document.getElementById('deny-image-deny').addEventListener('click', () => {
-        if (!are_confirm_buttons_active) return
-        sendCommand(API_CONFIRM_DESCRIPTION, {confirmed: false});
-        clear_picture();
-    });
     document.getElementById('abort-button').addEventListener('click', () => sendCommand(API_ABORT_ALL));
+    document.getElementById('add-note-button').addEventListener('click', () => {
+        const input = document.getElementById('note-input');
+        const note = input.value.trim();
+        if (!note) return;
+        sendCommand(API_SITE_DESCRIPTION, { note });
+        input.value = '';
+    });
+    document.getElementById('note-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            document.getElementById('add-note-button').click();
+        }
+    });
 }
 
 function clear_picture() {
@@ -81,7 +89,6 @@ function clear_picture() {
     noPictureReceived.style.display = "block";
     noPictureReceived.textContent = "No more scene to describe. Waiting for more...";
     document.getElementById('accept-image-button').classList.add('disabled');
-    document.getElementById('deny-image-deny').classList.add('disabled');
 }
 
 function loadTheme() {
@@ -175,7 +182,6 @@ function initaliseSocket() {
                     imageElement.src = data.url;
                     are_confirm_buttons_active = true;
                     document.getElementById('accept-image-button').classList.remove('disabled');
-                    document.getElementById('deny-image-deny').classList.remove('disabled');
                 default:
                     console.warn("Unknown message type:", data.type);
             }

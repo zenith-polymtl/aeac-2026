@@ -3,6 +3,7 @@
     ros2dds: {  
       domain: 3,  
       ros_localhost_only: true,
+      reliable_routes_blocking: false,  
       queries_timeout: {  
         default: 2.0  // Reduce from 5.0 seconds  
       },

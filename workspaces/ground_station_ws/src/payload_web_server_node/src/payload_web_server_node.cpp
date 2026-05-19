@@ -54,6 +54,11 @@ PayloadWebServerNode::PayloadWebServerNode() : Node("payload_web_server_node"),
     package_share_dir_ = ament_index_cpp::get_package_share_directory("payload_web_server_node");
     server_thread_ = std::thread([this]()
                                  { run_server(); });
+    std::string notes_path = "/tmp/mission_notes.txt";
+    notes_file_.open(notes_path, std::ios::out | std::ios::trunc);
+    if (!notes_file_.is_open()) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to open notes file at %s", notes_path.c_str());
+    }
 }
 
 PayloadWebServerNode::~PayloadWebServerNode()
@@ -62,6 +67,10 @@ PayloadWebServerNode::~PayloadWebServerNode()
     if (server_thread_.joinable())
     {
         server_thread_.join();
+    }
+    if (notes_file_.is_open())
+    {
+        notes_file_.close();
     }
 }
 
@@ -121,7 +130,7 @@ void PayloadWebServerNode::initialize_subscriber()
     time_left_subscriber_ = create_subscription<std_msgs::msg::Int32>("/aeac/external/lap/time_left", reliable_qos, std::bind(&PayloadWebServerNode::time_left_callback, this, std::placeholders::_1));
     
     picture_subscriber_ = create_subscription<Image>(
-        "/aeac/external/detection_overlay", best_effort_qos,
+        "/aeac/external/detection_overlay", reliable_qos,
         std::bind(&PayloadWebServerNode::picture_callback, this, std::placeholders::_1)
     );
 }
@@ -514,6 +523,34 @@ PayloadWebServerNode::try_handle_api(
         send_client_latest_picture();
 
         return generate_responce("Request Confirm Description received", req);
+    }
+    if (target == API_SITE_DESCRIPTION)
+    {
+        RCLCPP_INFO(get_logger(), "Add Note received!");
+        try
+        {
+            auto j = nlohmann::json::parse(req.body());
+            std::string note = j.at("note").get<std::string>();
+
+            auto now = std::chrono::system_clock::now();
+            std::time_t now_t = std::chrono::system_clock::to_time_t(now);
+            char time_buf[32];
+            std::strftime(time_buf, sizeof(time_buf), "%Y-%m-%d %H:%M:%S", std::localtime(&now_t));
+
+            std::lock_guard<std::mutex> lock(notes_mutex_);
+            if (notes_file_.is_open()) {
+                notes_file_ << "[" << time_buf << "] " << note << "\n";
+                notes_file_.flush();
+            }
+
+            send_log(true, "Note added: " + note);
+            return generate_responce("Note added", req);
+        }
+        catch (const std::exception& e)
+        {
+            RCLCPP_ERROR(get_logger(), "Add note error: %s", e.what());
+            return generate_responce("Invalid request", req);
+        }
     }
     if (target == API_ABORT_ALL)
     {

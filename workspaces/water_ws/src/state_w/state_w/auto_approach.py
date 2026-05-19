@@ -92,7 +92,6 @@ class AutonomousApproach(Node):
     
     def define_initial_state(self):
         self._state          = ApproachState.IDLE
-        self.auto_aim_enable = False
         
         self.in_position          = False
         self.target_aimed         = False
@@ -110,7 +109,11 @@ class AutonomousApproach(Node):
         self.declare_parameter('sim', False)
         self.declare_parameter('ignore_state_check', False)
         self.declare_parameter('continues_in_sight_threshold', 5)
+        self.declare_parameter('polar_activation_delais', 0.5)
         self.declare_parameter('shoot_picture_delais', 1.0)
+        self.declare_parameter('polar_distace', 3.0)
+        self.declare_parameter('polar_target_topic', "/polar/goal_pose")
+
         
         self.approach_radius    = self.get_parameter('approach_radius').value
         self.approach_height    = self.get_parameter('approach_height').value
@@ -118,6 +121,9 @@ class AutonomousApproach(Node):
         self.ignore_state_check = self.get_parameter('ignore_state_check').value
         self.continues_in_sight_threshold = self.get_parameter('continues_in_sight_threshold').value
         self.shoot_picture_delais = self.get_parameter('shoot_picture_delais').value
+        self.polar_activation_delais = self.get_parameter('polar_activation_delais').value
+        self.polar_distace = self.get_parameter('polar_distace').value
+        self.polar_target_topic = self.get_parameter('polar_target_topic').value
 
     
     # ------------------------------------------------------------------
@@ -149,9 +155,9 @@ class AutonomousApproach(Node):
             Bool, '/aeac/internal/auto_approach/in_position',
             self.in_position_callback, qos_reliable)
  
-        self.target_position_sub = self.create_subscription(
-            ObjectsStamped, '/aeac/internal/auto_approach/target_detected',
-            self.target_position_received_callback, qos_reliable)
+        # self.target_position_sub = self.create_subscription(
+        #     ObjectsStamped, '/aeac/internal/auto_approach/target_detected',
+        #     self.target_position_received_callback, qos_reliable)
  
         self.trigger_target_detection_pub = self.create_publisher(
             Empty, '/aeac/internal/auto_approach/detect_target', qos_reliable)
@@ -160,7 +166,7 @@ class AutonomousApproach(Node):
             String, '/aeac/internal/auto_approach/activate_polar', qos_reliable)
  
         self.polar_target_pub = self.create_publisher(
-            TargetPosePolar, '/aeac/internal/auto_approach/target_position', qos_reliable)
+            TargetPosePolar, self.polar_target_topic, qos_reliable)
  
         self.polar_center_location_pub = self.create_publisher(
             PoseStamped, '/aeac/internal/auto_shoot/center_location', qos_reliable)
@@ -211,13 +217,8 @@ class AutonomousApproach(Node):
                 return
  
             self._transition(ApproachState.DETECTING)
- 
-            if not self.sim:
-                self.get_logger().info("[DETECT] Publishing trigger to detection node")
-                self.trigger_target_detection_pub.publish(Empty())
-            else:
-                self.get_logger().info("[DETECT] Sim mode — bypassing detection, sending polar target directly")
-                self.send_polar_target(None)
+            
+            self.activate_polar_callback()
  
         else:
             if self._state == ApproachState.IDLE:
@@ -227,102 +228,102 @@ class AutonomousApproach(Node):
             self._stop_polar()
             self.define_initial_state()
 
-    def target_position_received_callback(self, msg: ObjectsStamped):
-        self.get_logger().info(f"[DETECT] Received ObjectsStamped with {len(msg.objects)} object(s)")
+    # def target_position_received_callback(self, msg: ObjectsStamped):
+    #     self.get_logger().info(f"[DETECT] Received ObjectsStamped with {len(msg.objects)} object(s)")
         
-        if not self._assert_state(ApproachState.DETECTING, "target_position_received_callback"):
-            return
+    #     if not self._assert_state(ApproachState.DETECTING, "target_position_received_callback"):
+    #         return
         
-        if len(msg.objects) == 0:
-            self.get_logger().warn("[DETECT] No objects in message.")
-            self.send_message_to_ui("No object detected", is_success=False)
-            return
+    #     if len(msg.objects) == 0:
+    #         self.get_logger().warn("[DETECT] No objects in message.")
+    #         self.send_message_to_ui("No object detected", is_success=False)
+    #         return
         
-        best_confidence    = 0.0
-        best_found_object  = None
-        for obj in msg.objects:
-            if obj.confidence > best_confidence:
-                best_confidence   = obj.confidence
-                best_found_object = obj
+    #     best_confidence    = 0.0
+    #     best_found_object  = None
+    #     for obj in msg.objects:
+    #         if obj.confidence > best_confidence:
+    #             best_confidence   = obj.confidence
+    #             best_found_object = obj
  
-        self.get_logger().info(
-            f"[DETECT] Best object: label={best_found_object.label}  "
-            f"confidence={best_confidence*100:.1f}%  pos={list(best_found_object.position)}"
-        )
-        self.send_message_to_ui(
-            f"Object {best_found_object.label} detected with "
-            f"{best_confidence*100:.1f}% confidence at {list(best_found_object.position)}"
-        )
+    #     self.get_logger().info(
+    #         f"[DETECT] Best object: label={best_found_object.label}  "
+    #         f"confidence={best_confidence*100:.1f}%  pos={list(best_found_object.position)}"
+    #     )
+    #     self.send_message_to_ui(
+    #         f"Object {best_found_object.label} detected with "
+    #         f"{best_confidence*100:.1f}% confidence at {list(best_found_object.position)}"
+    #     )
  
-        CONFIDENCE_THRESHOLD = 0.5
-        if best_confidence < CONFIDENCE_THRESHOLD:
-            self.get_logger().warn(
-                f"[DETECT] Confidence {best_confidence:.2f} below threshold "
-                f"{CONFIDENCE_THRESHOLD}. Aborting approach."
-            )
-            self.send_message_to_ui(
-                f"Object detected with too low confidence ({best_confidence*100:.1f}%). "
-                f"Returning to idle.", is_success=False
-            )
-            self.define_initial_state()
-            return
+    #     CONFIDENCE_THRESHOLD = 0.5
+    #     if best_confidence < CONFIDENCE_THRESHOLD:
+    #         self.get_logger().warn(
+    #             f"[DETECT] Confidence {best_confidence:.2f} below threshold "
+    #             f"{CONFIDENCE_THRESHOLD}. Aborting approach."
+    #         )
+    #         self.send_message_to_ui(
+    #             f"Object detected with too low confidence ({best_confidence*100:.1f}%). "
+    #             f"Returning to idle.", is_success=False
+    #         )
+    #         self.define_initial_state()
+    #         return
  
-        self.get_logger().info("[DETECT] Target accepted — proceeding to approach")
-        self.send_polar_target(best_found_object)
+    #     self.get_logger().info("[DETECT] Target accepted — proceeding to approach")
+    #     self.send_polar_target(best_found_object)
         
-    def send_polar_target(self, best_found_object):
-        """
-        Transforms the detected target into the map frame and publishes the
-        centre location, then kicks off the polar approach.
-        """
-        if not self._assert_state(ApproachState.DETECTING, "send_polar_target"):
-            return
+    # def send_polar_target(self, best_found_object):
+    #     """
+    #     Transforms the detected target into the map frame and publishes the
+    #     centre location, then kicks off the polar approach.
+    #     """
+    #     if not self._assert_state(ApproachState.DETECTING, "send_polar_target"):
+    #         return
         
-        try:
-            pose_stamped                 = PoseStamped()
-            pose_stamped.header.stamp    = self.get_clock().now().to_msg()
-            pose_stamped.header.frame_id = "zed_camera_link"
+    #     try:
+    #         pose_stamped                 = PoseStamped()
+    #         pose_stamped.header.stamp    = self.get_clock().now().to_msg()
+    #         pose_stamped.header.frame_id = "zed_camera_link"
  
-            target_position = Pose()
-            if not self.sim:
-                target_position.position.x = float(best_found_object.position[2])
-                target_position.position.y = float(best_found_object.position[1])
-                target_position.position.z = float(best_found_object.position[0])
-                self.get_logger().info(
-                    f"[TF] Raw camera-frame position: "
-                    f"x={target_position.position.x:.3f}  "
-                    f"y={target_position.position.y:.3f}  "
-                    f"z={target_position.position.z:.3f}"
-                )
-            else:
-                target_position.position.x = 5.0
-                target_position.position.y = 0.0
-                target_position.position.z = 0.0
-                self.get_logger().info("[TF] Sim mode — using hardcoded position (5, 0, 0)")
+    #         target_position = Pose()
+    #         if not self.sim:
+    #             target_position.position.x = float(best_found_object.position[2])
+    #             target_position.position.y = float(best_found_object.position[1])
+    #             target_position.position.z = float(best_found_object.position[0])
+    #             self.get_logger().info(
+    #                 f"[TF] Raw camera-frame position: "
+    #                 f"x={target_position.position.x:.3f}  "
+    #                 f"y={target_position.position.y:.3f}  "
+    #                 f"z={target_position.position.z:.3f}"
+    #             )
+    #         else:
+    #             target_position.position.x = 5.0
+    #             target_position.position.y = 0.0
+    #             target_position.position.z = 0.0
+    #             self.get_logger().info("[TF] Sim mode — using hardcoded position (5, 0, 0)")
  
-            transform = self.tf_buffer.lookup_transform(
-                'map', 
-                # 'base_link',
-                'zed_camera_link', 
-                rclpy.time.Time())
+    #         transform = self.tf_buffer.lookup_transform(
+    #             'map', 
+    #             # 'base_link',
+    #             'zed_camera_link', 
+    #             rclpy.time.Time())
  
-            pose_stamped.pose = do_transform_pose(target_position, transform)
-            self.get_logger().info(
-                f"[TF] Map-frame position: "
-                f"x={pose_stamped.pose.position.x:.3f}  "
-                f"y={pose_stamped.pose.position.y:.3f}  "
-                f"z={pose_stamped.pose.position.z:.3f}"
-            )
+    #         pose_stamped.pose = do_transform_pose(target_position, transform)
+    #         self.get_logger().info(
+    #             f"[TF] Map-frame position: "
+    #             f"x={pose_stamped.pose.position.x:.3f}  "
+    #             f"y={pose_stamped.pose.position.y:.3f}  "
+    #             f"z={pose_stamped.pose.position.z:.3f}"
+    #         )
  
-            self.polar_center_location_pub.publish(pose_stamped)
-            self.get_logger().info("[APPROACH] Published polar centre location")
+    #         self.polar_center_location_pub.publish(pose_stamped)
+    #         self.get_logger().info("[APPROACH] Published polar centre location")
  
-            self.activate_polar_callback()
+    #         self.activate_polar_callback()
  
-        except Exception as e:
-            self.get_logger().error(f"[TF] Transform failed: {e}")
-            self.send_message_to_ui("TF transform failed — approach aborted.", is_success=False)
-            self.define_initial_state()
+    #     except Exception as e:
+    #         self.get_logger().error(f"[TF] Transform failed: {e}")
+    #         self.send_message_to_ui("TF transform failed — approach aborted.", is_success=False)
+    #         self.define_initial_state()
             
     def activate_polar_callback(self):   
         if not self._assert_state(ApproachState.DETECTING, "activate_polar_callback"):
@@ -332,18 +333,21 @@ class AutonomousApproach(Node):
         start_msg.data = "start"
         self.activate_polar_pub.publish(start_msg)
         self.get_logger().info("[APPROACH] Published 'start' to polar controller")
- 
-        self.send_polar_target_pose()
+        
+        self.send_movement_command_timer = self.create_timer(self.polar_activation_delais, self.send_polar_target_pose)  
 
     def send_polar_target_pose(self):
+        
+        self.send_movement_command_timer.destroy()
+
         if not self._assert_state(ApproachState.DETECTING, "send_polar_target_pose"):
             return
- 
+        
         request         = TargetPosePolar()
         request.relative = False
         request.z        = np.nan
         request.theta    = np.nan
-        request.r        = self.approach_radius   # use the declared parameter, not a magic number
+        request.r        = self.polar_distace
         self.polar_target_pub.publish(request)
  
         self.get_logger().info(
@@ -370,11 +374,12 @@ class AutonomousApproach(Node):
         stop_msg.data = "stop"
         self.activate_polar_pub.publish(stop_msg)
         self.get_logger().info("[APPROACH] Published 'stop' to polar controller")
+        
+        self.auto_shoot_callback(msg)
     
     def auto_shoot_callback(self, msg: Bool):
         self.get_logger().info(
-            f"[TOPIC] auto_shoot/start received: {msg.data}  "
-            f"(auto_aim currently={self.auto_aim_enable})"
+            f"[TOPIC] auto_shoot/start received: {msg.data} "
         )
         
         if self._state == ApproachState.AIMING:

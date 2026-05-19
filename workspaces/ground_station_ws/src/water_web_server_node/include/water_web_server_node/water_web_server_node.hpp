@@ -39,7 +39,6 @@ const int SERVER_PORT = 8080;
 // API routes
 const std::string API_MISSION_GO = "/api/mission/go";
 const std::string API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
-const std::string API_AUTO_APPROACH = "/api/mission/auto_approach";
 const std::string API_AUTO_SHOOT = "/api/mission/auto_shoot";
 const std::string API_SHOOT = "/api/mission/shoot";
 const std::string TAKE_PICTURE = "/api/mission/take_picture";
@@ -99,10 +98,12 @@ private:
     void heartbeat_timer_callback();
     void send_connection_notification(const bool ignore_log = false);
     void on_client_connection();
+    void confirm_target(std::string path);
 
     void gimbal_callback(const GimbalState msg);
     void state_callback(const std_msgs::msg::String msg);
     void drone_heartbeat_callback(const DroneHealth);
+    void auto_approach_callback(const std_msgs::msg::Bool msg);
     void send_log(bool is_success, std::string message);
     void send_notification(const nlohmann::json status_json);
     void send_client_latest_picture();
@@ -125,6 +126,7 @@ private:
     rclcpp::TimerBase::SharedPtr heartbeat_timer_;
     bool drone_is_connected_ = false;
     bool zed_is_connected_ = false;
+    bool is_auto_aiming = false;
     
     // Target logic variables
     int target_number_ = 0;
@@ -134,10 +136,10 @@ private:
     rclcpp::Subscription<GimbalState>::SharedPtr gimbal_state_subscriber_;
     rclcpp::Subscription<Image>::SharedPtr picture_subscriber_;
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr state_subscriber_;
+       rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr auto_approach_subscriber_;
 
 
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr mission_go_publisher_;
-    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr auto_approach_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr auto_shoot_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr shoot_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr take_picutre_publisher_;

@@ -341,9 +341,10 @@ body {
 
 .bottom-container {
     display: flex;
-    width: 100%;
+    width: calc(100% - 2 * var(--top-middle-container-child-margin));
     height: var(--bottom-container-height);
     min-height: var(--bottom-container-height);
+    margin: var(--top-middle-container-child-margin);
 }
 
 /* --- Sidebar Logs --- */
