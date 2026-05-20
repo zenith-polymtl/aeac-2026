@@ -28,10 +28,7 @@ class RemoteControlInterface(Node):
         qos_re = QoSProfile(reliability=QoSReliabilityPolicy.RELIABLE, history=QoSHistoryPolicy.KEEP_LAST, depth=10)
         
         self.rc_sub = self.create_subscription(RCIn, '/mavros/rc/in', self.rc_callback, qos_be)
-        self.state_sub = self.create_subscription(State, '/mavros/state', self.state_callback, qos_re)
-        
-        self.mavros_fight_state = State()  
-        
+                
         self.auto_approach_pub = self.create_publisher(Bool, '/aeac/external/auto_approach/start', qos_re)
         self.auto_shoot_pub = self.create_publisher(Bool, '/aeac/external/auto_shoot/start', qos_re)
         self.shoot_pub = self.create_publisher(Bool, '/aeac/internal/shoot', qos_re)
@@ -93,9 +90,6 @@ class RemoteControlInterface(Node):
                 if state == "LOW":
                     self.trigger_auto_approach(False)
                 else:
-                    if not self.mavros_fight_state.mode == "GUIDED":
-                        self.get_logger().info("Auto approached trigger but not in guided, skipping")
-                        return
                     self.trigger_auto_approach(True)
 
     def camera_change(self, state):
@@ -108,9 +102,6 @@ class RemoteControlInterface(Node):
                 self.get_logger().info("Camera: Setting HIGH angle (e.g., 90°)")        
 
         self.send_servo("camera", state)
-
-    def state_callback(self, msg):
-        self.mavros_fight_state = msg
     
     def send_servo(self, name, state):
         request = ServoState.Request()

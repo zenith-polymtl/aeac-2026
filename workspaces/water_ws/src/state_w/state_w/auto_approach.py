@@ -96,6 +96,8 @@ class AutonomousApproach(Node):
         self.in_position          = False
         self.target_aimed         = False
         
+        self.mavros_fight_state = State() 
+        
         self.continues_target_in_sight = 0
         
         self.get_logger().info("[STATE] State machine reset to IDLE")
@@ -134,6 +136,8 @@ class AutonomousApproach(Node):
  
         self.tf_buffer   = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
+        
+        self.state_sub = self.create_subscription(State, '/mavros/state', self.state_callback, qos_re)
  
         self.message_to_ui_pub = self.create_publisher(
             UiMessage, 'aeac/external/send_to_ui', qos_reliable)
@@ -207,13 +211,20 @@ class AutonomousApproach(Node):
       
     # ------------------------------------------------------------------
     # Callbacks
-    # ------------------------------------------------------------------          
+    # ------------------------------------------------------------------  
+    def state_callback(self, msg):
+        self.mavros_fight_state = msg
+            
     def auto_approach_activation_callback(self, msg: Bool):
         """Activates or deactivates the autonomous approach.""" 
         if msg.data:
             if self._state != ApproachState.IDLE:
                 self.get_logger().warn(
                     f"[GUARD] auto_approach/start: already running (state={self._state}). Ignoring.")
+                return
+            
+            if not self.mavros_fight_state.mode == "GUIDED":
+                self.get_logger().info("Auto approached trigger but not in guided, skipping")
                 return
  
             self._transition(ApproachState.DETECTING)
