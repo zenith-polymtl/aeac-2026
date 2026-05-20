@@ -13,7 +13,7 @@
             async_image_retrieval: false  
             camera_timeout_sec: 10
             camera_max_reconnect: 10  
-            camera_flip: true  
+            camera_flip: false  
             self_calib: true
           
         # Video settings - outdoor optimized  

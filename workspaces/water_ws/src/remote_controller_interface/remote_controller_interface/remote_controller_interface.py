@@ -19,7 +19,7 @@ class RemoteControlInterface(Node):
             'camera':    {'rc_ch': 13, 'servo_ch' : 12, 'last_state': None,  "LOW" : 2100, "MIDDLE" : 1350 ,"HIGH" : 1068},
             'mission_action_state':   {'rc_ch': 9, 'last_state': None},
             'mode_trigger' : {'rc_ch': 10, 'last_state': None},
-            'flight_mode_switch' : {'rc_ch': 5, 'last_state': None},
+            'auto_approach_switch' : {'rc_ch': 7, 'last_state': None},
         }
         
         self.inital_state()
@@ -28,8 +28,9 @@ class RemoteControlInterface(Node):
         qos_re = QoSProfile(reliability=QoSReliabilityPolicy.RELIABLE, history=QoSHistoryPolicy.KEEP_LAST, depth=10)
         
         self.rc_sub = self.create_subscription(RCIn, '/mavros/rc/in', self.rc_callback, qos_be)
-        # self.state_sub = self.create_subscription(State, '/mavros/state', self.state_callback, qos_re)
+        self.state_sub = self.create_subscription(State, '/mavros/state', self.state_callback, qos_re)
         
+        self.mavros_fight_state = State()  
         
         self.auto_approach_pub = self.create_publisher(Bool, '/aeac/external/auto_approach/start', qos_re)
         self.auto_shoot_pub = self.create_publisher(Bool, '/aeac/external/auto_shoot/start', qos_re)
@@ -45,6 +46,7 @@ class RemoteControlInterface(Node):
 
     def inital_state(self):
         self.mode_triggered = False
+        self.get_logger().info("state changed")
     
     def _declare_parameters(self):
         self.declare_parameter('threshold_high', 1700)
@@ -87,11 +89,14 @@ class RemoteControlInterface(Node):
             case 'mode_trigger':
                 if state == "HIGH":
                     self.trigger_pipline_action()
-            case 'flight_mode_switch':
-                if state == "MIDDLE":
-                    self.trigger_auto_approach(True)
-                else:
+            case 'auto_approach_switch':
+                if state == "LOW":
                     self.trigger_auto_approach(False)
+                else:
+                    if not self.mavros_fight_state.mode == "GUIDED":
+                        self.get_logger().info("Auto approached trigger but not in guided, skipping")
+                        return
+                    self.trigger_auto_approach(True)
 
     def camera_change(self, state):
         match state:
@@ -104,6 +109,9 @@ class RemoteControlInterface(Node):
 
         self.send_servo("camera", state)
 
+    def state_callback(self, msg):
+        self.mavros_fight_state = msg
+    
     def send_servo(self, name, state):
         request = ServoState.Request()
         request.servo_num = self.controls[name]["servo_ch"]
