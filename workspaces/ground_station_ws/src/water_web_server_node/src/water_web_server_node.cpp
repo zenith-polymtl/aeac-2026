@@ -70,6 +70,7 @@ void WaterWebServerNode::initialize_publisher()
     move_to_scene_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/control_nav/move_to_scene", 10);
     abort_all_mission_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/mission/abort_all", 10);
     gimbal_mode_publisher_ = create_publisher<std_msgs::msg::UInt8>("/aeac/external/gimbal/set_mode", 10);
+    auto_apporach_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/auto_approach/start", 10);
     auto_shoot_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/auto_shoot/start", 10);
     shoot_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/shoot", 10);
     take_picutre_publisher_ = create_publisher<std_msgs::msg::Bool>("/aeac/external/take_picture", 10);
@@ -460,15 +461,25 @@ WaterWebServerNode::try_handle_api(
 
         return generate_responce("Request Scene movement received", req);
     }
-    if (target == API_AUTO_SHOOT)
+    if (target == API_AUTO_AIM)
     {
-        RCLCPP_INFO(get_logger(), "Received Auto Shoot!");
+        RCLCPP_INFO(get_logger(), "Received Auto Aim!");
 
         std_msgs::msg::Bool msg;
         msg.data = true;
         auto_shoot_publisher_->publish(msg);
 
         return generate_responce("Request Auto Shoot received", req);
+    }
+    if (target == API_AUTO_APPROACH)
+    {
+        RCLCPP_INFO(get_logger(), "Received Auto Approach!");
+
+        std_msgs::msg::Bool msg;
+        msg.data = true;
+        auto_apporach_publisher_->publish(msg);
+
+        return generate_responce("Request Auto Approach received", req);
     }
     if (target == API_SHOOT)
     {

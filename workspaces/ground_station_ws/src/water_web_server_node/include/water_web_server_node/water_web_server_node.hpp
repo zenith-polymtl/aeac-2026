@@ -39,7 +39,8 @@ const int SERVER_PORT = 8080;
 // API routes
 const std::string API_MISSION_GO = "/api/mission/go";
 const std::string API_MOVE_TO_SCENE = "/api/mission/move_to_scene";
-const std::string API_AUTO_SHOOT = "/api/mission/auto_shoot";
+const std::string API_AUTO_APPROACH = "/api/mission/auto_approach";
+const std::string API_AUTO_AIM = "/api/mission/auto_aim";
 const std::string API_SHOOT = "/api/mission/shoot";
 const std::string TAKE_PICTURE = "/api/mission/take_picture";
 const std::string API_ABORT_ALL = "/api/mission/abort_all";
@@ -136,11 +137,12 @@ private:
     rclcpp::Subscription<GimbalState>::SharedPtr gimbal_state_subscriber_;
     rclcpp::Subscription<Image>::SharedPtr picture_subscriber_;
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr state_subscriber_;
-       rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr auto_approach_subscriber_;
+    rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr auto_approach_subscriber_;
 
 
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr mission_go_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr auto_shoot_publisher_;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr auto_apporach_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr shoot_publisher_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr take_picutre_publisher_;
     rclcpp::Publisher<TargetImage>::SharedPtr target_image_publisher_;
