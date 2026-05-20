@@ -8,6 +8,7 @@ from custom_interfaces.msg import TargetPosePolar, UiMessage
 from std_msgs.msg import Bool, String, UInt8, Empty
 from geometry_msgs.msg import PoseStamped, Point, Pose
 from zed_msgs.msg import ObjectsStamped
+from mavros_msgs.msg import State
 import numpy as np
 from tf2_ros import Buffer, TransformListener
 from tf2_geometry_msgs import do_transform_pose
@@ -137,7 +138,7 @@ class AutonomousApproach(Node):
         self.tf_buffer   = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
         
-        self.state_sub = self.create_subscription(State, '/mavros/state', self.state_callback, qos_re)
+        self.state_sub = self.create_subscription(State, '/mavros/state', self.state_callback, qos_reliable)
  
         self.message_to_ui_pub = self.create_publisher(
             UiMessage, 'aeac/external/send_to_ui', qos_reliable)
