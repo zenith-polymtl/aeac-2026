@@ -9,14 +9,22 @@ from mavros_msgs.msg import PositionTarget
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 from geometry_msgs.msg import PoseStamped, Point
 from std_msgs.msg import Bool
+from mavros_msgs.msg import State
 from rclpy.qos import QoSProfile
 
 from custom_interfaces.srv import ConvertGpsToLocal
+from custom_interfaces.msg import UiMessage
 
 import os
 
 qos_profile_BE = QoSProfile(
     reliability=QoSReliabilityPolicy.BEST_EFFORT,
+    history=QoSHistoryPolicy.KEEP_LAST,
+    depth=8
+)
+
+qos_profile_RE = QoSProfile(
+    reliability=QoSReliabilityPolicy.RELIABLE,
     history=QoSHistoryPolicy.KEEP_LAST,
     depth=8
 )
@@ -34,9 +42,12 @@ class ControlNav(Node):
         # Publisher
         self.publisher_raw = self.create_publisher(PositionTarget, '/mavros/setpoint_raw/local', 10)
         self.move_to_scene_pub = self.create_publisher(Bool, '/mission/control_nav/move_to_scene/finished', 10)
+        self.ui_message_pub = self.create_publisher(UiMessage, '/aeac/external/send_to_ui', qos_profile_RE)
         
         # Subscribers
-        self.move_to_scene_sub = self.create_subscription(Bool, '/mission/control_nav/move_to_scene', self.move_to_scene_procedure, 10)
+        self.move_to_scene_sub = self.create_subscription(Bool, '/mission/control_nav/move_to_scene', self.move_to_scene_callback, 10)
+        self.take_off_completed_sub = self.create_subscription(Bool, '/aeac/internal/mission/takeoff_completed', self.take_off_completed_callback, 10)
+        self.state_sub = self.create_subscription(State, '/mavros/state', self.state_callback, qos_profile_RE)
         
         # Genretal controle subscriber
         self.abort_all_sub = self.create_subscription(Bool, '/mission/abort_all', self.stop_drone, 10)
@@ -59,9 +70,9 @@ class ControlNav(Node):
         self.declare_parameter('delais_for_position_check', 0.5)
         self.declare_parameter('distance_from_objectif_threashold', 3.0)
 
-        self.declare_parameter('latitude_of_scene', -35.361450)
-        self.declare_parameter('longitude_of_scene', 149.161448)
-        self.declare_parameter('altitude_of_scene', 10.0)
+        self.declare_parameter('latitude_of_scene', -35.360347)
+        self.declare_parameter('longitude_of_scene', 149.159630)
+        self.declare_parameter('altitude_of_scene', 30.0)
         
         self.delais_for_position_check = self.get_parameter('delais_for_position_check').get_parameter_value().double_value
         self.distance_from_objectif_threashold = self.get_parameter('distance_from_objectif_threashold').get_parameter_value().double_value
@@ -70,7 +81,15 @@ class ControlNav(Node):
         self.longitude_of_scene = self.get_parameter('longitude_of_scene').get_parameter_value().double_value
         self.altitude_of_scene = self.get_parameter('altitude_of_scene').get_parameter_value().double_value
         
-    
+    def take_off_completed_callback(self, msg):
+        if msg.data:
+            take_off_completed_msg = UiMessage()
+            take_off_completed_msg.message = "TakeOff completed"
+            take_off_completed_msg.is_success = True
+            
+            self.ui_message_pub.publish(take_off_completed_msg)
+            self.move_to_scene()
+            
     def move_to_pose(self, wp):
         self.current_point_objectif = wp
         
@@ -93,8 +112,8 @@ class ControlNav(Node):
         target.position = self.current_point_objectif
 
         self.publisher_raw.publish(target)
-    
-    def move_to_scene_procedure(self, _):
+        
+    def move_to_scene(self):
         scene_conversion_request = ConvertGpsToLocal.Request()
         scene_conversion_request.gps_point = NavSatFix()
         scene_conversion_request.gps_point.latitude = self.latitude_of_scene
@@ -104,6 +123,25 @@ class ControlNav(Node):
         self.get_logger().info(f"Move to Scene procedure started")
         future.add_done_callback(self.object_conversion_callback)
         
+        moving_to_scene_msg = UiMessage()
+        moving_to_scene_msg.message = "Moving to scene"
+        moving_to_scene_msg.is_success = True
+        
+        self.ui_message_pub.publish(moving_to_scene_msg)
+
+    
+    def move_to_scene_callback(self, _):
+        self.move_to_scene()
+    
+    def state_callback(self, msg):        
+        if msg.mode != "GUIDED" and self.is_moving_to_position:
+            self.stop_laps()
+            moving_to_scene_msg = UiMessage()
+            moving_to_scene_msg.message = "Stopping "
+            moving_to_scene_msg.is_success = True
+        
+        self.ui_message_pub.publish(moving_to_scene_msg)
+    
     def object_conversion_callback(self, future):
         if future.result() is not None:
             local_pose = future.result().local_point
@@ -158,6 +196,12 @@ class ControlNav(Node):
             reached_site_msg = Bool()
             reached_site_msg.data = True
             self.move_to_scene_pub.publish(reached_site_msg)
+            
+            reached_site_msg = UiMessage()
+            reached_site_msg.message = "Scene Reached"
+            reached_site_msg.is_success = True
+            
+            self.ui_message_pub.publish(reached_site_msg)
     
     # Stop the drone in current place
     def stop_current_lap(self):
