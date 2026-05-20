@@ -32,9 +32,10 @@ class AutonomousApproach(Node):
     def __init__(self):
         super().__init__('autonomous_approach')
 
-        self.define_initial_state()
         self.set_up_parameters()
         self.set_up_topics()
+        self.define_initial_state()
+
         
         self.get_logger().info(f"Autonomous Approach node launched")
 
@@ -94,6 +95,10 @@ class AutonomousApproach(Node):
     def define_initial_state(self):
         self._state          = ApproachState.IDLE
         
+        msg = String()
+        msg.data = ApproachState.IDLE
+        self.state_pub.publish(msg)
+                
         self.in_position          = False
         self.target_aimed         = False
         
@@ -215,6 +220,10 @@ class AutonomousApproach(Node):
     # ------------------------------------------------------------------  
     def state_callback(self, msg):
         self.mavros_fight_state = msg
+        
+        if not self.mavros_fight_state.mode == "GUIDED" and self._state in [ApproachState.DETECTING, ApproachState.APPROACHING]:
+            self._stop_polar()
+            self.define_initial_state()
             
     def auto_approach_activation_callback(self, msg: Bool):
         """Activates or deactivates the autonomous approach.""" 

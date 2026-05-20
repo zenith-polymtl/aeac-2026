@@ -140,7 +140,7 @@ class ControlNav(Node):
             moving_to_scene_msg.message = "Stopping "
             moving_to_scene_msg.is_success = True
         
-        self.ui_message_pub.publish(moving_to_scene_msg)
+            self.ui_message_pub.publish(moving_to_scene_msg)
     
     def object_conversion_callback(self, future):
         if future.result() is not None:
