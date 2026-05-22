@@ -85,7 +85,7 @@ class ControlNav(Node):
 
     def initialize_parameters(self):
         ## Param decalration
-        self.declare_parameter('json_filename', 'lap_champs.json')
+        self.declare_parameter('json_filename', 'compe_course.json')
         self.declare_parameter('json_subfolder', 'config')
         self.declare_parameter('delais_for_position_check', 0.5)
         self.declare_parameter('distance_from_objectif_threashold', 3.5)
